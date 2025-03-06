@@ -1,6 +1,12 @@
 # myshoppingmall
+该项目为西电25春spm前端代码
 
-This template should help get you started developing with Vue 3 in Vite.
+## 运行环境:
+
+vue3
+
+node v20.15.0  ***请不要低于19，否则可能会引发未知错误***
+
 
 ## Recommended IDE Setup
 

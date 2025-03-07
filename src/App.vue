@@ -16,6 +16,7 @@ import TheWelcome from './components/TheWelcome.vue'
   <main>
     <TheWelcome />
   </main>
+  <el-button type="primary">主要按钮</el-button>
 
 </template>
 

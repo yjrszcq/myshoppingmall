@@ -1,4 +1,4 @@
-import './assets/main.css'
+import '@/styles/common.scss'
 import {createPinia} from "pinia";
 import router from './router'
 

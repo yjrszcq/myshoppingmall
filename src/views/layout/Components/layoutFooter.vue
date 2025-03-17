@@ -34,15 +34,15 @@
         <div class="slogan">
           <a href="javascript:;">
             <i class="iconfont icon-footer01"></i>
-            <span>价格亲民</span>
+            <span>Cheap</span>
           </a>
           <a href="javascript:;">
             <i class="iconfont icon-footer02"></i>
-            <span>物流快捷</span>
+            <span>Fast</span>
           </a>
           <a href="javascript:;">
             <i class="iconfont icon-footer03"></i>
-            <span>品质新鲜</span>
+            <span>Fresh</span>
           </a>
         </div>
         <!-- 版权信息 -->
@@ -56,7 +56,7 @@
             <a href="javascript:;">搜索推荐</a>
             <a href="javascript:;">友情链接</a>
           </p>
-          <p>CopyRight © 小兔鲜儿</p>
+          <p>CopyRight © Tafeimall</p>
         </div>
       </div>
     </div>

@@ -1,9 +1,29 @@
 <script setup>
-import Home
+import HomePanel from '@/views/Home/components/HomePanel.vue'
+import { findNewAPI } from '@/apis/findnew.js'
+import { ref } from 'vue'
+import Goodsitem from "@/views/Home/components/Goodsitem.vue";
+
+const newList = ref([])
+const getNewList = async () => {
+  const res = await findNewAPI()
+  newList.value = res.result
+  console.log(res)
+}
+
+getNewList()
 </script>
 
 <template>
-  <div></div>
+  <HomePanel title="新鲜好物" sub-title="新鲜出炉 品质靠谱">
+    <template #main>
+      <ul class="goods-list">
+        <li v-for="item in newList" :key="item.id">
+          <Goodsitem :goods="item"/>
+        </li>
+      </ul>
+    </template>
+  </HomePanel>
   <!-- 下面是插槽主体内容模版
   <ul class="goods-list">
     <li v-for="item in newList" :key="item.id">
@@ -29,12 +49,9 @@ import Home
     height: 406px;
 
     background: #f0f9f4;
-    transition: all .5s;
-
-    &:hover {
-      transform: translate3d(0, -3px, 0);
-      box-shadow: 0 3px 8px rgb(0 0 0 / 20%);
-    }
+    display: flex; /* 添加 flex 布局 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
 
     img {
       width: 306px;

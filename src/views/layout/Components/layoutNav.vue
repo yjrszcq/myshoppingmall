@@ -1,5 +1,19 @@
 <script setup>
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
+
+const goToMyOrder = () => {
+  router.push('/myorder');
+};
+
+const goToBusiness = () => {
+  router.push({ path: '/login/business' });
+};
+
+const goToUser = () => {
+  router.push({ path: '/user/123', query: { name: 'John' } });
+}
 </script>
 
 <template>
@@ -15,9 +29,9 @@
               </template>
             </el-popconfirm>
           </li>
-          <li><a href="javascript:;">我的订单</a></li>
-          <li><a href="javascript:;">会员中心</a></li>
-          <li><a href="javascript:;">商家版</a></li>
+          <li><a href="javascript:;" @click="goToMyOrder">我的订单</a></li>
+          <li><a href="javascript:;" @click="goToUser">会员中心</a></li>
+          <li><a href="javascript:;" @click="goToBusiness">商家版</a></li>
         </template>
         <template v-else>
           <li><a href="javascript:;">请先登录</a></li>

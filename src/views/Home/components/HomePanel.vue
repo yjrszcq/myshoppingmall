@@ -1,12 +1,16 @@
 <script setup>
+
 defineProps({
   title: {
     type: String,
+    default: ''
   },
-  subtitle: {
+  subTitle: {
     type: String,
+    default: ''
   }
 })
+
 </script>
 
 
@@ -16,14 +20,15 @@ defineProps({
       <div class="head">
         <!-- 主标题和副标题 -->
         <h3>
-          {{ title }}<small>{{ subtitle }}</small>
+          {{ title }}<small>{{ subTitle }}</small>
         </h3>
       </div>
       <!-- 主体内容区域 -->
-      <slot />
+      <slot name="main" />
     </div>
   </div>
 </template>
+
 
 <style scoped lang='scss'>
 .home-panel {

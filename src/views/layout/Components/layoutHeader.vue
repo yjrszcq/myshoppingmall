@@ -92,14 +92,14 @@ const categoryStore = useCategoryStore();
 
   .search {
     flex-shrink: 0;
-    width: 1000px;
+    width: 80%;
     height: 0;
     position: relative;
     border-bottom: 1px solid #e7e7e7;
     line-height: 30px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     margin-top: 40px;
 
     :deep(.el-input__wrapper) {

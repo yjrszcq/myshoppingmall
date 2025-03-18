@@ -53,12 +53,15 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   height: 406px;
+  flex-wrap: wrap;
+  column-gap: 0px; // 横向间距调小
+  row-gap: 20px;   // 纵向保持
 
   li {
-    width: 306px;
+    width: 250px;
     height: 406px;
 
-    background: #f0f9f4;
+    background: #fff;
     display: flex; /* 添加 flex 布局 */
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */

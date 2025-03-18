@@ -4,6 +4,7 @@ import {useScroll} from '@vueuse/core'
 
 const {y} = useScroll(window)
 import {useCategoryStore} from "@/stores/category.js";
+import {Search} from "@element-plus/icons-vue";
 const categoryStore = useCategoryStore();
 
 </script>
@@ -13,16 +14,20 @@ const categoryStore = useCategoryStore();
     <div class="container">
       <RouterLink class="logo" to="/" />
       <!-- 导航区域 -->
-      <ul class="app-header-nav ">
-        <li class="home" v-for="item in categoryStore.categoryList" :key="item.id">
-          <RouterLink to="/">{{item.name}}</RouterLink>
-        </li>
-      </ul>
-
-      <div class="right">
-        <RouterLink to="/">品牌</RouterLink>
-        <RouterLink to="/">专题</RouterLink>
+      <div class="search">
+        <!--        <i class="iconfont icon-search"></i>-->
+        <el-input
+            v-model="input"
+            placeholder="请输入您想要的商品喵"
+            class="input"
+            size="large"
+        >
+          <template #append>
+            <el-button :icon="Search" style="background-color: #ff99cc; padding: 0; width: 50px; height: 50px; color: white" size="large" />
+          </template>
+        </el-input>
       </div>
+
     </div>
   </div>
 </template>
@@ -78,6 +83,43 @@ const categoryStore = useCategoryStore();
       &:hover {
         color: $xtxColor;
       }
+    }
+  }
+  .search {
+    flex-shrink: 0;
+    width: 1000px;
+    height: 0;
+    position: relative;
+    border-bottom: 1px solid #e7e7e7;
+    line-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+
+    :deep(.el-input__wrapper) {
+      height: 50px;
+      border-radius: 25px;
+      box-shadow: 0 0 8px rgba(255, 192, 203, 0.6);
+      border: 1px solid #FFC0CB;
+      padding: 0 20px;
+    }
+
+    :deep(.el-input-group__append) {
+      padding: 0;
+    }
+
+    :deep(.el-button) {
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    :deep(.el-icon) {
+      font-size: 24px;
     }
   }
 }

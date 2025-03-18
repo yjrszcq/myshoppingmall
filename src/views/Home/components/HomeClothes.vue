@@ -9,14 +9,14 @@ const total = ref(0)
 
 const getProductList = async () => {
 
-    const res = await searchProducts({
-      keyword: '手机',
-      page: 1,
-      limit: 20,
-      sort: 'price_asc'  //返回所有关键词为手机的产品
-    })
-    newList.value = res.results
-    total.value = res.total
+  const res = await searchProducts({
+    keyword: '衣服',
+    page: 1,
+    limit: 20,
+    sort: 'price_asc'  //返回所有关键词为手机的产品
+  })
+  newList.value = res.results
+  total.value = res.total
 }
 
 onMounted(() => {
@@ -25,7 +25,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <HomePanel title="数码产品" sub-title="科技前沿 领航新世界">
+  <HomePanel title="潮流风尚" sub-title="我不要想文案啊">
     <template #main>
       <ul class="goods-list">
         <li v-for="item in newList" :key="item.id">

@@ -1,5 +1,6 @@
 <script setup>
 import {useCategoryStore} from "@/stores/category.js";
+import {Search} from "@element-plus/icons-vue";
 
 const categoryStore = useCategoryStore();
 </script>
@@ -8,17 +9,27 @@ const categoryStore = useCategoryStore();
   <header class='app-header'>
     <div class="container">
       <h1 class="logo">
-        <RouterLink to="/">小兔鲜</RouterLink>
+        <RouterLink to="/">Tafei Mall</RouterLink>
       </h1>
       <ul class="app-header-nav">
-        <li class="home" v-for="item in categoryStore.categoryList" :key="item.id">
-          <RouterLink to="/">{{item.name}}</RouterLink>
-        </li>
-        <li> <RouterLink to="/">工具</RouterLink> </li>
+<!--        <li class="home" v-for="item in categoryStore.categoryList" :key="item.id">-->
+<!--          <RouterLink to="/">{{item.name}}</RouterLink>-->
+<!--        </li> -->
+<!--        没给种类，就不分类了-->
+<!--        <li> <RouterLink to="/">工具</RouterLink> </li>-->
       </ul>
       <div class="search">
-        <i class="iconfont icon-search"></i>
-        <input type="text" placeholder="搜一搜">
+<!--        <i class="iconfont icon-search"></i>-->
+        <el-input
+            v-model="input"
+            placeholder="请输入您想要的商品喵"
+            class="input"
+            size="large"
+        >
+          <template #append>
+            <el-button :icon="Search" style="background-color: #ff99cc; padding: 0; width: 50px; height: 50px; color: white" size="large" />
+          </template>
+        </el-input>
       </div>
       <!-- 头部购物车 -->
 
@@ -34,10 +45,12 @@ const categoryStore = useCategoryStore();
   .container {
     display: flex;
     align-items: center;
+    justify-content: space-between; // 让两端对齐
   }
 
   .logo {
     width: 300px;
+    flex-shrink: 0; // 不允许被压缩
 
     a {
       display: block;
@@ -49,11 +62,9 @@ const categoryStore = useCategoryStore();
   }
 
   .app-header-nav {
-    width: 820px;
+    flex-grow: 1; // 填充中间剩余空间
     display: flex;
     padding-left: 40px;
-    position: relative;
-    z-index: 998;
 
     li {
       margin-right: 40px;
@@ -80,21 +91,40 @@ const categoryStore = useCategoryStore();
   }
 
   .search {
-    width: 170px;
-    height: 32px;
+    flex-shrink: 0;
+    width: 1000px;
+    height: 0;
     position: relative;
     border-bottom: 1px solid #e7e7e7;
-    line-height: 32px;
+    line-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;
 
-    .icon-search {
-      font-size: 18px;
-      margin-left: 5px;
+    :deep(.el-input__wrapper) {
+      height: 50px;
+      border-radius: 25px;
+      box-shadow: 0 0 8px rgba(255, 192, 203, 0.6);
+      border: 1px solid #FFC0CB;
+      padding: 0 20px;
     }
 
-    input {
-      width: 140px;
-      padding-left: 5px;
-      color: #666;
+    :deep(.el-input-group__append) {
+      padding: 0;
+    }
+
+    :deep(.el-button) {
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    :deep(.el-icon) {
+      font-size: 24px;
     }
   }
 

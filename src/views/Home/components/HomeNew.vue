@@ -39,7 +39,9 @@ onMounted(() => {
     <template #main>
       <ul class="goods-list">
         <li v-for="item in testlist" :key="item.id">
-          <Goodsitem :goods="item"/>
+          <RouterLink :to="`/detail/${item.id}`">
+            <Goodsitem :goods="item"/>
+          </RouterLink>
         </li>
       </ul>
     </template>

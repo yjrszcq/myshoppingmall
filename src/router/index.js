@@ -12,6 +12,7 @@ import Product from "@/views/Business/components/product.vue";
 import business from "@/views/login/Components/business.vue";
 import customer from "@/views/login/Components/customer.vue";
 import businesshome from "@/views/Business/components/Home.vue"
+import Detail from "@/views/Detail/index.vue"
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +28,10 @@ const router = createRouter({
                 {
                     path: 'category',
                     component: Category,
+                },
+                {
+                    path:'detail/:id',
+                    component: Detail,
                 }]
         },
         {

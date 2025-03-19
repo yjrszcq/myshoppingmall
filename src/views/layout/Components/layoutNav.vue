@@ -1,13 +1,10 @@
 <script setup>
-import { useRouter } from 'vue-router';
+import { useRouter} from 'vue-router';
 import {useUserstore} from "@/stores/user.js";
 
 const Userstore = useUserstore();
 const router = useRouter();
 
-const goToMyOrder = () => {
-  router.push('/myorder');
-};
 
 const goToBusiness = () => {
   Userstore.clearUserInfo()
@@ -15,7 +12,7 @@ const goToBusiness = () => {
 };
 
 const goToUser = () => {
-  router.push({ path: '/user/123', query: { name: 'John' } }); //登录模块记得改！
+  router.push({ path: '/member'});
 }
 
 // 退出登录
@@ -31,20 +28,21 @@ const confirm = () =>{
       <ul>
 <!--        多模板渲染，区分登录和未登录-->
         <template v-if="Userstore.userInfo.sessionId">
-          <li><a href="javascript:;"><i class="iconfont icon-user"></i>{{ Userstore.userInfo.userAccount }}</a></li>
+          <li><a href="javascript:;" @click="goToUser"><i class="iconfont icon-user"></i>{{ Userstore.userInfo.userAccount }}</a></li>
           <li>
             <el-popconfirm @confirm="confirm" title="确认退出吗?" confirm-button-text="确认" cancel-button-text="取消">
               <template #reference>
-                <a href="javascript:;">退出登录</a>
+                <a >退出登录</a>
               </template>
             </el-popconfirm>
           </li>
-          <li><a href="javascript:;" @click="goToMyOrder">我的订单</a></li>
           <li><a href="javascript:;" @click="goToUser">会员中心</a></li>
           <li><a href="javascript:;" @click="goToBusiness">商家版</a></li>
+          <li><a href="javascript:;" @click="$router.push('/cart')"><i class="iconfont icon-cart" ></i>购物车</a></li>
         </template>
         <template v-else>
           <li><a href="javascript:;" @click="$router.push('/login')">请先登录</a></li>
+          <li><a href="javascript:;" @click="$router.push('/login')"><i class="iconfont icon-cart" ></i>购物车</a></li>
           <li><a href="javascript:;">帮助中心</a></li>
           <li><a href="javascript:;">关于我们</a></li>
           <li><a href="javascript:;" @click="goToBusiness">商家版</a></li>

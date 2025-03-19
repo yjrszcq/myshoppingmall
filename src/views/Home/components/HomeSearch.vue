@@ -58,7 +58,7 @@ testProductList() //测试函数
 
 <template>
   <div class="search-page">
-    <h2>搜索结果: "{{ keyword }}"</h2>
+    <h2 style="color: palevioletred">搜索结果: "{{ keyword }}"</h2>
 
     <!-- 搜索无结果 -->
     <div v-if="testlist.length === 0">
@@ -69,7 +69,7 @@ testProductList() //测试函数
 
     <!-- 搜索结果展示 -->
     <div v-if="testlist.length !== 0">
-      <HomePanel title="为您找到：" sub-title="不用谢喵">
+      <HomePanel title="为您找到：" sub-title="不用谢喵" >
         <template #main>
           <ul class="product-list">
             <li v-for="item in testlist" :key="item.id">
@@ -97,6 +97,7 @@ testProductList() //测试函数
 .search-page {
   padding: 20px;
 }
+
 
 .product-list {
   display: flex;

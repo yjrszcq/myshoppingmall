@@ -46,10 +46,11 @@ defineProps({
       margin-left: 6px;
       height: 35px;
       line-height: 35px;
+      color: #c75c8a;
 
       small {
         font-size: 16px;
-        color: #999;
+        color: pink;
         margin-left: 20px;
       }
     }

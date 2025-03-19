@@ -3,17 +3,16 @@
 
 import { createRouter, createWebHistory } from 'vue-router'
 import Layout from '@/views/layout/index.vue'
-import Login from '@/views/login/index.vue'
+import Login from '@/views/login/customer.vue'
 import Home from '@/views/Home/home.vue'
 import Category  from "@/views/Category/category.vue";
 import Business from "@/views/Business/index.vue"
 import Order from "@/views/Business/components/order.vue"
 import Product from "@/views/Business/components/product.vue";
-import business from "@/views/login/Components/business.vue";
-import customer from "@/views/login/Components/customer.vue";
 import businesshome from "@/views/Business/components/Home.vue"
 import Detail from "@/views/Detail/index.vue"
 import Search from "@/views/Home/components/HomeSearch.vue";
+import Businesslogin from "@/views/login/business.vue"
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,15 +42,10 @@ const router = createRouter({
         {
             path: '/login',
             component: Login,
-            children: [{
-                path: '/customer',
-                component: customer,
-            },
-                {
-                    path: '/businesslogin',
-                    component: business,
-                }
-            ]
+        },
+        {
+            path: '/loginbusiness',
+            component: Businesslogin,
         },
         {
             path: '/business',

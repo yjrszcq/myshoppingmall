@@ -1,5 +1,46 @@
 <script setup>
+import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { registerUser } from '@/apis/login.js'  // 刚才写的接口
 
+// 控制当前显示登录还是注册
+const isRegister = ref(false)
+
+// 登录表单数据（现有逻辑应该有了，这里略）
+// const loginForm = ref({ ... })
+
+// 注册表单数据
+const registerForm = ref({
+  username: '',
+  password: '',
+  email: '',
+  phone: ''
+})
+
+// 注册方法
+const handleRegister = async () => {
+  try {
+    // 简单校验（可以根据需要完善）
+    if (!registerForm.value.username || !registerForm.value.password) {
+      ElMessage.error('用户名和密码不能为空')
+      return
+    }
+    const res = await registerUser(registerForm.value)
+    ElMessage.success('注册成功！')
+    console.log('注册成功:', res)
+
+    // 注册成功后自动切回登录表单
+    isRegister.value = false
+  } catch (error) {
+    console.error('注册失败:', error)
+    ElMessage.error('注册失败，请重试')
+  }
+}
+
+// 点击「注册」按钮，切换到注册表单
+const toggleForm = () => {
+  isRegister.value = !isRegister.value
+}
 </script>
 
 
@@ -8,7 +49,7 @@
     <header class="login-header">
       <div class="container m-top-20">
         <h1 class="logo">
-          <RouterLink to="/">小兔鲜</RouterLink>
+          <RouterLink to="/">TafeiMall</RouterLink>
         </h1>
         <RouterLink class="entry" to="/">
           进入网站首页
@@ -17,27 +58,66 @@
         </RouterLink>
       </div>
     </header>
+
     <section class="login-section">
       <div class="wrapper">
         <nav>
-          <a href="javascript:;">账户登录</a>
+          <a href="javascript:;" @click="isRegister = false" :style="{ color: !isRegister ? '#ff66b3' : '#333' }">账户登录</a>
+          <a href="javascript:;" @click="isRegister = true" :style="{ color: isRegister ? '#ff66b3' : '#333' }">账户注册</a>
         </nav>
-        <div class="account-box">
+
+        <!-- 登录表单 -->
+        <div class="account-box" v-if="!isRegister">
           <div class="form">
-            <el-form label-position="right" label-width="60px"
-                     status-icon>
-              <el-form-item  label="账户">
-                <el-input/>
+            <el-form label-position="right" label-width="60px" status-icon>
+              <el-form-item label="账户">
+                <el-input />
               </el-form-item>
               <el-form-item label="密码">
-                <el-input/>
+                <el-input />
               </el-form-item>
               <el-form-item label-width="22px">
-                <el-checkbox  size="large">
+                <el-checkbox size="large">
                   我已同意隐私条款和服务条款
                 </el-checkbox>
               </el-form-item>
-              <el-button size="large" class="subBtn">点击登录</el-button>
+              <el-form-item>
+                <div class="btn-group">
+                  <el-button class="subBtn">登录</el-button>
+                  <el-button class="subBtn" @click="toggleForm">注册</el-button>
+                </div>
+              </el-form-item>
+            </el-form>
+          </div>
+        </div>
+
+        <!-- 注册表单 -->
+        <div class="account-box" v-else>
+          <div class="form">
+            <el-form label-position="right" label-width="60px" status-icon>
+              <el-form-item label="用户名">
+                <el-input v-model="registerForm.username" />
+              </el-form-item>
+              <el-form-item label="密码">
+                <el-input v-model="registerForm.password" type="password" />
+              </el-form-item>
+              <el-form-item label="邮箱">
+                <el-input v-model="registerForm.email" />
+              </el-form-item>
+              <el-form-item label="手机号">
+                <el-input v-model="registerForm.phone" />
+              </el-form-item>
+              <el-form-item label-width="22px">
+                <el-checkbox size="large">
+                  我已同意隐私条款和服务条款
+                </el-checkbox>
+              </el-form-item>
+              <el-form-item>
+                <div class="btn-group">
+                  <el-button class="subBtn" @click="handleRegister">提交注册</el-button>
+                  <el-button class="subBtn" @click="toggleForm">返回登录</el-button>
+                </div>
+              </el-form-item>
             </el-form>
           </div>
         </div>
@@ -55,7 +135,7 @@
           <a href="javascript:;">搜索推荐</a>
           <a href="javascript:;">友情链接</a>
         </p>
-        <p>CopyRight &copy; 小兔鲜儿</p>
+        <p>CopyRight &copy; TafeiMall</p>
       </div>
     </footer>
   </div>
@@ -284,7 +364,15 @@
 
 .subBtn {
   background: $xtxColor;
-  width: 100%;
+  min-width: 100px; /* 按钮宽度 */
   color: #fff;
+  text-align: center;
 }
+
+.btn-group {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  gap: 40px;               /* 按钮之间的间距，自己调整 */
+}
+
 </style>

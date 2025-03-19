@@ -8,7 +8,7 @@ const goToMyOrder = () => {
 };
 
 const goToBusiness = () => {
-  router.push({ path: '/login/business' });
+  router.push({ path: '/loginbusiness' });
 };
 
 const goToUser = () => {

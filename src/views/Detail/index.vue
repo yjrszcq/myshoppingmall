@@ -1,23 +1,37 @@
 <script setup>
-import {getDetails} from "@/apis/detail.js";
-import {ref,onMounted} from 'vue'
-import {useRoute} from "vue-router";
-import ImageView from "@/components/imageView/index.vue";
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { getProductById } from "@/apis/detail.js" // 用你的接口方法
+import ImageView from "@/components/imageView/index.vue"
 
+// 商品详情对象
+const goods = ref({})
 
-const goods = ref([])
+// 获取路由参数 id
 const route = useRoute()
-const getGoodes = async () => {
-  const res = await getDetails(route.params.id)
-  goods.value = res.result  //这里是为了测试，后面记得改！！
-  console.log(res)
+
+// 获取商品详情数据
+const getGoods = async () => {
+  try {
+    const res = await getProductById(route.params.id) // 这里调用封装的方法
+    goods.value = res
+    console.log(goods.value)
+  } catch (error) {
+    console.error("获取商品详情失败", error)
+  }
 }
-onMounted(() => {getGoodes()})
+
+// 页面加载时发请求
+onMounted(() => {
+  getGoods()
+})
 </script>
+
+
 
 <template>
   <div class="xtx-goods-page">
-    <div class="container" v-if="goods.details">
+    <div class="container" v-if="goods">
       <div class="bread-container">
         <el-breadcrumb separator=">">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
@@ -72,8 +86,8 @@ onMounted(() => {getGoodes()})
               <p class="g-name"> {{ goods.name }} </p>
               <p class="g-desc">{{ goods.desc }} </p>
               <p class="g-price">
-                <span>{{ goods.oldPrice }}</span>
-                <span> {{ goods.price }}</span>
+                <span>{{ goods.price }}</span>
+                <span> {{ goods.stock }}</span>
               </p>
               <div class="g-service">
                 <dl>
@@ -206,20 +220,22 @@ onMounted(() => {getGoodes()})
     margin-top: 10px;
 
     span {
-      &::before {
-        content: "¥";
-        font-size: 14px;
-      }
 
       &:first-child {
+        &::before {
+          content: "¥";
+          font-size: 14px;
+        }
         color: $priceColor;
         margin-right: 10px;
         font-size: 22px;
       }
 
       &:last-child {
+        &::before {
+          content: "库存仅剩：";
+        }
         color: #999;
-        text-decoration: line-through;
         font-size: 16px;
       }
     }

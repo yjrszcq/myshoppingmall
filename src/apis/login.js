@@ -9,3 +9,14 @@ export const registerUser = (data) => {
         data
     })
 }
+
+export const loginapi = ({account,password}) => {
+    return request({
+        url: '/api/auth/login',  //记得改
+        method: 'POST',
+        data: {
+            account,
+            password
+        }
+    })
+}

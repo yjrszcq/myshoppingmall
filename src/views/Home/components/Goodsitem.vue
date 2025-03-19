@@ -9,7 +9,7 @@ defineProps({
 </script>
 
 <template>
-  <RouterLink :to="`/detail/${goods.id}`" class="goods-item">
+  <RouterLink :to="`/detail/${goods.productId}`" class="goods-item">
       <img :src="goods.picture" alt="" />
       <p class="name">{{ goods.name }}</p>
       <!--    <p class="desc">{{ goods.desc }}</p>-->

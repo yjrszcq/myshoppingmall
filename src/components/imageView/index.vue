@@ -1,32 +1,43 @@
 <script setup>
-// 图片列表
-import {getDetails} from "@/apis/detail.js";
-import {ref,onMounted} from 'vue'
-import {useRoute} from "vue-router";
+import { getProductById } from "@/apis/detail.js";
+import { ref, onMounted } from 'vue';
+import { useRoute } from "vue-router";
 
-
-const goods = ref([])
+const goods = ref({})        // 改为对象
 const route = useRoute()
 const imageList = ref([])
-const getGoodes = async () => {
-  const res = await getDetails(route.params.id)
-  goods.value = res.result  //这里是为了测试，后面记得改！！
-  console.log(goods)
-  imageList.value = goods.value.mainPictures
+
+const getGoods = async () => {
+  try {
+    const res = await getProductById(route.params.id)
+    console.log("res",res)
+    goods.value = res
+    console.log("商品详情", goods.value)
+
+    // 确保 mainPictures 是数组
+      imageList.value = goods.value.mainPictures
+  } catch (error) {
+    console.error("获取商品详情失败", error)
+  }
 }
-onMounted(() => {getGoodes()})
+
+onMounted(() => {
+  getGoods()
+})
 </script>
 
 
+
 <template>
-  <div class="home-banner">
+  <div class="home-banner" v-if="imageList.length > 0">
     <el-carousel height="500px" trigger="click" indicator-position="outside">
-      <el-carousel-item v-for="img in imageList" :src="img" :key="img">
+      <el-carousel-item v-for="img in imageList" :key="img">
         <img :src="img" alt="banner" />
       </el-carousel-item>
     </el-carousel>
   </div>
 </template>
+
 
 <style scoped lang="scss">
 .home-banner {

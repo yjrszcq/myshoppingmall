@@ -2,12 +2,33 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { registerUser } from '@/apis/login.js'  // 刚才写的接口
+import {useRouter} from "vue-router";
+import {useUserstore} from '@/stores/user.js'
+
+const userStore = useUserstore()
 
 // 控制当前显示登录还是注册
 const isRegister = ref(false)
 
-// 登录表单数据（现有逻辑应该有了，这里略）
-// const loginForm = ref({ ... })
+// 登录表单数据（后面记得改一下）
+const loginForm = ref({
+  account:'',
+  password:'',
+})
+
+const router = useRouter()
+
+const loginrules = {
+  account: [
+    {required:true,message:'用户名不能为空！',trigger:'blur'},
+  ],
+  password:[
+    {
+      required: true,message:'密码不能为空',trigger:'blur'
+      //后面还可以添加其他规则
+    }
+  ]
+}
 
 // 注册表单数据
 const registerForm = ref({
@@ -41,6 +62,28 @@ const handleRegister = async () => {
 const toggleForm = () => {
   isRegister.value = !isRegister.value
 }
+
+const loginformRef = ref(null)
+
+const dologin = () => {
+  const { account, password } = loginForm.value
+  // 调用实例方法
+  loginformRef.value.validate(async (valid) => {
+    // valid: 所有表单都通过校验  才为true
+    console.log(valid)
+    // 以valid做为判断条件 如果通过校验才执行登录逻辑
+    if (valid) {
+      // TODO LOGIN
+      await userStore.getUserInfo({account,password})
+      // 1. 提示用户
+      ElMessage({ type: 'success', message: '登录成功' })
+      // 2. 跳转首页
+      router.replace({ path: '/' })
+    }
+  })
+}
+
+
 </script>
 
 
@@ -62,28 +105,29 @@ const toggleForm = () => {
     <section class="login-section">
       <div class="wrapper">
         <nav>
-          <a href="javascript:;" @click="isRegister = false" :style="{ color: !isRegister ? '#ff66b3' : '#333' }">账户登录</a>
-          <a href="javascript:;" @click="isRegister = true" :style="{ color: isRegister ? '#ff66b3' : '#333' }">账户注册</a>
+          <a  @click="isRegister = false" :style="{ color: !isRegister ? '#ff66b3' : '#333' }">账户登录</a>
+          <a  @click="isRegister = true" :style="{ color: isRegister ? '#ff66b3' : '#333' }">账户注册</a>
         </nav>
 
         <!-- 登录表单 -->
         <div class="account-box" v-if="!isRegister">
           <div class="form">
-            <el-form label-position="right" label-width="60px" status-icon>
-              <el-form-item label="账户">
-                <el-input />
+            <el-form ref="loginformRef"  :model="loginForm" :rules="loginrules" label-position="right" label-width="60px" status-icon>
+              <el-form-item prop="account" label="账户">
+                <el-input v-model="loginForm.account"/>
               </el-form-item>
-              <el-form-item label="密码">
-                <el-input />
+              <el-form-item prop="password" label="密码">
+                <el-input v-model="loginForm.password" />
               </el-form-item>
-              <el-form-item label-width="22px">
-                <el-checkbox size="large">
-                  我已同意隐私条款和服务条款
-                </el-checkbox>
-              </el-form-item>
+<!--              后端没有提供相应的接口，可以考虑在后面的版本添加上去-->
+<!--              <el-form-item label-width="22px">-->
+<!--                <el-checkbox size="large">-->
+<!--                  我已同意隐私条款和服务条款-->
+<!--                </el-checkbox>-->
+<!--              </el-form-item>-->
               <el-form-item>
                 <div class="btn-group">
-                  <el-button class="subBtn">登录</el-button>
+                  <el-button class="subBtn" @click="dologin">登录</el-button>
                   <el-button class="subBtn" @click="toggleForm">注册</el-button>
                 </div>
               </el-form-item>
@@ -126,15 +170,15 @@ const toggleForm = () => {
 
     <footer class="login-footer">
       <div class="container">
-        <p>
-          <a href="javascript:;">关于我们</a>
-          <a href="javascript:;">帮助中心</a>
-          <a href="javascript:;">售后服务</a>
-          <a href="javascript:;">配送与验收</a>
-          <a href="javascript:;">商务合作</a>
-          <a href="javascript:;">搜索推荐</a>
-          <a href="javascript:;">友情链接</a>
-        </p>
+<!--        <p>-->
+<!--          <a href="javascript:;">关于我们</a>-->
+<!--          <a href="javascript:;">帮助中心</a>-->
+<!--          <a href="javascript:;">售后服务</a>-->
+<!--          <a href="javascript:;">配送与验收</a>-->
+<!--          <a href="javascript:;">商务合作</a>-->
+<!--          <a href="javascript:;">搜索推荐</a>-->
+<!--          <a href="javascript:;">友情链接</a>-->
+<!--        </p>-->
         <p>CopyRight &copy; TafeiMall</p>
       </div>
     </footer>

@@ -43,16 +43,6 @@ watch(() => route.query.keyword, (newKeyword) => {
   fetchProducts();
 });
 
-//仅为测试使用：记得删掉：
-import {findNewAPI} from "@/apis/findnew.js";
-const testlist = ref([])
-const testProductList = async () => {
-  const res = await findNewAPI()
-  testlist.value = res.result
-  console.log(testlist.value)
-}
-//测试代码结束
-testProductList() //测试函数
 
 </script>
 
@@ -61,18 +51,18 @@ testProductList() //测试函数
     <h2 style="color: palevioletred">搜索结果: "{{ keyword }}"</h2>
 
     <!-- 搜索无结果 -->
-    <div v-if="testlist.length === 0">
+    <div v-if="products.length === 0">
       <HomePanel title="没有找到喵" sub-title="私密马赛呜呜呜">
 
       </HomePanel>
     </div>
 
     <!-- 搜索结果展示 -->
-    <div v-if="testlist.length !== 0">
+    <div v-if="products.length !== 0">
       <HomePanel title="为您找到：" sub-title="不用谢喵" >
         <template #main>
           <ul class="product-list">
-            <li v-for="item in testlist" :key="item.id">
+            <li v-for="item in products" :key="item.id">
               <Goodsitem :goods="item"/>
             </li>
           </ul>

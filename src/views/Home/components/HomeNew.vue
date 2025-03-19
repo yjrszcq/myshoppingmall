@@ -19,17 +19,8 @@ const getProductList = async () => {
     total.value = res.total
 }
 
-// 以下是测试使用的接口
-import {findNewAPI} from "@/apis/findnew.js";
-const testlist = ref([])
-const testProductList = async () => {
-  const res = await findNewAPI()
-  testlist.value = res.result
-}
-//测试代码结束
-testProductList() //测试函数
 onMounted(() => {
-  // getProductList() 真正的函数 确认后取消注释
+  getProductList()
 
 })
 </script>
@@ -38,7 +29,7 @@ onMounted(() => {
   <HomePanel title="数码产品" sub-title="科技前沿 领航新世界">
     <template #main>
       <ul class="goods-list">
-        <li v-for="item in testlist" :key="item.id">
+        <li v-for="item in newList" :key="item.id">
             <Goodsitem :goods="item"/>
         </li>
       </ul>

@@ -1,8 +1,19 @@
 <script setup>
-import {useCategoryStore} from "@/stores/category.js";
 import {Search} from "@element-plus/icons-vue";
+import { useRouter } from 'vue-router';
+import { ref } from 'vue';
 
-const categoryStore = useCategoryStore();
+const router = useRouter();
+const input = ref(''); // 绑定到 el-input
+
+const handleSearch = () => {
+  if (!input.value) return; // 简单校验
+  router.push({
+    path: '/search',
+    query: { keyword: input.value }
+  });
+};
+
 </script>
 
 <template>
@@ -25,9 +36,10 @@ const categoryStore = useCategoryStore();
             placeholder="请输入您想要的商品喵"
             class="input"
             size="large"
+            @keyup.enter="handleSearch"
         >
           <template #append>
-            <el-button :icon="Search" style="background-color: #ff99cc; padding: 0; width: 50px; height: 50px; color: white" size="large" />
+            <el-button :icon="Search" style="background-color: #ff99cc; padding: 0; width: 50px; height: 50px; color: white" size="large" @click="handleSearch"/>
           </template>
         </el-input>
       </div>

@@ -4,7 +4,7 @@
 
 <template>
 <div>
-  product
+  产品管理
 </div>
 </template>
 

@@ -14,7 +14,7 @@ const getGoods = async () => {
     goods.value = res
     console.log("商品详情", goods.value)
 
-    // 确保 mainPictures 是数组
+    // mainPictures
       imageList.value = goods.value.mainPictures
   } catch (error) {
     console.error("获取商品详情失败", error)

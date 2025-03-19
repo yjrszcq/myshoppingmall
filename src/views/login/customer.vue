@@ -61,6 +61,8 @@ const handleRegister = async () => {
 // 点击「注册」按钮，切换到注册表单
 const toggleForm = () => {
   isRegister.value = !isRegister.value
+  ElMessage({ type: 'success', message: '登录成功' })
+  console.log('switch')
 }
 
 const loginformRef = ref(null)
@@ -73,12 +75,13 @@ const dologin = () => {
     console.log(valid)
     // 以valid做为判断条件 如果通过校验才执行登录逻辑
     if (valid) {
-      // TODO LOGIN
       await userStore.getUserInfo({account,password})
       // 1. 提示用户
       ElMessage({ type: 'success', message: '登录成功' })
       // 2. 跳转首页
       router.replace({ path: '/' })
+    }else{
+      ElMessage({ type: 'error',message:'登录失败！' })
     }
   })
 }

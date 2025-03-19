@@ -1,6 +1,8 @@
 <script setup>
 import { useRouter } from 'vue-router';
+import {useUserstore} from "@/stores/user.js";
 
+const Userstore = useUserstore();
 const router = useRouter();
 
 const goToMyOrder = () => {
@@ -8,11 +10,18 @@ const goToMyOrder = () => {
 };
 
 const goToBusiness = () => {
+  Userstore.clearUserInfo()
   router.push({ path: '/loginbusiness' });
 };
 
 const goToUser = () => {
   router.push({ path: '/user/123', query: { name: 'John' } }); //登录模块记得改！
+}
+
+// 退出登录
+const confirm = () =>{
+  Userstore.clearUserInfo()
+  router.push({ path: '/login'});
 }
 </script>
 
@@ -21,10 +30,10 @@ const goToUser = () => {
     <div class="container">
       <ul>
 <!--        多模板渲染，区分登录和未登录-->
-        <template v-if="false">
-          <li><a href="javascript:;"><i class="iconfont icon-user"></i>永雏塔菲</a></li>
+        <template v-if="Userstore.userInfo.sessionId">
+          <li><a href="javascript:;"><i class="iconfont icon-user"></i>{{ Userstore.userInfo.userAccount }}</a></li>
           <li>
-            <el-popconfirm title="确认退出吗?" confirm-button-text="确认" cancel-button-text="取消">
+            <el-popconfirm @confirm="confirm" title="确认退出吗?" confirm-button-text="确认" cancel-button-text="取消">
               <template #reference>
                 <a href="javascript:;">退出登录</a>
               </template>

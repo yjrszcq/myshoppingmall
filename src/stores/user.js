@@ -1,16 +1,29 @@
-//管理用户数据相关
-import {ref} from 'vue';
-import {defineStore} from "pinia";
-import {loginapi} from "@/apis/login.js";
+// 管理用户数据相关
 
-export const useUserstore =  defineStore('user',()=>{
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { loginapi } from '@/apis/login.js'
+
+export const useUserstore = defineStore('user', () => {
+    // 1. 定义管理用户数据的state
     const userInfo = ref({})
-    const getUserInfo = async ({account,password}) =>{
-    const res = await loginapi({account,password})
+    // 2. 定义获取接口数据的action函数
+    const getUserInfo = async ({ account, password }) => {
+        const res = await loginapi({ account, password })
         userInfo.value = res
     }
-    return {
-        userInfo,
-        getUserInfo
+    // 3. 以对象的格式把state和action return
+
+    //退出登录
+    const clearUserInfo = () => {
+        userInfo.value = {}
     }
+
+    return {
+        getUserInfo,
+        userInfo,
+        clearUserInfo,
+    }
+}, {
+    persist: true,
 })

@@ -9,7 +9,7 @@ export const registerUser = (data) => {
         data
     })
 }
-
+//登录用户接口
 export const loginapi = ({account,password}) => {
     return request({
         url: '/api/auth/login',  //记得改
@@ -20,3 +20,4 @@ export const loginapi = ({account,password}) => {
         }
     })
 }
+

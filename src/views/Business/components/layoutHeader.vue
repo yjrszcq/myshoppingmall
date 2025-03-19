@@ -22,9 +22,13 @@
             </template>
             <el-menu-item index="/order">订单管理</el-menu-item>
           </el-sub-menu>
-          <el-menu-item index="/login/business">
+          <el-menu-item >
             <el-icon><setting /></el-icon>
-            <span>登录管理</span>
+            <el-popconfirm @confirm="confirm" title="确认退出吗?" confirm-button-text="确认" cancel-button-text="取消">
+              <template #reference>
+                <a style="width: 1000px">退出登录</a>
+              </template>
+            </el-popconfirm>
           </el-menu-item>
         </el-menu>
       </el-aside>
@@ -38,15 +42,21 @@
 </template>
 
 <script setup>
-import { Location, Menu as IconMenu, Document, Setting } from '@element-plus/icons-vue';
+import { Location,  Setting } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
+import { useUserstore} from '@/stores/user.js'
 
 const router = useRouter();
-
+const Userstore = useUserstore();
 const handleMenuSelect = (index) => {
   router.push(index); // 跳转到对应的路由
 };
 
+// 退出登录
+const confirm = () =>{
+  Userstore.clearUserInfo()
+  router.push({ path: '/loginbusiness'});
+}
 </script>
 
 <style scoped>

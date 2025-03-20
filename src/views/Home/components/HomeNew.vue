@@ -17,6 +17,7 @@ const getProductList = async () => {
     })
     newList.value = res.results
     total.value = res.total
+    console.log('商品',res)
 }
 
 onMounted(() => {

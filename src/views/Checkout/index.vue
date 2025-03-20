@@ -333,7 +333,7 @@ const curAddress = {}  // 地址对象
     &.active,
     &:hover {
       border-color: $xtxColor;
-      background: lighten($xtxColor, 50%);
+      background: scale($xtxColor, 50%);
     }
 
     >ul {

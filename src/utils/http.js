@@ -15,7 +15,7 @@ httpInstance.interceptors.request.use(config => {
     // 2. 按照后端的要求拼接token
     const token = userStore.userInfo.sessionId
     if (token) {
-        config.headers['Session_ID'] = `${token}`
+        config.headers['Session-Id'] = `${token}`
     }
     return config
 }, e => Promise.reject(e))

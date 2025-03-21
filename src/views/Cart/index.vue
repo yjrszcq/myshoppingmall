@@ -70,7 +70,7 @@ const cartList = []
       <!-- 操作栏 -->
       <div class="action">
         <div class="batch">
-          共 10 件商品，已选择 2 件，商品合计：
+          共 10 件商品，已选择 1 件，商品合计：
           <span class="red">¥ 200.00 </span>
         </div>
         <div class="total">
@@ -82,6 +82,12 @@ const cartList = []
     </div>
   </div>
 </template>
+
+
+
+
+
+
 
 <style scoped lang="scss">
 .xtx-cart-page {

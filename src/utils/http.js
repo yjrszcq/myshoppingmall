@@ -8,15 +8,14 @@ const httpInstance = axios.create({
     timeout: 5000,
 })
 
-//axios请求式拦截器
 // axios请求拦截器
 httpInstance.interceptors.request.use(config => {
     // 1. 从pinia获取token数据
     const userStore = useUserstore()
-    // 2. 按照后端的要求拼接token数据
+    // 2. 按照后端的要求拼接token
     const token = userStore.userInfo.sessionId
     if (token) {
-        config.headers.Authorization = `Bearer ${token}`
+        config.headers['Session-Id'] = `${token}`
     }
     return config
 }, e => Promise.reject(e))

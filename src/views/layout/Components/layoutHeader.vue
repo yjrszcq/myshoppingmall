@@ -26,6 +26,8 @@ const handleSearch = () => {
 <!--        <li class="home" v-for="item in categoryStore.categoryList" :key="item.id">-->
 <!--          <RouterLink to="/">{{item.name}}</RouterLink>-->
 <!--        </li> -->
+
+
 <!--        没给种类，就不分类了-->
 <!--        <li> <RouterLink to="/">工具</RouterLink> </li>-->
       </ul>
@@ -44,7 +46,7 @@ const handleSearch = () => {
         </el-input>
       </div>
       <!-- 头部购物车 -->
-
+     
     </div>
   </header>
 </template>

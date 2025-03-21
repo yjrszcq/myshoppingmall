@@ -3,13 +3,35 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getProductById } from "@/apis/detail.js" // 用你的接口方法
 import ImageView from "@/components/imageView/index.vue"
+import { useCartStore } from '@/stores/cartStore'
+//import { picture } from '@element-plus/icons-vue/dist/types'
+
+const cartStore = useCartStore()
 
 // 商品详情对象
 const goods = ref({})
 
+
 // 获取路由参数 id
 const route = useRoute()
 
+//count
+const count = ref(1)
+const countChange = (count) => {
+  console.log(count)
+}
+
+//添加购物车
+const addCart = () => {
+     cartStore.addCart({
+      id: goods.value.id,
+      name: goods.value.name,
+      picture: goods.value.mainPictures[0],
+      price: goods.value.price,
+      count: count.value,
+      selected:true
+     })
+}
 // 获取商品详情数据
 const getGoods = async () => {
   try {
@@ -107,10 +129,10 @@ onMounted(() => {
               <!-- sku组件 -->
 
               <!-- 数据组件 -->
-
+              <el-input-number v-model="count":min="1" @change="countChange" class="number"/>
               <!-- 按钮组件 -->
               <div>
-                <el-button size="large" class="btn">
+                <el-button size="large" class="btn" @click="addCart">
                   加入购物车
                 </el-button>
               </div>
@@ -385,6 +407,11 @@ onMounted(() => {
 
 .btn {
   margin-top: 20px;
+
+}
+
+.number {
+  margin-top: 15px;
 
 }
 

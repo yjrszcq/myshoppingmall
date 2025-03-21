@@ -12,7 +12,7 @@ const httpInstance = axios.create({
 httpInstance.interceptors.request.use(config => {
     // 1. 从pinia获取token数据
     const userStore = useUserstore()
-    // 2. 按照后端的要求拼接token数据
+    // 2. 按照后端的要求拼接token
     const token = userStore.userInfo.sessionId
     if (token) {
         config.headers['Session_ID'] = `${token}`

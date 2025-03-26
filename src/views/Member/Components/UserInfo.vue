@@ -29,7 +29,7 @@ const userStore = {}
   <div class="like-container">
     <div class="home-panel">
       <div class="header">
-        <h4 data-v-bcb266e0="">猜你喜欢</h4>
+        <h4 data-v-bcb266e0="">猜你喜欢 </h4>
       </div>
       <div class="goods-list">
         <!-- <GoodsItem v-for="good in likeList" :key="good.id" :good="good" /> -->

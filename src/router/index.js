@@ -17,6 +17,8 @@ import Checkout from "@/views/Checkout/index.vue"
 import Member from "@/views/Member/index.vue"
 import UserOrder from "@/views/Member/Components/UserOrder.vue";
 import UserInfo from "@/views/Member/Components/UserInfo.vue";
+import Payment from "@/views/Payment/index.vue"
+import BankInfo from "@/views/BankInfo/index.vue"
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +46,14 @@ const router = createRouter({
                 {
                     path:'checkout',
                     component: Checkout,
+                },
+                {
+                    path:'payment',
+                    component: Payment,
+                },
+                {
+                    path:'bank-info',
+                    component: BankInfo,
                 },
                 {
                     path: '/member',

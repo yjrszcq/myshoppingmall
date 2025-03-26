@@ -1,7 +1,48 @@
 <script setup>
-const checkInfo = {}  // 订单对象
-const curAddress = {}  // 地址对象
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 
+const router = useRouter()
+const checkInfo = ref({})  // 订单对象
+const curAddress = ref({})  // 地址对象
+const payMethod = ref('online') // 支付方式
+const toggleFlag = ref(false) // 切换地址弹窗
+const addFlag = ref(false) // 添加地址弹窗
+
+// 默认地址
+const defaultAddress = {
+  receiver: '张三',
+  contact: '13800138000',
+  fullLocation: '北京市 北京市 朝阳区',
+  address: '三里屯SOHO 2号楼 2层 2-2-2'
+}
+
+// 初始化默认地址
+onMounted(() => {
+  curAddress.value = defaultAddress
+})
+
+// 切换支付方式
+const changePayMethod = (method) => {
+  payMethod.value = method
+}
+
+// 提交订单
+const submitOrder = () => {
+  if (!curAddress.value) {
+    ElMessage.warning('请选择收货地址')
+    return
+  }
+  
+  if (payMethod.value === 'online') {
+    // 在线支付，跳转到支付页面
+    router.push('/payment')
+  } else {
+    // 货到付款，跳转到银行卡信息页面
+    router.push('/bank-info')
+  }
+}
 </script>
 
 <template>
@@ -12,7 +53,7 @@ const curAddress = {}  // 地址对象
         <h3 class="box-title">收货地址
           <a href="javascript:;" @click="$router.push('/cart')"><i class="iconfont icon-cart" ></i>购物车</a>
         </h3>
-      <div class="box-body">
+        <div class="box-body">
           <div class="address">
             <div class="text">
               <div class="none" v-if="!curAddress">您需要先添加收货地址才可提交订单。</div>
@@ -28,38 +69,40 @@ const curAddress = {}  // 地址对象
             </div>
           </div>
         </div>
+
         <!-- 商品信息 -->
         <h3 class="box-title">商品信息</h3>
         <div class="box-body">
           <table class="goods">
             <thead>
-            <tr>
-              <th width="520">商品信息</th>
-              <th width="170">单价</th>
-              <th width="170">数量</th>
-              <th width="170">小计</th>
-              <th width="170">实付</th>
-            </tr>
+              <tr>
+                <th width="520">商品信息</th>
+                <th width="170">单价</th>
+                <th width="170">数量</th>
+                <th width="170">小计</th>
+                <th width="170">实付</th>
+              </tr>
             </thead>
             <tbody>
-            <tr v-for="i in checkInfo.goods" :key="i.id">
-              <td>
-                <a href="javascript:;" class="info">
-                  <img :src="i.picture" alt="">
-                  <div class="right">
-                    <p>{{ i.name }}</p>
-                    <p>{{ i.attrsText }}</p>
-                  </div>
-                </a>
-              </td>
-              <td>&yen;{{ i.price }}</td>
-              <td>{{ i.price }}</td>
-              <td>&yen;{{ i.totalPrice }}</td>
-              <td>&yen;{{ i.totalPayPrice }}</td>
-            </tr>
+              <tr v-for="i in checkInfo.goods" :key="i.id">
+                <td>
+                  <a href="javascript:;" class="info">
+                    <img :src="i.picture" alt="">
+                    <div class="right">
+                      <p>{{ i.name }}</p>
+                      <p>{{ i.attrsText }}</p>
+                    </div>
+                  </a>
+                </td>
+                <td>&yen;{{ i.price }}</td>
+                <td>{{ i.price }}</td>
+                <td>&yen;{{ i.totalPrice }}</td>
+                <td>&yen;{{ i.totalPayPrice }}</td>
+              </tr>
             </tbody>
           </table>
         </div>
+
         <!-- 配送时间 -->
         <h3 class="box-title">配送时间</h3>
         <div class="box-body">
@@ -67,13 +110,15 @@ const curAddress = {}  // 地址对象
           <a class="my-btn" href="javascript:;">工作日送货：周一至周五</a>
           <a class="my-btn" href="javascript:;">双休日、假日送货：周六至周日</a>
         </div>
+
         <!-- 支付方式 -->
         <h3 class="box-title">支付方式</h3>
         <div class="box-body">
-          <a class="my-btn active" href="javascript:;">在线支付</a>
-          <a class="my-btn" href="javascript:;">货到付款</a>
+          <a class="my-btn" :class="{ active: payMethod === 'online' }" href="javascript:;" @click="changePayMethod('online')">在线支付</a>
+          <a class="my-btn" :class="{ active: payMethod === 'cod' }" href="javascript:;" @click="changePayMethod('cod')">货到付款</a>
           <span style="color:#999">货到付款需付5元手续费</span>
         </div>
+
         <!-- 金额明细 -->
         <h3 class="box-title">金额明细</h3>
         <div class="box-body">
@@ -92,14 +137,14 @@ const curAddress = {}  // 地址对象
             </dl>
             <dl>
               <dt>应付总额：</dt>
-              <dd class="price">{{ checkInfo.summary?.totalPayPrice.toFixed(2) }}</dd>
+              <dd class="price">¥{{ checkInfo.summary?.totalPayPrice.toFixed(2) }}</dd>
             </dl>
           </div>
         </div>
+
         <!-- 提交订单 -->
         <div class="submit">
-          <el-button  size="large" style="background-color: #ff66b3;color: white">提交订单</el-button>
-
+          <el-button size="large" style="background-color: #ff66b3;color: white" @click="submitOrder">提交订单</el-button>
         </div>
       </div>
     </div>

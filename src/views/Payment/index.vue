@@ -6,11 +6,25 @@ import { ElMessage } from 'element-plus'
 const router = useRouter()
 const payMethod = ref('alipay') // 默认支付宝支付
 
-// 生成随机标识字符串
+// 生成支付标识字符串
 const generatePaymentId = () => {
-  const timestamp = Date.now().toString().slice(-6)
-  const random = Math.random().toString(36).substring(2, 8)
-  return `PAY${timestamp}${random}`
+  // 获取当前日期
+  const now = new Date()
+  const year = now.getFullYear().toString().slice(-2) // 年份后两位
+  const month = (now.getMonth() + 1).toString().padStart(2, '0') // 月份，补零
+  const day = now.getDate().toString().padStart(2, '0') // 日期，补零
+  const hour = now.getHours().toString().padStart(2, '0') // 小时，补零
+  const minute = now.getMinutes().toString().padStart(2, '0') // 分钟，补零
+  
+  // 生成4位随机字母（不包含容易混淆的字母）
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ' // 排除了容易混淆的I和O
+  let randomLetters = ''
+  for (let i = 0; i < 4; i++) {
+    randomLetters += letters.charAt(Math.floor(Math.random() * letters.length))
+  }
+  
+  // 组合支付标识：PAY + 年月日时分 + 4位随机字母
+  return `PAY${year}${month}${day}${hour}${minute}${randomLetters}`
 }
 
 // 支付标识字符串
@@ -138,7 +152,8 @@ const confirmPay = async () => {
               <div class="payment-id-box">
                 <p class="payment-id-label">支付标识：</p>
                 <p class="payment-id">{{ paymentId }}</p>
-                <p class="payment-id-tip">请在转账时输入此标识，以便我们及时确认您的支付</p>
+                <p class="payment-id-tip">请在转账时备注此支付标识</p>
+                <p class="payment-id-tip">（标识包含：支付日期时间 + 4位字母）</p>
               </div>
             </div>
           </div>
@@ -322,6 +337,31 @@ const confirmPay = async () => {
       padding: 20px 0;
       border-top: 1px solid #f5f5f5;
     }
+  }
+}
+
+.payment-id {
+  margin-top: 15px;
+  text-align: center;
+
+  .label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+  }
+
+  .value {
+    font-size: 18px;
+    color: #ff66b3;
+    font-weight: bold;
+    font-family: monospace; // 使用等宽字体，便于阅读
+    margin-bottom: 10px;
+  }
+
+  .tip {
+    font-size: 12px;
+    color: #999;
+    margin: 5px 0;
   }
 }
 </style> 

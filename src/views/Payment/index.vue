@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
@@ -15,6 +15,15 @@ const generatePaymentId = () => {
 
 // 支付标识字符串
 const paymentId = ref(generatePaymentId())
+
+// 从本地存储获取支付金额
+const totalAmount = ref(0)
+onMounted(() => {
+  const cartInfo = JSON.parse(localStorage.getItem('cartInfo') || '{}')
+  if (cartInfo.summary) {
+    totalAmount.value = cartInfo.summary.totalPayPrice
+  }
+})
 
 // 支付方式列表
 const payMethods = [
@@ -96,6 +105,10 @@ const confirmPay = async () => {
   <div class="payment-page">
     <div class="container">
       <div class="wrapper">
+        <div class="payment-amount">
+          <span class="amount-label">支付金额：</span>
+          <span class="amount-value">¥{{ totalAmount.toFixed(2) }}</span>
+        </div>
         <h3 class="box-title">选择支付方式</h3>
         <div class="box-body">
           <div class="pay-methods">
@@ -170,6 +183,25 @@ const confirmPay = async () => {
     background: #fff;
     padding: 20px;
 
+    .payment-amount {
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #f5f5f5;
+      margin-bottom: 20px;
+
+      .amount-label {
+        font-size: 16px;
+        color: #666;
+        margin-right: 10px;
+      }
+
+      .amount-value {
+        font-size: 24px;
+        color: #ff66b3;
+        font-weight: bold;
+      }
+    }
+
     .box-title {
       font-size: 16px;
       font-weight: normal;
@@ -198,7 +230,6 @@ const confirmPay = async () => {
         justify-content: center;
         cursor: pointer;
         transition: all 0.3s;
-        background-color: #fff;
 
         &:hover {
           border-color: #ff66b3;
@@ -213,7 +244,6 @@ const confirmPay = async () => {
           width: 40px;
           height: 40px;
           margin-bottom: 10px;
-          background-color: #fff;
         }
 
         span {

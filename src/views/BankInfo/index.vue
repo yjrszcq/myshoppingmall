@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
@@ -32,6 +32,15 @@ const rules = {
 
 const formRef = ref(null)
 
+// 从本地存储获取担保金额
+const totalAmount = ref(0)
+onMounted(() => {
+  const cartInfo = JSON.parse(localStorage.getItem('cartInfo') || '{}')
+  if (cartInfo.summary) {
+    totalAmount.value = cartInfo.summary.totalPayPrice
+  }
+})
+
 // 提交银行卡信息
 const submitBankInfo = async () => {
   if (!formRef.value) return
@@ -52,6 +61,21 @@ const submitBankInfo = async () => {
       <div class="wrapper">
         <h3 class="box-title">银行卡信息</h3>
         <div class="box-body">
+          <!-- 添加担保金额提示 -->
+          <div class="amount-notice">
+            <el-alert
+              title="担保金额"
+              type="info"
+              :closable="false"
+              show-icon
+            >
+              <template #default>
+                <p>您需要担保的金额为：<span class="amount">¥{{ totalAmount.toFixed(2) }}</span></p>
+                <p class="notice">请确保您的银行卡余额充足，以便完成支付。</p>
+              </template>
+            </el-alert>
+          </div>
+
           <!-- 担保提示信息 -->
           <div class="notice-box">
             <i class="el-icon-warning"></i>
@@ -110,6 +134,23 @@ const submitBankInfo = async () => {
 
     .box-body {
       padding: 20px 0;
+    }
+
+    .amount-notice {
+      margin-bottom: 20px;
+
+      .amount {
+        color: #ff66b3;
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0 5px;
+      }
+
+      .notice {
+        margin-top: 10px;
+        color: #666;
+        font-size: 14px;
+      }
     }
 
     .notice-box {

@@ -9,6 +9,7 @@ const curAddress = ref({})  // 地址对象
 const payMethod = ref('online') // 支付方式
 const toggleFlag = ref(false) // 切换地址弹窗
 const addFlag = ref(false) // 添加地址弹窗
+const selectedAddress = ref(null)
 
 // 默认地址
 const defaultAddress = {
@@ -18,9 +19,26 @@ const defaultAddress = {
   address: '三里屯SOHO 2号楼 2层 2-2-2'
 }
 
+// 从本地存储获取购物车商品信息
+const getCartInfo = () => {
+  const cartInfo = JSON.parse(localStorage.getItem('cartInfo') || '{}')
+  if (cartInfo.goods && cartInfo.goods.length > 0) {
+    checkInfo.value = {
+      goods: cartInfo.goods,
+      summary: {
+        goodsCount: cartInfo.goods.reduce((sum, item) => sum + item.count, 0),
+        totalPrice: cartInfo.goods.reduce((sum, item) => sum + item.price * item.count, 0),
+        postFee: 10, // 运费
+        totalPayPrice: cartInfo.goods.reduce((sum, item) => sum + item.price * item.count, 0) + 10
+      }
+    }
+  }
+}
+
 // 初始化默认地址
 onMounted(() => {
   curAddress.value = defaultAddress
+  getCartInfo()
 })
 
 // 切换支付方式
@@ -43,6 +61,87 @@ const submitOrder = () => {
     router.push('/bank-info')
   }
 }
+
+const address = ref('北京市朝阳区三里屯SOHO 2号楼 2层')
+const phone = ref('13800138000')
+
+// 地址列表数据
+const addressList = ref([
+  {
+    id: 1,
+    name: '张三',
+    phone: '13800138000',
+    address: '北京市朝阳区三里屯SOHO 2号楼 2层',
+    isDefault: true
+  },
+  {
+    id: 2,
+    name: '张三',
+    phone: '13800138001',
+    address: '上海市浦东新区陆家嘴环路1000号',
+    isDefault: false
+  }
+])
+
+// 新增地址表单数据
+const addressForm = ref({
+  name: '',
+  phone: '',
+  address: ''
+})
+
+// 表单验证规则
+const rules = {
+  name: [
+    { required: true, message: '请输入收货人姓名', trigger: 'blur' }
+  ],
+  phone: [
+    { required: true, message: '请输入联系电话', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
+  ],
+  address: [
+    { required: true, message: '请输入详细地址', trigger: 'blur' }
+  ]
+}
+
+const formRef = ref(null)
+
+// 选择地址
+const selectAddress = (addr) => {
+  selectedAddress.value = addr
+  curAddress.value = {
+    receiver: addr.name,
+    contact: addr.phone,
+    address: addr.address,
+    fullLocation: '' // 移除这个字段，因为我们不需要重复显示地址
+  }
+  toggleFlag.value = false
+}
+
+// 添加新地址
+const handleAddAddress = async () => {
+  if (!formRef.value) return
+  
+  try {
+    await formRef.value.validate()
+    // 这里应该调用后端API保存地址
+    const newAddress = {
+      id: addressList.value.length + 1,
+      ...addressForm.value,
+      isDefault: false
+    }
+    addressList.value.push(newAddress)
+    addFlag.value = false
+    // 重置表单
+    addressForm.value = {
+      name: '',
+      phone: '',
+      address: ''
+    }
+  } catch (error) {
+    ElMessage.error('请检查表单信息是否正确')
+  }
+}
 </script>
 
 <template>
@@ -60,7 +159,7 @@ const submitOrder = () => {
               <ul v-else>
                 <li><span>收<i />货<i />人：</span>{{ curAddress.receiver }}</li>
                 <li><span>联系方式：</span>{{ curAddress.contact }}</li>
-                <li><span>收货地址：</span>{{ curAddress.fullLocation }} {{ curAddress.address }}</li>
+                <li><span>收货地址：</span>{{ curAddress.address }}</li>
               </ul>
             </div>
             <div class="action">
@@ -95,9 +194,9 @@ const submitOrder = () => {
                   </a>
                 </td>
                 <td>&yen;{{ i.price }}</td>
-                <td>{{ i.price }}</td>
-                <td>&yen;{{ i.totalPrice }}</td>
-                <td>&yen;{{ i.totalPayPrice }}</td>
+                <td>{{ i.count }}</td>
+                <td>&yen;{{ (i.price * i.count).toFixed(2) }}</td>
+                <td>&yen;{{ (i.price * i.count).toFixed(2) }}</td>
               </tr>
             </tbody>
           </table>
@@ -151,6 +250,72 @@ const submitOrder = () => {
   </div>
   <!-- 切换地址 -->
   <!-- 添加地址 -->
+
+  <!-- 地址选择弹窗 -->
+  <el-dialog
+    v-model="toggleFlag"
+    title="选择收货地址"
+    width="500px"
+  >
+    <div class="address-list">
+      <div
+        v-for="addr in addressList"
+        :key="addr.id"
+        class="address-item"
+        :class="{ active: selectedAddress?.id === addr.id }"
+        @click="selectAddress(addr)"
+      >
+        <div class="address-content">
+          <div class="address-header">
+            <span class="name">{{ addr.name }}</span>
+            <span class="phone">{{ addr.phone }}</span>
+            <el-tag v-if="addr.isDefault" size="small" type="success">默认</el-tag>
+          </div>
+          <div class="address-detail">{{ addr.address }}</div>
+        </div>
+        <div class="radio-wrapper">
+          <el-radio :model-value="selectedAddress?.id" :label="addr.id">
+            <span class="sr-only">选择地址</span>
+          </el-radio>
+        </div>
+      </div>
+    </div>
+  </el-dialog>
+
+  <!-- 新增地址弹窗 -->
+  <el-dialog
+    v-model="addFlag"
+    title="新增收货地址"
+    width="500px"
+  >
+    <el-form
+      ref="formRef"
+      :model="addressForm"
+      :rules="rules"
+      label-width="80px"
+    >
+      <el-form-item label="收货人" prop="name">
+        <el-input v-model="addressForm.name" placeholder="请输入收货人姓名" />
+      </el-form-item>
+      <el-form-item label="手机号码" prop="phone">
+        <el-input v-model="addressForm.phone" placeholder="请输入手机号码" />
+      </el-form-item>
+      <el-form-item label="详细地址" prop="address">
+        <el-input
+          v-model="addressForm.address"
+          type="textarea"
+          :rows="3"
+          placeholder="请输入详细地址"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="addFlag = false">取消</el-button>
+        <el-button type="primary" @click="handleAddAddress">确定</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <style scoped lang="scss">
@@ -387,5 +552,78 @@ const submitOrder = () => {
       line-height: 30px;
     }
   }
+}
+
+.address-list {
+  .address-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border: 1px solid #e4e4e4;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      border-color: #ff66b3;
+    }
+
+    &.active {
+      border-color: #ff66b3;
+      background-color: #fff5f8;
+    }
+
+    .address-content {
+      flex: 1;
+      margin-right: 15px;
+
+      .address-header {
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .name {
+          font-size: 16px;
+          font-weight: bold;
+        }
+
+        .phone {
+          color: #666;
+        }
+      }
+
+      .address-detail {
+        color: #666;
+        line-height: 1.5;
+        font-size: 14px;
+      }
+    }
+
+    .radio-wrapper {
+      padding-left: 10px;
+    }
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 </style>

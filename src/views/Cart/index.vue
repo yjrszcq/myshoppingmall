@@ -91,10 +91,10 @@ const checkout = () => {
               <p>&yen;{{ i.price }}</p>
             </td>
             <td class="tc">
-              <el-input-number v-model="i.count":min="1" />
+              <el-input-number v-model="i.quantity":min="1" />
             </td>
             <td class="tc">
-              <p class="f16 red">&yen;{{ (i.price * i.count).toFixed(2) }}</p>
+              <p class="f16 red">&yen;{{ (i.price * i.quantity).toFixed(2) }}</p>
             </td>
             <td class="tc">
               <p>

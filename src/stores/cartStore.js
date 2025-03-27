@@ -3,49 +3,80 @@
 import { defineStore } from 'pinia'
 import { computed,ref} from 'vue'
 import { useUserstore } from './user'
+import { addItemToCartAPI,getCartContentsAPI,deleteCartItemAPI,updateCartItemQuantityAPI } from '@/apis/cart'
 
 export const useCartStore = defineStore('cart', () => {
     const userStore = useUserstore()
+    const isLogin = computed(() => userStore.userInfo.token)
 
     //定义cartlist 
     const cartList = ref([])
    
  
     //定义添加
-    const addCart =  (goods)=>{
-      const { name, count } = goods
+    const addCart =  async (goods)=>{
+      const { productId, quantity } = goods
+      if(isLogin.value){
+        //已登录后的逻辑
+        await addItemToCartAPI({productId, quantity})
+        const res = await getCartContentsAPI()
+        cartList.value = res.result
+      }
+      else{
         // 添加购物车操作
-        const item = cartList.value.find((item) => goods.name === item.name)
+        const item = cartList.value.find((item) => goods.productId === item.productId)
       if(item){
-        item.count+=goods.count
+        item.quantity+=goods.quantity
       }
       else{
         cartList.value.push(goods)
       }
+      }
   }
 
     // 删除购物车
-// 删除购物车中的单个商品
-    const delCart = (name) => {
-        const idx = cartList.value.findIndex((item) => name === item.name);
-        if (idx !== -1) {
-            cartList.value.splice(idx, 1); // 仅删除匹配的商品
-        }
+     const delCart = async (productId) => {
+      if(isLogin.value){
+        //调用接口
+        await deleteCartItemAPI(productId)
+        const res = await getCartContentsAPI()
+        cartList.value = res.result
 
-        // 如果购物车为空，取消全选状态
-        isAll.value = cartList.value.length > 0;
-    };
+      }
+      else{
+        const idx = cartList.value.findIndex((item) => productId === item.productId)
+        cartList.value.splice(idx, 1)
+        isAll.value = false;
+      }
+    }
+
+      //更新商品数量
+      const updateQuantity = async (itemId, quantity) => {
+        if(isLogin.value){
+          // 已登录后的逻辑
+          await updateCartItemQuantityAPI(itemId, quantity)
+          const res = await getCartContentsAPI()
+          cartList.value = res.result
+        } else {
+          // 未登录的逻辑
+          const item = cartList.value.find((item) => itemId === item.itemId)
+          if(item) {
+            item.quantity = quantity
+          }
+        }
+      }
+
 
 
     //单选功能
-    const singleCheck = (name,selected) => {
-      const item = cartList.value.find((item) => item.name===name)
+    const singleCheck = (productId,selected) => {
+      const item = cartList.value.find((item) => item.productId===productId)
       item.selected = selected
     }
 
 
     //  总的数量 所有项的count之和
-    const allCount = computed(() => cartList.value.reduce((a, c) => a + c.count, 0))
+    const allCount = computed(() => cartList.value.reduce((a, c) => a + c.quantity, 0))
 
     //是否全选
     const isAll = computed(() => {
@@ -61,9 +92,9 @@ export const useCartStore = defineStore('cart', () => {
     }
 
     //已选择数量
-    const selectedCount = computed(() => cartList.value.filter(item => item.selected).reduce((a, c) => a + c.count, 0))
+    const selectedCount = computed(() => cartList.value.filter(item => item.selected).reduce((a, c) => a + c.quantity, 0))
     //已选择合计
-    const selectedPrice = computed(() => cartList.value.filter(item => item.selected).reduce((a, c) => a + c.count * c.price, 0))
+    const selectedPrice = computed(() => cartList.value.filter(item => item.selected).reduce((a, c) => a + c.quantity * c.price, 0))
 
     return{
         cartList,
@@ -72,6 +103,7 @@ export const useCartStore = defineStore('cart', () => {
         allCheck,
         singleCheck,
         delCart,
+        updateQuantity,
         selectedCount,
         selectedPrice,
         allCount

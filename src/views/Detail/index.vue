@@ -11,24 +11,28 @@ const cartStore = useCartStore()
 // 商品详情对象
 const goods = ref({})
 
+const updateQuantity = (itemId, quantity) => {
+  cartStore.updateCartItemQuantity(itemId, quantity)
+}
 
 // 获取路由参数 id
 const route = useRoute()
 
 //count
-const count = ref(1)
-const countChange = (count) => {
-  console.log(count)
+const quantity = ref(1)
+const countChange = (quantity) => {
+  console.log(quantity)
 }
 
 //添加购物车
 const addCart = () => {
      cartStore.addCart({
-      id: goods.value.id,
+      itemId: goods.value.itemId,
+      productId: goods.value.productId,
       name: goods.value.name,
       picture: goods.value.mainPictures[0],
       price: goods.value.price,
-      count: count.value,
+      quantity: quantity.value,
       selected:true
      })
 }
@@ -129,7 +133,7 @@ onMounted(() => {
               <!-- sku组件 -->
 
               <!-- 数据组件 -->
-              <el-input-number v-model="count":min="1" @change="countChange" class="number"/>
+              <el-input-number v-model="quantity":min="1" @change="() => updateQuantity(goods.value.itemId, quantity)" class="number"/>
               <!-- 按钮组件 -->
               <div>
                 <el-button size="large" class="btn" @click="addCart">

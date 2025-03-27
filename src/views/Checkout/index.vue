@@ -470,19 +470,35 @@ const handleAddAddress = async () => {
   .info {
     display: flex;
     text-align: left;
+    align-items: center;
+    height: 70px;
 
     img {
       width: 70px;
       height: 70px;
       margin-right: 20px;
+      object-fit: cover;
     }
 
     .right {
-      line-height: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
 
       p {
+        line-height: 24px;
+        margin: 0;
+
+        &:first-child {
+          font-size: 16px;
+          margin-bottom: 4px;
+        }
+
         &:last-child {
           color: #999;
+          font-size: 14px;
         }
       }
     }
@@ -492,6 +508,8 @@ const handleAddAddress = async () => {
     th {
       background: #f5f5f5;
       font-weight: normal;
+      height: 50px;
+      font-size: 16px;
     }
 
     td,
@@ -499,6 +517,7 @@ const handleAddAddress = async () => {
       text-align: center;
       padding: 20px;
       border-bottom: 1px solid #f5f5f5;
+      vertical-align: middle;
 
       &:first-child {
         border-left: 1px solid #f5f5f5;
@@ -507,6 +526,10 @@ const handleAddAddress = async () => {
       &:last-child {
         border-right: 1px solid #f5f5f5;
       }
+    }
+
+    td:first-child {
+      padding: 10px 20px;
     }
   }
 }
@@ -534,26 +557,41 @@ const handleAddAddress = async () => {
 }
 
 .total {
+  padding: 20px 30px;
+
   dl {
     display: flex;
     justify-content: flex-end;
-    line-height: 50px;
+    align-items: center;
+    margin-bottom: 15px; // 增加行间距
+    font-size: 16px; // 增加字体大小
+
+    &:last-child {
+      margin-bottom: 0;
+    }
 
     dt {
+      width: 140px; // 统一宽度，保证对齐
+      text-align: right;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
       i {
         display: inline-block;
-        width: 2em;
+        width: 1em;
+        height: 1em;
       }
     }
 
     dd {
-      width: 240px;
+      width: 140px; // 统一宽度
       text-align: right;
-      padding-right: 70px;
+      padding-right: 50px;
 
       &.price {
         font-size: 20px;
-        color: $priceColor;
+        color: #ff66b3;
       }
     }
   }

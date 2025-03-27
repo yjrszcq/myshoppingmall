@@ -19,7 +19,7 @@ import UserOrder from "@/views/Member/Components/UserOrder.vue";
 import UserInfo from "@/views/Member/Components/UserInfo.vue";
 import Payment from "@/views/Payment/index.vue"
 import BankInfo from "@/views/BankInfo/index.vue"
-
+import Address from "@/views/Member/Components/address.vue"
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     // path和component对应关系的位置
@@ -27,10 +27,11 @@ const router = createRouter({
         {
             path: '/',
             component: Layout,
-            children: [{
-                path: '',
-                component: Home,
-            },
+            children: [
+                {
+                    path: '',
+                    component: Home,
+                },
                 {
                     path:'detail/:id',
                     component: Detail,
@@ -55,17 +56,25 @@ const router = createRouter({
                     path:'bank-info',
                     component: BankInfo,
                 },
+                //会员中心
                 {
-                    path: '/member',
+                    name: 'member',
+                    path: 'member',
                     component: Member,
-                    children:[{
-                        path:'/member/user',
-                        component:UserOrder,
-                    },
+                    children:[
                         {
-                            path:'/member/order',
+                            path:'',
                             component:UserInfo,
-                        }]
+                        },
+                        {
+                            path:'order',
+                            component:UserOrder,
+                        },
+                        {
+                            path:'address',
+                            component:Address,
+                        }
+                    ]
                 }
             ]
         },

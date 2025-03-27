@@ -1,5 +1,43 @@
 <script setup>
+import { onMounted, ref } from "vue";
+import GoodsItem from '../../../views/Home/components/GoodsItem.vue';
 const userStore = {}
+// 猜你喜欢列表，暂无接口，模拟数据
+const likeList = ref([
+  {
+    "id": "3995454",
+    "name": "黑科技专利款100%防水保暖针织毛线帽",
+    "desc": "黑科技专利，做到真正的保暖防水",
+    "price": "135.00",
+    "picture": "https://yanxuan-item.nosdn.127.net/3683d874b9623434a10b4ab0c2e6be9f.png",
+    "orderNum": 3989
+  },
+  {
+    "id": "4027998",
+    "name": "亮碟多效合一洗涤块495g",
+    "desc": "洗碗机专用，强力去污",
+    "price": "69.90",
+    "picture": "https://yanxuan-item.nosdn.127.net/e07c2b63765cf9f4a46d489c6e09c1c1.jpg",
+    "orderNum": 7798
+  },
+  {
+    "id": "4026809",
+    "name": "亚洲头围城市运动通勤电动车头盔",
+    "desc": "亚洲头型设计3C认证城市通勤",
+    "price": "158.00",
+    "picture": "https://yanxuan-item.nosdn.127.net/ae521f6d97560598f3e6b3ddaed477c0.png",
+    "orderNum": 12705
+  },
+  {
+    "id": "4023839",
+    "name": "日本冰块冰球制冰模具",
+    "desc": "轻轻一拍，轻松取冰",
+    "price": "29.80",
+    "picture": "https://yanxuan-item.nosdn.127.net/2be38fc160992fe41f7d4a45bd0f90e5.png",
+    "orderNum": 9800
+  }
+]);
+
 </script>
 
 <template>
@@ -20,10 +58,12 @@ const userStore = {}
         <span class="iconfont icon-aq"></span>
         <p>安全设置</p>
       </a>
-      <a href="javascript:;">
-        <span class="iconfont icon-dw"></span>
-        <p>地址管理</p>
-      </a>
+      <RouterLink to="/member/address">
+        <a href="javascript:;">
+          <span class="iconfont icon-dw"></span>
+          <p>地址管理</p>
+        </a>
+      </RouterLink>
     </div>
   </div>
   <div class="like-container">
@@ -32,7 +72,7 @@ const userStore = {}
         <h4 data-v-bcb266e0="">猜你喜欢 </h4>
       </div>
       <div class="goods-list">
-        <!-- <GoodsItem v-for="good in likeList" :key="good.id" :good="good" /> -->
+        <GoodsItem v-for="good in likeList" :key="good.id" :goods="good" />
       </div>
     </div>
   </div>
@@ -126,6 +166,8 @@ const userStore = {}
   .goods-list {
     display: flex;
     justify-content: space-around;
+    box-sizing: border-box;
+    padding: 20px 0;
   }
 }
 </style>

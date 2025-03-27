@@ -9,8 +9,8 @@ defineProps({
 </script>
 
 <template>
-  <RouterLink :to="`/detail/${goods.productId}`" class="goods-item">
-      <img :src="goods.thumbnail" alt="" />
+  <RouterLink :to="{path: `/detail/${goods.id}`}" class="goods-item">
+      <img :src="goods.picture" alt="" />
       <p class="name">{{ goods.name }}</p>
       <!--    <p class="desc">{{ goods.desc }}</p>-->
       <p class="price">&yen;{{ goods.price }}</p>
@@ -21,14 +21,16 @@ defineProps({
 <style scoped lang="scss">
 .goods-item {
   display: block;
-  width: 250px;
-  height: 400px;
+  width: 210px;
+  height: 300px;
   padding: 5px 5px;
   text-align: center;
-  transition: all .5s;
+  transition: all .2s;
   background-color: #fff;
   border-radius: 16px; // 圆角矩形
   box-sizing: border-box; // 让宽高包含 padding，避免撑开
+  //增加阴影
+  box-shadow: 0 4px 8px rgba(192, 121, 155, 0.314);
 
   &:hover {
     transform: translate3d(0, -3px, 0);
@@ -36,8 +38,8 @@ defineProps({
   }
 
   img {
-    width: 100%;
-    height: 70%;
+    width: 170px;
+    height: 160px;
     border-radius: 16px; // 圆角矩形
   }
 

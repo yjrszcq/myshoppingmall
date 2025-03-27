@@ -11,7 +11,7 @@
           <el-col :span="8" v-for="(address, index) in addressList" :key="index">
             <el-card class="address-item" shadow="hover">
               <div class="info">
-                <p><span class="label">收货人：</span>{{ address.name }}</p>
+                <p><span class="label">收货人： </span>{{ address.name }}</p>
                 <p><span class="label">联系电话：</span>{{ address.phone }}</p>
                 <p><span class="label">收货地址：</span>{{ address.address }}</p>
               </div>

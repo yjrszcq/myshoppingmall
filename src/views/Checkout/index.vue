@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
@@ -9,6 +9,26 @@ const curAddress = ref({})  // 地址对象
 const payMethod = ref('online') // 支付方式
 const toggleFlag = ref(false) // 切换地址弹窗
 const addFlag = ref(false) // 添加地址弹窗
+const selectedAddress = ref(null)
+
+// 配送时间选择
+const deliveryTime = ref('anytime') // 默认选择不限送货时间
+const deliveryOptions = [
+  { id: 'anytime', text: '不限送货时间：周一至周日' },
+  { id: 'workday', text: '工作日送货：周一至周五' },
+  { id: 'weekend', text: '双休日、假日送货：周六至周日' }
+]
+
+// 计算手续费
+const serviceFee = computed(() => {
+  return payMethod.value === 'online' ? 0 : 5
+})
+
+// 计算应付总额
+const totalPayPrice = computed(() => {
+  if (!checkInfo.value.summary) return 0
+  return checkInfo.value.summary.totalPrice + checkInfo.value.summary.postFee + serviceFee.value
+})
 
 // 默认地址
 const defaultAddress = {
@@ -18,14 +38,36 @@ const defaultAddress = {
   address: '三里屯SOHO 2号楼 2层 2-2-2'
 }
 
+// 从本地存储获取购物车商品信息
+const getCartInfo = () => {
+  const cartInfo = JSON.parse(localStorage.getItem('cartInfo') || '{}')
+  if (cartInfo.goods && cartInfo.goods.length > 0) {
+    checkInfo.value = {
+      goods: cartInfo.goods,
+      summary: {
+        goodsCount: cartInfo.goods.reduce((sum, item) => sum + item.count, 0),
+        totalPrice: cartInfo.goods.reduce((sum, item) => sum + item.price * item.count, 0),
+        postFee: 10, // 运费
+        totalPayPrice: cartInfo.goods.reduce((sum, item) => sum + item.price * item.count, 0) + 10
+      }
+    }
+  }
+}
+
 // 初始化默认地址
 onMounted(() => {
   curAddress.value = defaultAddress
+  getCartInfo()
 })
 
 // 切换支付方式
 const changePayMethod = (method) => {
   payMethod.value = method
+}
+
+// 切换配送时间
+const changeDeliveryTime = (timeId) => {
+  deliveryTime.value = timeId
 }
 
 // 提交订单
@@ -41,6 +83,87 @@ const submitOrder = () => {
   } else {
     // 货到付款，跳转到银行卡信息页面
     router.push('/bank-info')
+  }
+}
+
+const address = ref('北京市朝阳区三里屯SOHO 2号楼 2层')
+const phone = ref('13800138000')
+
+// 地址列表数据
+const addressList = ref([
+  {
+    id: 1,
+    name: '张三',
+    phone: '13800138000',
+    address: '北京市朝阳区三里屯SOHO 2号楼 2层',
+    isDefault: true
+  },
+  {
+    id: 2,
+    name: '张三',
+    phone: '13800138001',
+    address: '上海市浦东新区陆家嘴环路1000号',
+    isDefault: false
+  }
+])
+
+// 新增地址表单数据
+const addressForm = ref({
+  name: '',
+  phone: '',
+  address: ''
+})
+
+// 表单验证规则
+const rules = {
+  name: [
+    { required: true, message: '请输入收货人姓名', trigger: 'blur' }
+  ],
+  phone: [
+    { required: true, message: '请输入联系电话', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
+  ],
+  address: [
+    { required: true, message: '请输入详细地址', trigger: 'blur' }
+  ]
+}
+
+const formRef = ref(null)
+
+// 选择地址
+const selectAddress = (addr) => {
+  selectedAddress.value = addr
+  curAddress.value = {
+    receiver: addr.name,
+    contact: addr.phone,
+    address: addr.address,
+    fullLocation: '' // 移除这个字段，因为我们不需要重复显示地址
+  }
+  toggleFlag.value = false
+}
+
+// 添加新地址
+const handleAddAddress = async () => {
+  if (!formRef.value) return
+  
+  try {
+    await formRef.value.validate()
+    // 这里应该调用后端API保存地址
+    const newAddress = {
+      id: addressList.value.length + 1,
+      ...addressForm.value,
+      isDefault: false
+    }
+    addressList.value.push(newAddress)
+    addFlag.value = false
+    // 重置表单
+    addressForm.value = {
+      name: '',
+      phone: '',
+      address: ''
+    }
+  } catch (error) {
+    ElMessage.error('请检查表单信息是否正确')
   }
 }
 </script>
@@ -60,7 +183,7 @@ const submitOrder = () => {
               <ul v-else>
                 <li><span>收<i />货<i />人：</span>{{ curAddress.receiver }}</li>
                 <li><span>联系方式：</span>{{ curAddress.contact }}</li>
-                <li><span>收货地址：</span>{{ curAddress.fullLocation }} {{ curAddress.address }}</li>
+                <li><span>收货地址：</span>{{ curAddress.address }}</li>
               </ul>
             </div>
             <div class="action">
@@ -95,9 +218,9 @@ const submitOrder = () => {
                   </a>
                 </td>
                 <td>&yen;{{ i.price }}</td>
-                <td>{{ i.price }}</td>
-                <td>&yen;{{ i.totalPrice }}</td>
-                <td>&yen;{{ i.totalPayPrice }}</td>
+                <td>{{ i.count }}</td>
+                <td>&yen;{{ (i.price * i.count).toFixed(2) }}</td>
+                <td>&yen;{{ (i.price * i.count).toFixed(2) }}</td>
               </tr>
             </tbody>
           </table>
@@ -106,9 +229,16 @@ const submitOrder = () => {
         <!-- 配送时间 -->
         <h3 class="box-title">配送时间</h3>
         <div class="box-body">
-          <a class="my-btn active" href="javascript:;">不限送货时间：周一至周日</a>
-          <a class="my-btn" href="javascript:;">工作日送货：周一至周五</a>
-          <a class="my-btn" href="javascript:;">双休日、假日送货：周六至周日</a>
+          <a 
+            v-for="option in deliveryOptions" 
+            :key="option.id"
+            class="my-btn" 
+            :class="{ active: deliveryTime === option.id }" 
+            href="javascript:;"
+            @click="changeDeliveryTime(option.id)"
+          >
+            {{ option.text }}
+          </a>
         </div>
 
         <!-- 支付方式 -->
@@ -136,8 +266,12 @@ const submitOrder = () => {
               <dd>¥{{ checkInfo.summary?.postFee.toFixed(2) }}</dd>
             </dl>
             <dl>
+              <dt>手<i></i>续费：</dt>
+              <dd>¥{{ serviceFee.toFixed(2) }}</dd>
+            </dl>
+            <dl>
               <dt>应付总额：</dt>
-              <dd class="price">¥{{ checkInfo.summary?.totalPayPrice.toFixed(2) }}</dd>
+              <dd class="price">¥{{ totalPayPrice.toFixed(2) }}</dd>
             </dl>
           </div>
         </div>
@@ -151,6 +285,72 @@ const submitOrder = () => {
   </div>
   <!-- 切换地址 -->
   <!-- 添加地址 -->
+
+  <!-- 地址选择弹窗 -->
+  <el-dialog
+    v-model="toggleFlag"
+    title="选择收货地址"
+    width="500px"
+  >
+    <div class="address-list">
+      <div
+        v-for="addr in addressList"
+        :key="addr.id"
+        class="address-item"
+        :class="{ active: selectedAddress?.id === addr.id }"
+        @click="selectAddress(addr)"
+      >
+        <div class="address-content">
+          <div class="address-header">
+            <span class="name">{{ addr.name }}</span>
+            <span class="phone">{{ addr.phone }}</span>
+            <el-tag v-if="addr.isDefault" size="small" type="success">默认</el-tag>
+          </div>
+          <div class="address-detail">{{ addr.address }}</div>
+        </div>
+        <div class="radio-wrapper">
+          <el-radio :model-value="selectedAddress?.id" :label="addr.id">
+            <span class="sr-only">选择地址</span>
+          </el-radio>
+        </div>
+      </div>
+    </div>
+  </el-dialog>
+
+  <!-- 新增地址弹窗 -->
+  <el-dialog
+    v-model="addFlag"
+    title="新增收货地址"
+    width="500px"
+  >
+    <el-form
+      ref="formRef"
+      :model="addressForm"
+      :rules="rules"
+      label-width="80px"
+    >
+      <el-form-item label="收货人" prop="name">
+        <el-input v-model="addressForm.name" placeholder="请输入收货人姓名" />
+      </el-form-item>
+      <el-form-item label="手机号码" prop="phone">
+        <el-input v-model="addressForm.phone" placeholder="请输入手机号码" />
+      </el-form-item>
+      <el-form-item label="详细地址" prop="address">
+        <el-input
+          v-model="addressForm.address"
+          type="textarea"
+          :rows="3"
+          placeholder="请输入详细地址"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="addFlag = false">取消</el-button>
+        <el-button type="primary" @click="handleAddAddress">确定</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <style scoped lang="scss">
@@ -270,19 +470,35 @@ const submitOrder = () => {
   .info {
     display: flex;
     text-align: left;
+    align-items: center;
+    height: 70px;
 
     img {
       width: 70px;
       height: 70px;
       margin-right: 20px;
+      object-fit: cover;
     }
 
     .right {
-      line-height: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
 
       p {
+        line-height: 24px;
+        margin: 0;
+
+        &:first-child {
+          font-size: 16px;
+          margin-bottom: 4px;
+        }
+
         &:last-child {
           color: #999;
+          font-size: 14px;
         }
       }
     }
@@ -292,6 +508,8 @@ const submitOrder = () => {
     th {
       background: #f5f5f5;
       font-weight: normal;
+      height: 50px;
+      font-size: 16px;
     }
 
     td,
@@ -299,6 +517,7 @@ const submitOrder = () => {
       text-align: center;
       padding: 20px;
       border-bottom: 1px solid #f5f5f5;
+      vertical-align: middle;
 
       &:first-child {
         border-left: 1px solid #f5f5f5;
@@ -307,6 +526,10 @@ const submitOrder = () => {
       &:last-child {
         border-right: 1px solid #f5f5f5;
       }
+    }
+
+    td:first-child {
+      padding: 10px 20px;
     }
   }
 }
@@ -320,34 +543,55 @@ const submitOrder = () => {
   margin-right: 25px;
   color: #666666;
   display: inline-block;
+  transition: all 0.3s; // 添加过渡效果
 
   &.active,
   &:hover {
-    border-color: $xtxColor;
+    border-color: #ff66b3;
+    color: #ff66b3; // 添加文字颜色变化
+  }
+
+  &.active {
+    background-color: #fff5f8; // 添加选中状态的背景色
   }
 }
 
 .total {
+  padding: 20px 30px;
+
   dl {
     display: flex;
     justify-content: flex-end;
-    line-height: 50px;
+    align-items: center;
+    margin-bottom: 15px; // 增加行间距
+    font-size: 16px; // 增加字体大小
+
+    &:last-child {
+      margin-bottom: 0;
+    }
 
     dt {
+      width: 140px; // 统一宽度，保证对齐
+      text-align: right;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
       i {
         display: inline-block;
-        width: 2em;
+        width: 1em;
+        height: 1em;
       }
     }
 
     dd {
-      width: 240px;
+      width: 140px; // 统一宽度
       text-align: right;
-      padding-right: 70px;
+      padding-right: 50px;
 
       &.price {
         font-size: 20px;
-        color: $priceColor;
+        color: #ff66b3;
       }
     }
   }
@@ -387,5 +631,78 @@ const submitOrder = () => {
       line-height: 30px;
     }
   }
+}
+
+.address-list {
+  .address-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border: 1px solid #e4e4e4;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      border-color: #ff66b3;
+    }
+
+    &.active {
+      border-color: #ff66b3;
+      background-color: #fff5f8;
+    }
+
+    .address-content {
+      flex: 1;
+      margin-right: 15px;
+
+      .address-header {
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .name {
+          font-size: 16px;
+          font-weight: bold;
+        }
+
+        .phone {
+          color: #666;
+        }
+      }
+
+      .address-detail {
+        color: #666;
+        line-height: 1.5;
+        font-size: 14px;
+      }
+    }
+
+    .radio-wrapper {
+      padding-left: 10px;
+    }
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 </style>

@@ -1,6 +1,11 @@
 <script setup>
 import { useCartStore } from '@/stores/cartStore'
+import { ElMessage } from 'element-plus'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
 const cartStore = useCartStore()
+const router = useRouter()
 
 const singleCheck = (i,selected) => {
   console.log(i,selected)
@@ -9,6 +14,42 @@ cartStore.singleCheck(i.name,selected)
 
 const allCheck = (selected)=> {
   cartStore.allCheck(selected)
+}
+
+// 下单结算
+const checkout = () => {
+  // 保存选中的商品信息到本地存储
+  const selectedGoods = cartStore.cartList.filter(item => item.selected)
+  if (selectedGoods.length === 0) {
+    ElMessage.warning('请选择要结算的商品')
+    return
+  }
+  
+  // 计算商品总价和应付总额
+  const totalPrice = selectedGoods.reduce((sum, item) => sum + item.price * item.count, 0)
+  const postFee = 10 // 运费
+  const totalPayPrice = totalPrice + postFee
+  
+  // 将选中的商品信息和金额信息保存到本地存储
+  localStorage.setItem('cartInfo', JSON.stringify({
+    goods: selectedGoods.map(item => ({
+      id: item.id,
+      name: item.name,
+      picture: item.picture,
+      price: item.price,
+      count: item.count,
+      attrsText: item.attrsText
+    })),
+    summary: {
+      goodsCount: selectedGoods.reduce((sum, item) => sum + item.count, 0),
+      totalPrice: totalPrice,
+      postFee: postFee,
+      totalPayPrice: totalPayPrice
+    }
+  }))
+  
+  // 跳转到结算页面
+  router.push('/checkout')
 }
 </script>
 
@@ -50,10 +91,10 @@ const allCheck = (selected)=> {
               <p>&yen;{{ i.price }}</p>
             </td>
             <td class="tc">
-              <el-input-number v-model="i.count":min="1" />
+              <el-input-number v-model="i.quantity":min="1" />
             </td>
             <td class="tc">
-              <p class="f16 red">&yen;{{ (i.price * i.count).toFixed(2) }}</p>
+              <p class="f16 red">&yen;{{ (i.price * i.quantity).toFixed(2) }}</p>
             </td>
             <td class="tc">
               <p>
@@ -85,7 +126,7 @@ const allCheck = (selected)=> {
           <span class="red">¥ {{cartStore.selectedPrice.toFixed(2)}} </span>
         </div>
         <div class="total">
-          <el-button size="large" style="background-color: #ff66b3;color: white" @click="$router.push('/checkout')">下单结算</el-button>
+          <el-button size="large" style="background-color: #ff66b3;color: white" @click="checkout">下单结算</el-button>
         </div>
         <div>
         </div>

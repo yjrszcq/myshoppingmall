@@ -1,20 +1,43 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const payMethod = ref('alipay') // 默认支付宝支付
 
-// 生成随机标识字符串
+// 生成支付标识字符串
 const generatePaymentId = () => {
-  const timestamp = Date.now().toString().slice(-6)
-  const random = Math.random().toString(36).substring(2, 8)
-  return `PAY${timestamp}${random}`
+  // 获取当前日期
+  const now = new Date()
+  const year = now.getFullYear().toString().slice(-2) // 年份后两位
+  const month = (now.getMonth() + 1).toString().padStart(2, '0') // 月份，补零
+  const day = now.getDate().toString().padStart(2, '0') // 日期，补零
+  const hour = now.getHours().toString().padStart(2, '0') // 小时，补零
+  const minute = now.getMinutes().toString().padStart(2, '0') // 分钟，补零
+  
+  // 生成4位随机字母（不包含容易混淆的字母）
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ' // 排除了容易混淆的I和O
+  let randomLetters = ''
+  for (let i = 0; i < 4; i++) {
+    randomLetters += letters.charAt(Math.floor(Math.random() * letters.length))
+  }
+  
+  // 组合支付标识：PAY + 年月日时分 + 4位随机字母
+  return `PAY${year}${month}${day}${hour}${minute}${randomLetters}`
 }
 
 // 支付标识字符串
 const paymentId = ref(generatePaymentId())
+
+// 从本地存储获取支付金额
+const totalAmount = ref(0)
+onMounted(() => {
+  const cartInfo = JSON.parse(localStorage.getItem('cartInfo') || '{}')
+  if (cartInfo.summary) {
+    totalAmount.value = cartInfo.summary.totalPayPrice
+  }
+})
 
 // 支付方式列表
 const payMethods = [
@@ -96,6 +119,10 @@ const confirmPay = async () => {
   <div class="payment-page">
     <div class="container">
       <div class="wrapper">
+        <div class="payment-amount">
+          <span class="amount-label">支付金额：</span>
+          <span class="amount-value">¥{{ totalAmount.toFixed(2) }}</span>
+        </div>
         <h3 class="box-title">选择支付方式</h3>
         <div class="box-body">
           <div class="pay-methods">
@@ -125,7 +152,8 @@ const confirmPay = async () => {
               <div class="payment-id-box">
                 <p class="payment-id-label">支付标识：</p>
                 <p class="payment-id">{{ paymentId }}</p>
-                <p class="payment-id-tip">请在转账时输入此标识，以便我们及时确认您的支付</p>
+                <p class="payment-id-tip">请在转账时备注此支付标识</p>
+                <p class="payment-id-tip">（标识包含：支付日期时间 + 4位字母）</p>
               </div>
             </div>
           </div>
@@ -170,6 +198,25 @@ const confirmPay = async () => {
     background: #fff;
     padding: 20px;
 
+    .payment-amount {
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #f5f5f5;
+      margin-bottom: 20px;
+
+      .amount-label {
+        font-size: 16px;
+        color: #666;
+        margin-right: 10px;
+      }
+
+      .amount-value {
+        font-size: 24px;
+        color: #ff66b3;
+        font-weight: bold;
+      }
+    }
+
     .box-title {
       font-size: 16px;
       font-weight: normal;
@@ -198,7 +245,6 @@ const confirmPay = async () => {
         justify-content: center;
         cursor: pointer;
         transition: all 0.3s;
-        background-color: #fff;
 
         &:hover {
           border-color: #ff66b3;
@@ -213,7 +259,6 @@ const confirmPay = async () => {
           width: 40px;
           height: 40px;
           margin-bottom: 10px;
-          background-color: #fff;
         }
 
         span {
@@ -292,6 +337,31 @@ const confirmPay = async () => {
       padding: 20px 0;
       border-top: 1px solid #f5f5f5;
     }
+  }
+}
+
+.payment-id {
+  margin-top: 15px;
+  text-align: center;
+
+  .label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+  }
+
+  .value {
+    font-size: 18px;
+    color: #ff66b3;
+    font-weight: bold;
+    font-family: monospace; // 使用等宽字体，便于阅读
+    margin-bottom: 10px;
+  }
+
+  .tip {
+    font-size: 12px;
+    color: #999;
+    margin: 5px 0;
   }
 }
 </style> 

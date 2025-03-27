@@ -37,7 +37,8 @@ const totalAmount = ref(0)
 onMounted(() => {
   const cartInfo = JSON.parse(localStorage.getItem('cartInfo') || '{}')
   if (cartInfo.summary) {
-    totalAmount.value = cartInfo.summary.totalPayPrice
+    // 商品总价 + 运费 + 货到付款手续费(5元)
+    totalAmount.value = cartInfo.summary.totalPrice + cartInfo.summary.postFee + 5
   }
 })
 
@@ -71,6 +72,7 @@ const submitBankInfo = async () => {
             >
               <template #default>
                 <p>您需要担保的金额为：<span class="amount">¥{{ totalAmount.toFixed(2) }}</span></p>
+                <p class="notice">此金额包含商品总价、运费以及货到付款手续费(5元)</p>
                 <p class="notice">请确保您的银行卡余额充足，以便完成支付。</p>
               </template>
             </el-alert>

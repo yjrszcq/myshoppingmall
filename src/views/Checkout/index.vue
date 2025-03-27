@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
@@ -10,6 +10,25 @@ const payMethod = ref('online') // 支付方式
 const toggleFlag = ref(false) // 切换地址弹窗
 const addFlag = ref(false) // 添加地址弹窗
 const selectedAddress = ref(null)
+
+// 配送时间选择
+const deliveryTime = ref('anytime') // 默认选择不限送货时间
+const deliveryOptions = [
+  { id: 'anytime', text: '不限送货时间：周一至周日' },
+  { id: 'workday', text: '工作日送货：周一至周五' },
+  { id: 'weekend', text: '双休日、假日送货：周六至周日' }
+]
+
+// 计算手续费
+const serviceFee = computed(() => {
+  return payMethod.value === 'online' ? 0 : 5
+})
+
+// 计算应付总额
+const totalPayPrice = computed(() => {
+  if (!checkInfo.value.summary) return 0
+  return checkInfo.value.summary.totalPrice + checkInfo.value.summary.postFee + serviceFee.value
+})
 
 // 默认地址
 const defaultAddress = {
@@ -44,6 +63,11 @@ onMounted(() => {
 // 切换支付方式
 const changePayMethod = (method) => {
   payMethod.value = method
+}
+
+// 切换配送时间
+const changeDeliveryTime = (timeId) => {
+  deliveryTime.value = timeId
 }
 
 // 提交订单
@@ -205,9 +229,16 @@ const handleAddAddress = async () => {
         <!-- 配送时间 -->
         <h3 class="box-title">配送时间</h3>
         <div class="box-body">
-          <a class="my-btn active" href="javascript:;">不限送货时间：周一至周日</a>
-          <a class="my-btn" href="javascript:;">工作日送货：周一至周五</a>
-          <a class="my-btn" href="javascript:;">双休日、假日送货：周六至周日</a>
+          <a 
+            v-for="option in deliveryOptions" 
+            :key="option.id"
+            class="my-btn" 
+            :class="{ active: deliveryTime === option.id }" 
+            href="javascript:;"
+            @click="changeDeliveryTime(option.id)"
+          >
+            {{ option.text }}
+          </a>
         </div>
 
         <!-- 支付方式 -->
@@ -235,8 +266,12 @@ const handleAddAddress = async () => {
               <dd>¥{{ checkInfo.summary?.postFee.toFixed(2) }}</dd>
             </dl>
             <dl>
+              <dt>手<i></i>续费：</dt>
+              <dd>¥{{ serviceFee.toFixed(2) }}</dd>
+            </dl>
+            <dl>
               <dt>应付总额：</dt>
-              <dd class="price">¥{{ checkInfo.summary?.totalPayPrice.toFixed(2) }}</dd>
+              <dd class="price">¥{{ totalPayPrice.toFixed(2) }}</dd>
             </dl>
           </div>
         </div>
@@ -485,10 +520,16 @@ const handleAddAddress = async () => {
   margin-right: 25px;
   color: #666666;
   display: inline-block;
+  transition: all 0.3s; // 添加过渡效果
 
   &.active,
   &:hover {
-    border-color: $xtxColor;
+    border-color: #ff66b3;
+    color: #ff66b3; // 添加文字颜色变化
+  }
+
+  &.active {
+    background-color: #fff5f8; // 添加选中状态的背景色
   }
 }
 

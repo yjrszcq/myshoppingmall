@@ -10,13 +10,13 @@ node v20.15.0  ***请不要低于19，否则可能会引发未知错误***
 ## ToDoList
 * Home主页展示 （✔️）
 * 用户login （✔️）
-* 购物车
-* 个人中心
+* 购物车 (Estrella0101)
+* 个人中心 （adzukiZhu）
 * 搜索页面 （✔️）
 * 商品详情 （✔️）
 * 商户login （✔️）
-* 商户的商品/订单管理
-* 支付页面
+* 商户的商品/订单管理（Flliww）
+* 支付页面(KeloShen)
 
 
 ## Recommended IDE Setup

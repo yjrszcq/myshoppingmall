@@ -4,12 +4,13 @@ import { viewsOrders } from "../../../apis/vip.js";
 // tab列表
 const tabTypes = [
   { name: "all", label: "全部订单" },
-  { name: "unpay", label: "待付款" },
-  { name: "deliver", label: "待发货" },
-  { name: "receive", label: "待收货" },
-  { name: "comment", label: "待评价" },
-  { name: "complete", label: "已完成" },
-  { name: "cancel", label: "已取消" }
+  //   此处后端没有给接口，可以作为后面的扩展内容
+  // { name: "unpay", label: "待付款" },
+  // { name: "deliver", label: "待发货" },
+  // { name: "receive", label: "待收货" },
+  // { name: "comment", label: "待评价" },
+  // { name: "complete", label: "已完成" },
+  // { name: "cancel", label: "已取消" }
 ]
 // 定义订单列表
 const orderList = ref([])
@@ -24,8 +25,8 @@ const total = ref(0);
 //获取订单列表使用async+await 语法,解决异步问题，将异步变成同步
 const getOrderList = async () => {
   const res = await viewsOrders(params.value);
-  
-  
+
+
   orderList.value = res.orderItem;
   console.log(orderList.value);
   total.value = orderList.length; //后端接口缺少订单总数，暂时用订单列表长度代替
@@ -258,6 +259,6 @@ const formatPayState = (payState) => {
     }
   }
 
-  
+
 }
 </style>

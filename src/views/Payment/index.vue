@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { useCartStore } from '@/stores/cartStore.js'
 
 const router = useRouter()
 const payMethod = ref('alipay') // 默认支付宝支付
@@ -98,19 +99,64 @@ const selectPayMethod = (method) => {
 
 // 确认支付
 const confirmPay = async () => {
+  const cartStore = useCartStore()
+
   if (payMethod.value === 'card') {
     if (!formRef.value) return
-    
+
     try {
       await formRef.value.validate()
+
+      // 支付成功后的逻辑
+      await handleSuccessfulPayment(cartStore)
+
       ElMessage.success('支付成功')
       router.push('/member/order')
     } catch (error) {
       ElMessage.error('请检查银行卡信息是否正确')
     }
   } else {
+    // 非银行卡支付的成功逻辑
+    await handleSuccessfulPayment(cartStore)
+
     ElMessage.success('支付成功')
     router.push('/member/order')
+  }
+}
+
+// 支付成功后的处理函数
+const handleSuccessfulPayment = async (cartStore) => {
+  try {
+    // 1. 获取选中的商品（准备移除）
+    const selectedItems = cartStore.cartList.filter(item => item.selected)
+
+    // 2. 如果没有选中商品，理论上不应该发生，因为结算前应该检查
+    if (selectedItems.length === 0) {
+      console.warn('支付成功，但没有选中商品需要移除')
+      return
+    }
+
+    // 3. 根据登录状态处理购物车
+    if (cartStore.isLogin) {
+      // 已登录用户：调用API批量删除
+      const deletePromises = selectedItems.map(item =>
+          cartStore.delCart(item.productId)
+      )
+      await Promise.all(deletePromises)
+    } else {
+      // 未登录用户：本地移除选中的商品
+      selectedItems.forEach(item => {
+        cartStore.delCart(item.productId)
+      })
+    }
+
+    // 4. 可以在这里添加订单创建逻辑（如果需要）
+    // await createOrderAPI(selectedItems)
+
+  } catch (error) {
+    console.error('支付成功但更新购物车失败:', error)
+    // 这里可以选择不提示用户，因为支付已经成功了
+    // 或者记录错误日志以便后续处理
   }
 }
 </script>

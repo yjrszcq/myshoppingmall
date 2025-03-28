@@ -10,7 +10,7 @@ const total = ref(0)
 const getProductList = async () => {
 
     const res = await searchProducts({
-      keyword: '手机',
+      keyword: 'a3',
       page: 1,
       limit: 20,
       sort: 'price_asc'  //返回所有关键词为手机的产品

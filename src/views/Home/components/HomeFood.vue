@@ -10,13 +10,14 @@ const total = ref(0)
 const getProductList = async () => {
 
   const res = await searchProducts({
-    keyword: '食物',
+    keyword: 'a1',
     page: 1,
     limit: 20,
     sort: 'price_asc'  //返回所有关键词为手机的产品
   })
   newList.value = res.results
   total.value = res.total
+  console.log('商品3',res)
 }
 
 onMounted(() => {

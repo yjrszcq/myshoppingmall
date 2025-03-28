@@ -7,9 +7,11 @@ import { useRouter } from 'vue-router'
 const cartStore = useCartStore()
 const router = useRouter()
 
-const singleCheck = (i,selected) => {
-  console.log(i,selected)
-cartStore.singleCheck(i.name,selected)
+const singleCheck = (productId, selected) => {
+  const item = cartStore.cartList.find((item) => item.productId === productId)
+  if (item) {
+    item.selected = selected
+  }
 }
 
 const allCheck = (selected)=> {
@@ -75,7 +77,7 @@ const checkout = () => {
           <tr v-for="i in cartStore.cartList" :key="i.id">
             <td>
                 <!-- 单选框 -->
-              <el-checkbox :model-value="i.selected" @change="(selected)=>singleCheck(i,selected)" />
+              <el-checkbox :model-value="i.selected" @change="(selected)=>singleCheck(i.productId,selected)" />
             </td>
             <td>
               <div class="goods">

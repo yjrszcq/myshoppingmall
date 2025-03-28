@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useCartStore } from '@/stores/cartStore.js'
-
+import { useAddressStore } from '@/stores/addressStore'
+import { addAddressAPI } from '@/apis/vip.js';
 const router = useRouter()
 const checkInfo = ref({})  // 订单对象
 const curAddress = ref({})  // 地址对象
@@ -32,35 +33,40 @@ const totalPayPrice = computed(() => {
 })
 
 // 默认地址
-const defaultAddress = {
-  receiver: '张三',
-  contact: '13800138000',
-  fullLocation: '北京市 北京市 朝阳区',
-  address: '三里屯SOHO 2号楼 2层 2-2-2'
-}
+const defaultAddress = ref({})
 
 //从cart中直接获取
 const getCartInfo = () => {
-  const cartStore = useCartStore()
+  const cartStore = useCartStore();
 
-  if (cartStore.cartList.length > 0) {
-    checkInfo.value = {
-      goods: cartStore.cartList,
-      summary: {
-        goodsCount: cartStore.allCount,
-        totalPrice: cartStore.cartList.reduce((sum, item) => sum + item.price * item.quantity, 0),
-        postFee: 10, // 运费
-        totalPayPrice: cartStore.cartList.reduce((sum, item) => sum + item.price * item.quantity, 0) + 10
-      }
-    }
+  // 1. 筛选出被选中的商品（item.selected === true）
+  const selectedGoods = cartStore.cartList.filter(item => item.selected);
+
+  // 2. 如果没有选中商品，清空 checkInfo 并提示
+  if (selectedGoods.length === 0) {
+    checkInfo.value = null; // 或者设为空对象 {}
+    ElMessage.warning('请选择要结算的商品');
+    return;
   }
-}
 
-// 初始化默认地址
-onMounted(() => {
-  curAddress.value = defaultAddress
-  getCartInfo()
-})
+  // 3. 计算选中商品的总价、运费和应付总额
+  const totalPrice = selectedGoods.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const postFee = 10; // 运费
+  const totalPayPrice = totalPrice + postFee;
+
+  // 4. 更新 checkInfo.value（直接赋值）
+  checkInfo.value = {
+    goods: selectedGoods, // 仅包含选中的商品
+    summary: {
+      goodsCount: selectedGoods.reduce((sum, item) => sum + item.quantity, 0), // 选中商品总数量
+      totalPrice,   // 选中商品总价
+      postFee,      // 运费
+      totalPayPrice // 应付总额（总价 + 运费）
+    }
+  };
+};
+
+
 
 // 切换支付方式
 const changePayMethod = (method) => {
@@ -88,42 +94,51 @@ const submitOrder = () => {
   }
 }
 
-const address = ref('北京市朝阳区三里屯SOHO 2号楼 2层')
-const phone = ref('13800138000')
 
 // 地址列表数据
-const addressList = ref([
-  {
-    id: 1,
-    name: '张三',
-    phone: '13800138000',
-    address: '北京市朝阳区三里屯SOHO 2号楼 2层',
-    isDefault: true
-  },
-  {
-    id: 2,
-    name: '张三',
-    phone: '13800138001',
-    address: '上海市浦东新区陆家嘴环路1000号',
-    isDefault: false
+const addressList = ref([])
+const addressStore = useAddressStore();
+const fetchAddressList = async () => {
+  await addressStore.getAddressList();
+  addressList.value = addressStore.addressList;
+
+  if (addressList.value.length > 0) {
+    // 找到默认地址或使用第一个地址
+    const defaultAddr = addressList.value.find(addr => addr.isDefault) || addressList.value[0];
+    defaultAddress.value = defaultAddr;
+  } else {
+    defaultAddress.value = {};
   }
-])
+};
+
+// 添加 watch 监听 defaultAddress
+watch(defaultAddress, (newVal) => {
+  if (newVal && Object.keys(newVal).length > 0) {
+    curAddress.value = {
+      postalCode: newVal.postalCode,
+      city: newVal.city,
+      address: newVal.address,
+      // 根据你的实际需求添加其他字段
+    }
+  } else {
+    curAddress.value = {}
+  }
+}, { immediate: true })
 
 // 新增地址表单数据
 const addressForm = ref({
-  name: '',
-  phone: '',
+  postalCode: '',
+  city: '',
   address: ''
 })
 
 // 表单验证规则
 const rules = {
-  name: [
-    { required: true, message: '请输入收货人姓名', trigger: 'blur' }
+  postalCode: [
+    { required: true, message: '请输入邮编', trigger: 'blur' }
   ],
-  phone: [
-    { required: true, message: '请输入联系电话', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码', trigger: 'blur' }
+  city: [
+    { required: true, message: '请输入城市', trigger: 'blur' },
   ],
   address: [
     { required: true, message: '请输入详细地址', trigger: 'blur' }
@@ -133,11 +148,15 @@ const rules = {
 const formRef = ref(null)
 
 // 选择地址
+const selectedAddressId = ref(null) // 添加 selectedAddressId 变量，初始值为空
 const selectAddress = (addr) => {
   selectedAddress.value = addr
+  console.log(addr,"addr")
+  selectedAddressId.value = addr.addressId
   curAddress.value = {
-    receiver: addr.name,
-    contact: addr.phone,
+    addressId: addr.addressId,
+    postalCode: addr.postalCode,
+    city: addr.city,
     address: addr.address,
     fullLocation: '' // 移除这个字段，因为我们不需要重复显示地址
   }
@@ -146,28 +165,40 @@ const selectAddress = (addr) => {
 
 // 添加新地址
 const handleAddAddress = async () => {
-  if (!formRef.value) return
-  
+  if (!formRef.value) return;
+
   try {
-    await formRef.value.validate()
-    // 这里应该调用后端API保存地址
-    const newAddress = {
-      id: addressList.value.length + 1,
-      ...addressForm.value,
-      isDefault: false
-    }
-    addressList.value.push(newAddress)
-    addFlag.value = false
+    await formRef.value.validate(); // 先校验表单
+
+    // 调用后端 API 保存地址
+    const response = await addAddressAPI(addressForm.value);
+
+    // 如果添加成功，重新获取地址列表
+    await fetchAddressList()
+
+    // 关闭弹窗
+    addFlag.value = false;
+
     // 重置表单
     addressForm.value = {
-      name: '',
-      phone: '',
+      postalCode: '',
+      city: '',
       address: ''
-    }
+    };
+
+    ElMessage.success('地址添加成功');
   } catch (error) {
-    ElMessage.error('请检查表单信息是否正确')
+    ElMessage.error('添加地址失败，请检查表单信息');
+    console.error('添加地址失败:', error);
   }
-}
+};
+
+// 初始化默认地址
+onMounted(() => {
+  getCartInfo()
+  fetchAddressList()
+})
+
 </script>
 
 <template>
@@ -183,9 +214,9 @@ const handleAddAddress = async () => {
             <div class="text">
               <div class="none" v-if="!curAddress">您需要先添加收货地址才可提交订单。</div>
               <ul v-else>
-                <li><span>收<i />货<i />人：</span>{{ curAddress.receiver }}</li>
-                <li><span>联系方式：</span>{{ curAddress.contact }}</li>
-                <li><span>收货地址：</span>{{ curAddress.address }}</li>
+                <li><span>邮<i />编：</span>{{ curAddress.postalCode }}</li>
+                <li><span>收获城市：</span>{{ curAddress.city }}</li>
+                <li><span>详细地址：</span>{{ curAddress.address }}</li>
               </ul>
             </div>
             <div class="action">
@@ -290,28 +321,32 @@ const handleAddAddress = async () => {
 
   <!-- 地址选择弹窗 -->
   <el-dialog
-    v-model="toggleFlag"
-    title="选择收货地址"
-    width="500px"
+      v-model="toggleFlag"
+      title="选择收货地址"
+      width="500px"
   >
-    <div class="address-list">
+    <div class="address-list" >
       <div
-        v-for="addr in addressList"
-        :key="addr.id"
-        class="address-item"
-        :class="{ active: selectedAddress?.id === addr.id }"
-        @click="selectAddress(addr)"
+          v-for="addr in addressList"
+          :key="addr.id"
+          class="address-item"
+          :class="{ active: selectedAddress?.id === addr.id }"
+          @click="selectAddress(addr)"
       >
-        <div class="address-content">
+        <div class="address-content" >
           <div class="address-header">
-            <span class="name">{{ addr.name }}</span>
-            <span class="phone">{{ addr.phone }}</span>
+            <span class="name">{{ addr.postalCode }}</span>
+            <span class="phone">{{ addr.city }}</span>
             <el-tag v-if="addr.isDefault" size="small" type="success">默认</el-tag>
           </div>
           <div class="address-detail">{{ addr.address }}</div>
         </div>
         <div class="radio-wrapper">
-          <el-radio :model-value="selectedAddress?.id" :label="addr.id">
+          <el-radio
+              v-model="selectedAddressId"
+              :label="addr.id"
+              @change="selectAddress(addr)"
+          >
             <span class="sr-only">选择地址</span>
           </el-radio>
         </div>
@@ -331,11 +366,11 @@ const handleAddAddress = async () => {
       :rules="rules"
       label-width="80px"
     >
-      <el-form-item label="收货人" prop="name">
-        <el-input v-model="addressForm.name" placeholder="请输入收货人姓名" />
+      <el-form-item label="邮编" prop="name">
+        <el-input v-model="addressForm.name" placeholder="请输入邮编" />
       </el-form-item>
-      <el-form-item label="手机号码" prop="phone">
-        <el-input v-model="addressForm.phone" placeholder="请输入手机号码" />
+      <el-form-item label="城市" prop="phone">
+        <el-input v-model="addressForm.phone" placeholder="请输入城市" />
       </el-form-item>
       <el-form-item label="详细地址" prop="address">
         <el-input
@@ -649,11 +684,12 @@ const handleAddAddress = async () => {
 
     &:hover {
       border-color: #ff66b3;
+      background: white;
     }
 
     &.active {
       border-color: #ff66b3;
-      background-color: #fff5f8;
+      background-color: white;
     }
 
     .address-content {

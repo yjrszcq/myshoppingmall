@@ -37,7 +37,6 @@ const confirm = () =>{
             </el-popconfirm>
           </li>
           <li><a href="javascript:;" @click="goToUser">会员中心</a></li>
-          <li><a href="javascript:;" @click="goToBusiness">商家版</a></li>
           <li><a href="javascript:;" @click="$router.push('/cart')"><i class="iconfont icon-cart" ></i>购物车</a></li>
         </template>
         <template v-else>

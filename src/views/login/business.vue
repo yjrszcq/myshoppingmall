@@ -30,6 +30,31 @@ const loginrules = {
   ]
 }
 
+
+const reginsterrules = {
+  username: [
+    {required:true,message:'用户名不能为空！',trigger:'blur'},
+  ],
+  password:[
+    {
+      required: true,message:'密码不能为空',trigger:'blur',
+      //后面还可以添加其他规则
+    }
+  ],
+  email:[
+    {
+      required: true,message:'邮箱不能为空',trigger:'blur',
+      //后面还可以添加其他规则
+    }
+  ],
+  phone:[
+    {
+      required: true,message:'电话不能为空',trigger:'blur',
+      //后面还可以添加其他规则
+    }
+  ]
+}
+
 // 注册表单数据
 const registerForm = ref({
   username: '',
@@ -38,31 +63,10 @@ const registerForm = ref({
   phone: ''
 })
 
-// 注册方法
-const handleRegister = async () => {
-  try {
-    // 简单校验（可以根据需要完善）
-    if (!registerForm.value.username || !registerForm.value.password) {
-      ElMessage.error('用户名和密码不能为空')
-      return
-    }
-    const res = await registerUser(registerForm.value)
-    ElMessage.success('注册成功！')
-    console.log('注册成功:', res)
-
-    // 注册成功后自动切回登录表单
-    isRegister.value = false
-  } catch (error) {
-    console.error('注册失败:', error)
-    ElMessage.error('注册失败，请重试')
-  }
-}
 
 // 点击「注册」按钮，切换到注册表单
 const toggleForm = () => {
   isRegister.value = !isRegister.value
-  ElMessage({ type: 'success', message: '登录成功' })
-  console.log('switch')
 }
 
 const loginformRef = ref(null)
@@ -82,6 +86,25 @@ const dologin = () => {
       router.replace({ path: '/business' })
     }else{
       ElMessage({ type: 'error',message:'登录失败！' })
+    }
+  })
+}
+
+const registerformRef = ref(null)
+
+const doregister = () => {
+  registerformRef.value.validate(async (valid) => {
+    if (valid) {
+      try {
+        await registerUser(registerForm.value)  // 直接传递整个表单数据
+
+        ElMessage({ type: 'success', message: '注册成功' })
+        isRegister.value = false  // 注册成功后，自动切换回登录界面
+      } catch (error) {
+        ElMessage({ type: 'error', message: error.response?.data?.message || '注册失败！' })
+      }
+    } else {
+      ElMessage({ type: 'error', message: '注册失败！请检查输入' })
     }
   })
 }
@@ -139,29 +162,29 @@ const dologin = () => {
         </div>
 
         <!-- 注册表单 -->
-        <div class="account-box" v-else>
+        <div class="account-box" v-if="isRegister">
           <div class="form">
-            <el-form label-position="right" label-width="60px" status-icon>
-              <el-form-item label="用户名">
+            <el-form ref="registerformRef" :model="registerForm" :rules="reginsterrules" label-position="right" label-width="70px" status-icon>
+              <el-form-item prop="username" label="用户名">
                 <el-input v-model="registerForm.username" />
               </el-form-item>
-              <el-form-item label="密码">
+              <el-form-item prop="password" label="密码">
                 <el-input v-model="registerForm.password" type="password" />
               </el-form-item>
-              <el-form-item label="邮箱">
+              <el-form-item prop="email" label="邮箱">
                 <el-input v-model="registerForm.email" />
               </el-form-item>
-              <el-form-item label="手机号">
+              <el-form-item prop="phone" label="手机号">
                 <el-input v-model="registerForm.phone" />
               </el-form-item>
               <el-form-item label-width="22px">
-                <el-checkbox size="large">
-                  我已同意隐私条款和服务条款
-                </el-checkbox>
+<!--                <el-checkbox size="large">-->
+<!--                  我已同意隐私条款和服务条款-->
+<!--                </el-checkbox>-->
               </el-form-item>
               <el-form-item>
                 <div class="btn-group">
-                  <el-button class="subBtn" @click="handleRegister">提交注册</el-button>
+                  <el-button class="subBtn" @click="doregister">提交注册</el-button>
                   <el-button class="subBtn" @click="toggleForm">返回登录</el-button>
                 </div>
               </el-form-item>

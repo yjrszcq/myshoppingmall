@@ -104,13 +104,13 @@ const confirmPay = async () => {
     try {
       await formRef.value.validate()
       ElMessage.success('支付成功')
-      router.push('/member/user')
+      router.push('/member/order')
     } catch (error) {
       ElMessage.error('请检查银行卡信息是否正确')
     }
   } else {
     ElMessage.success('支付成功')
-    router.push('/member/user')
+    router.push('/member/order')
   }
 }
 </script>

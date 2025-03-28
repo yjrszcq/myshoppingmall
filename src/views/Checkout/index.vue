@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { useCartStore } from '@/stores/cartStore.js'
 
 const router = useRouter()
 const checkInfo = ref({})  // 订单对象
@@ -38,17 +39,18 @@ const defaultAddress = {
   address: '三里屯SOHO 2号楼 2层 2-2-2'
 }
 
-// 从本地存储获取购物车商品信息
+//从cart中直接获取
 const getCartInfo = () => {
-  const cartInfo = JSON.parse(localStorage.getItem('cartInfo') || '{}')
-  if (cartInfo.goods && cartInfo.goods.length > 0) {
+  const cartStore = useCartStore()
+
+  if (cartStore.cartList.length > 0) {
     checkInfo.value = {
-      goods: cartInfo.goods,
+      goods: cartStore.cartList,
       summary: {
-        goodsCount: cartInfo.goods.reduce((sum, item) => sum + item.count, 0),
-        totalPrice: cartInfo.goods.reduce((sum, item) => sum + item.price * item.count, 0),
+        goodsCount: cartStore.allCount,
+        totalPrice: cartStore.cartList.reduce((sum, item) => sum + item.price * item.quantity, 0),
         postFee: 10, // 运费
-        totalPayPrice: cartInfo.goods.reduce((sum, item) => sum + item.price * item.count, 0) + 10
+        totalPayPrice: cartStore.cartList.reduce((sum, item) => sum + item.price * item.quantity, 0) + 10
       }
     }
   }
@@ -218,9 +220,9 @@ const handleAddAddress = async () => {
                   </a>
                 </td>
                 <td>&yen;{{ i.price }}</td>
-                <td>{{ i.count }}</td>
-                <td>&yen;{{ (i.price * i.count).toFixed(2) }}</td>
-                <td>&yen;{{ (i.price * i.count).toFixed(2) }}</td>
+                <td>{{ i.quantity }}</td>
+                <td>&yen;{{ (i.price * i.quantity).toFixed(2) }}</td>
+                <td>&yen;{{ (i.price * i.quantity).toFixed(2) }}</td>
               </tr>
             </tbody>
           </table>
@@ -561,7 +563,7 @@ const handleAddAddress = async () => {
 
   dl {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
     margin-bottom: 15px; // 增加行间距
     font-size: 16px; // 增加字体大小
@@ -598,7 +600,7 @@ const handleAddAddress = async () => {
 }
 
 .submit {
-  text-align: right;
+  text-align: center;
   padding: 60px;
   border-top: 1px solid #f5f5f5;
 }

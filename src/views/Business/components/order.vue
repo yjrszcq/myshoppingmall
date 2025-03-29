@@ -3,9 +3,11 @@ import { ref, onMounted } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { viewOrders, manageOrders } from '@/apis/business';
 const orders = ref([
+
   { id: 1, orderNo: 'ORD001', customer: 'Aaa', total: 299, status: 'to be shipped', createTime: '2024-01-20' },
   { id: 2, orderNo: 'ORD002', customer: 'Bbb', total: 599, status: 'Shipped', createTime: '2024-01-19' },
   { id: 3, orderNo: 'ORD003', customer: 'Ccc', total: 899, status: 'Shipped', createTime: '2024-01-18' },
+
 ]);
 
 //根据接口获取数据
@@ -16,45 +18,55 @@ onMounted(async () => {
 //获取数据函数
 const getOrders = async () => {
   const res = await viewOrders()
+
   console.log(res,"success");
+
   
   orders.value = res.itemList
 }
 
 const handleOrderStatus = async (row) => {
+
   ElMessageBox.confirm(`Do you mark the order ${row.orderId} as completed?`, 'prompt', {
     confirmButtonText: 'yes',
     cancelButtonText: 'no',
+
     type: 'success',
   }).then(async () => {
     try {
       await manageOrders({
         orderId: row.orderId,
+
         status: 'done'
       })
       ElMessage.success('The order status has been updated');
       getOrders(); // 刷新订单列表
     } catch (error) {
       ElMessage.error('error');
+
     }
   });
 };
 
 const handleAcceptOrder = async (row) => {
+
   ElMessageBox.confirm(`Do you accept orders ${row.orderId}?`, 'prompt', {
     confirmButtonText: 'yes',
     cancelButtonText: 'no',
+
     type: 'success',
   }).then(async () => {
     try {
       await manageOrders({
         orderId: row.orderId,
+
         status: 'done'
       })
       ElMessage.success('The order has been accepted');
       getOrders(); // 刷新订单列表
     } catch (error) {
       ElMessage.error('error');
+
     }
   });
 };
@@ -77,15 +89,19 @@ const handleSizeChange = (val) => {
 <template>
   <div class="management-container">
     <div class="header">
+
       <h2 class="title">Order management</h2>
       <el-table :data="orders" style="width: 100%" border class="pink-table">
         <el-table-column prop="orderId" label="orderId" width="120"></el-table-column>
         <el-table-column prop="productName" label="productName" ></el-table-column>
         <el-table-column prop="price" label="price" width="120">
+
+
           <template #default="scope">
             ¥{{ scope.row.price }}
           </template>
         </el-table-column>
+
         <el-table-column prop="status" label="status" width="120">
           <template #default="scope">
             <el-tag :type="'success'">
@@ -95,18 +111,23 @@ const handleSizeChange = (val) => {
         </el-table-column>
         <el-table-column prop="createTime" label="createTime" width="180"></el-table-column>
         <el-table-column label="operate" width="240">
+
           <template #default="scope">
             <el-button 
               size="small" 
               type="success" 
               @click="handleOrderStatus(scope.row)">
+
               Complete the order
+
             </el-button>
             <el-button 
               size="small" 
               type="info" 
               @click="handleAcceptOrder(scope.row)">
+
               Accept orders
+
             </el-button>
           </template>
         </el-table-column>

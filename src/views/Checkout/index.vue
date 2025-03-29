@@ -16,9 +16,11 @@ const selectedAddress = ref(null)
 // 配送时间选择
 const deliveryTime = ref('anytime') // 默认选择不限送货时间
 const deliveryOptions = [
+
 { "id": "anytime", "text": "No delivery time limit: Monday to Sunday" },
 { "id": "workday", "text": "Delivery on weekdays: Monday to Friday" },
 { "id": "weekend", "text": "Delivery on weekends and holidays: Saturday to Sunday" }
+
 ]
 
 // 计算手续费
@@ -45,7 +47,9 @@ const getCartInfo = () => {
   // 2. 如果没有选中商品，清空 checkInfo 并提示
   if (selectedGoods.length === 0) {
     checkInfo.value = null; // 或者设为空对象 {}
+
     ElMessage.warning('Please select the product you want to check');
+
     return;
   }
 
@@ -81,7 +85,9 @@ const changeDeliveryTime = (timeId) => {
 // 提交订单
 const submitOrder = () => {
   if (!curAddress.value) {
+
     ElMessage.warning('Please select a shipping address')
+
     return
   }
   
@@ -135,6 +141,7 @@ const addressForm = ref({
 // 表单验证规则
 const rules = {
   postalCode: [
+
     { required: true, message: 'Please enter the postal code', trigger: 'blur' }
   ],
   city: [
@@ -142,6 +149,7 @@ const rules = {
   ],
   address: [
     { required: true, message: 'Please enter the detailed address', trigger: 'blur' }
+
   ]
 }
 
@@ -186,10 +194,12 @@ const handleAddAddress = async () => {
       address: ''
     };
 
+
     ElMessage.success('The address is added successfully');
   } catch (error) {
     ElMessage.error('Failed to add address, please check the form information');
     console.error('Failed to add address:', error);
+
   }
 };
 
@@ -206,12 +216,15 @@ onMounted(() => {
     <div class="container">
       <div class="wrapper">
         <!-- 收货地址 -->
+
         <h3 class="box-title">Delivery address
           <a href="javascript:;" @click="$router.push('/cart')"><i class="iconfont icon-cart" ></i>Shopping cart</a>
+
         </h3>
         <div class="box-body">
           <div class="address">
             <div class="text">
+
               <div class="none" v-if="!curAddress">You will need to add a shipping address before you can submit your order.</div>
               <ul v-else>
                 <li><span>Postal Code:</span>{{ curAddress.postalCode }}</li>
@@ -222,21 +235,26 @@ onMounted(() => {
             <div class="action">
               <el-button size="large" @click="toggleFlag = true">Switch addresses</el-button>
               <el-button size="large" @click="addFlag = true">Add address</el-button>
+
             </div>
           </div>
         </div>
 
         <!-- 商品信息 -->
+
         <h3 class="box-title">Product information</h3>
+
         <div class="box-body">
           <table class="goods">
             <thead>
               <tr>
+
               <th width="400">Product information</th>
               <th width="220">unit price</th>
               <th width="180">quantity</th>
               <th width="180">total</th>
               <th width="140">operation</th>
+
               </tr>
             </thead>
             <tbody>
@@ -260,7 +278,9 @@ onMounted(() => {
         </div>
 
         <!-- 配送时间 -->
+
         <h3 class="box-title">Delivery time</h3>
+
         <div class="box-body">
           <a 
             v-for="option in deliveryOptions" 
@@ -275,6 +295,7 @@ onMounted(() => {
         </div>
 
         <!-- 支付方式 -->
+
         <h3 class="box-title">Payment Methods</h3>
         <div class="box-body">
           <a class="my-btn" :class="{ active: payMethod === 'online' }" href="javascript:;" @click="changePayMethod('online')">Online Payment</a>
@@ -304,6 +325,7 @@ onMounted(() => {
             </dl>
             <dl>
               <dt>Total amount payable:</dt>
+
               <dd class="price">¥{{ totalPayPrice.toFixed(2) }}</dd>
             </dl>
           </div>
@@ -311,7 +333,9 @@ onMounted(() => {
 
         <!-- 提交订单 -->
         <div class="submit">
+
           <el-button size="large" style="background-color: #ff66b3;color: white" @click="submitOrder">Submit your order</el-button>
+
         </div>
       </div>
     </div>
@@ -322,7 +346,9 @@ onMounted(() => {
   <!-- 地址选择弹窗 -->
   <el-dialog
       v-model="toggleFlag"
+
       title="Select the shipping address"
+
       width="500px"
   >
     <div class="address-list" >
@@ -337,7 +363,9 @@ onMounted(() => {
           <div class="address-header">
             <span class="name">{{ addr.postalCode }}</span>
             <span class="phone">{{ addr.city }}</span>
+
             <el-tag v-if="addr.isDefault" size="small" type="success">default</el-tag>
+
           </div>
           <div class="address-detail">{{ addr.address }}</div>
         </div>
@@ -347,7 +375,9 @@ onMounted(() => {
               :label="addr.id"
               @change="selectAddress(addr)"
           >
+
             <span class="sr-only">Select an address</span>
+
           </el-radio>
         </div>
       </div>
@@ -357,7 +387,9 @@ onMounted(() => {
   <!-- 新增地址弹窗 -->
   <el-dialog
     v-model="addFlag"
+
     title="New address for additional shipments"
+
     width="500px"
   >
     <el-form
@@ -366,6 +398,7 @@ onMounted(() => {
       :rules="rules"
       label-width="80px"
     >
+
     <el-form-item label="Postal Code" prop="postalCode">
       <el-input v-model="addressForm.postalCode" placeholder="Please enter the postal code" />
     </el-form-item>
@@ -385,6 +418,7 @@ onMounted(() => {
       <span class="dialog-footer">
         <el-button @click="addFlag = false">cancel</el-button>
         <el-button type="primary" @click="handleAddAddress">ok</el-button>
+
       </span>
     </template>
   </el-dialog>

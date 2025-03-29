@@ -30,6 +30,7 @@ const confirm = () =>{
         <template v-if="Userstore.userInfo.sessionId">
           <li><a href="javascript:;" @click="goToUser"><i class="iconfont icon-user"></i>{{ Userstore.userInfo.userAccount }}</a></li>
           <li>
+
             <el-popconfirm @confirm="confirm" title="Are you sure?" confirm-button-text="yes" cancel-button-text="no">
               <template #reference>
                 <a >Sign out</a>
@@ -45,6 +46,7 @@ const confirm = () =>{
           <li><a href="javascript:;">Help Center</a></li>
           <li><a href="javascript:;">About us</a></li>
           <li><a href="javascript:;" @click="goToBusiness">Merchant Edition</a></li>
+
         </template>
       </ul>
     </div>

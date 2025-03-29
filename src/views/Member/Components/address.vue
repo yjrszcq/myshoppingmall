@@ -2,8 +2,10 @@
   <div class="address-container">
     <el-card class="address-card">
       <div class="header">
+
         <h3>Shipping address management</h3>
         <el-button type="primary" @click="handleAdd" :icon="Plus">Add a new address</el-button>
+
       </div>
       
       <div class="address-list">
@@ -11,6 +13,7 @@
           <el-col :span="8" v-for="(address, index) in addressList" :key="index">
             <el-card class="address-item" shadow="hover">
               <div class="info">
+
                 <p><span class="label">Zip code: </span>{{ address.postalCode }}</p>
                 <p><span class="label">Harvest the city：</span>{{ address.city }}</p>
                 <p><span class="label">Full address：</span>{{ address.address }}</p>
@@ -18,6 +21,7 @@
               <div class="actions">
                 <el-button type="primary" text @click="handleEdit(address)">edit</el-button>
                 <el-button type="danger" text @click="handleDelete(index)">delete</el-button>
+
               </div>
             </el-card>
           </el-col>
@@ -27,6 +31,7 @@
 
     <el-dialog
       v-model="dialogVisible"
+
       :title="isEdit ? 'Edit the address' : 'Add an address'"
       width="50%"
     >
@@ -44,6 +49,7 @@
       <template #footer>
         <el-button @click="dialogVisible = false">cancel</el-button>
         <el-button type="primary" @click="submitForm">ok</el-button>
+
       </template>
     </el-dialog>
   </div>
@@ -85,11 +91,13 @@ const addressForm = reactive({
 })
 
 const rules = {
+
   postalCode: [{ required: true, message: 'Please enter the name of the consignee', trigger: 'blur' }],
   city: [
     { required: true, message: 'Please enter your contact number', trigger: 'blur' },
   ],
   address: [{ required: true, message: 'Please enter your address details', trigger: 'blur' }]
+
 }
 
 // 添加新地址
@@ -111,10 +119,12 @@ const handleEdit = (address) => {
 const handleDelete = async (addressId) => {
   try {
     await addressStore.deleteAddress(addressId);
+
     ElMessage.success('The deletion is successful');
     await fetchAddressList(); // 重新获取列表
   } catch (error) {
     ElMessage.error('Deletion failed');
+
   }
 };
 
@@ -123,16 +133,20 @@ const submitForm = async () => {
   try {
     if (isEdit.value) {
       addressStore.updateAddress(addressList.value[editIndex.value].addressId, addressForm);
+
       ElMessage.success('The modification was successful');
     } else {
       addressStore.addAddress(addressForm);
       ElMessage.success('The addition was successful');
+
     }
     dialogVisible.value = false;
     await fetchAddressList(); // 重新获取列表
   } catch (error) {
     console.log(error);
+
     ElMessage.error('The operation failed');
+
   }
 };
 

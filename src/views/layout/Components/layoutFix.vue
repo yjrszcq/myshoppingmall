@@ -28,7 +28,9 @@ const handleSearch = () => {
         <!--        <i class="iconfont icon-search"></i>-->
         <el-input
             v-model="input"
+
             placeholder="Please enter the product you want"
+
             class="input"
             size="large"
             @keyup.enter="handleSearch"

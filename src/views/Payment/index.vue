@@ -44,19 +44,25 @@ onMounted(() => {
 const payMethods = [
   { 
     id: 'alipay', 
+
     name: 'Alipay payment', 
+
     icon: '/src/assets/images/alipay.svg',
     qrcode: '/src/assets/images/alipay_qrcode.jpg'
   },
   { 
     id: 'wechat', 
+
     name: 'WeChat Pay', 
+
     icon: '/src/assets/images/wechat.svg',
     qrcode: '/src/assets/images/wechat_qrcode.jpg'
   },
   { 
     id: 'card', 
+
     name: 'Pay by card', 
+
     icon: '/src/assets/images/card.svg'
   }
 ]
@@ -72,6 +78,7 @@ const cardForm = ref({
 // 表单验证规则
 const rules = {
   cardNumber: [
+
     { required: true, message: 'Please enter your bank card number', trigger: 'blur' },
     { pattern: /^\d{16,19}$/, message: 'Please enter the correct card number', trigger: 'blur' }
   ],
@@ -85,6 +92,7 @@ const rules = {
   cvv: [
     { required: true, message: 'Please enter the CVV code', trigger: 'blur' },
     { pattern: /^\d{3,4}$/, message: 'Please enter the correct CVV code', trigger: 'blur' }
+
   ]
 }
 
@@ -110,16 +118,20 @@ const confirmPay = async () => {
       // 支付成功后的逻辑
       await handleSuccessfulPayment(cartStore)
 
+
       ElMessage.success('success')
       router.push('/member/order')
     } catch (error) {
       ElMessage.error('Please check that your card details are correct')
+
     }
   } else {
     // 非银行卡支付的成功逻辑
     await handleSuccessfulPayment(cartStore)
 
+
     ElMessage.success('success')
+
     router.push('/member/order')
   }
 }
@@ -132,7 +144,9 @@ const handleSuccessfulPayment = async (cartStore) => {
 
     // 2. 如果没有选中商品，理论上不应该发生，因为结算前应该检查
     if (selectedItems.length === 0) {
+
       console.warn('The payment was successful, but the item that needs to be removed is not selected')
+
       return
     }
 
@@ -154,7 +168,9 @@ const handleSuccessfulPayment = async (cartStore) => {
     // await createOrderAPI(selectedItems)
 
   } catch (error) {
+
     console.error('The payment was successful but the cart update failed:', error)
+
     // 这里可以选择不提示用户，因为支付已经成功了
     // 或者记录错误日志以便后续处理
   }
@@ -166,10 +182,12 @@ const handleSuccessfulPayment = async (cartStore) => {
     <div class="container">
       <div class="wrapper">
         <div class="payment-amount">
+
           <span class="amount-label">Payment Amount:</span>
           <span class="amount-value">¥{{ totalAmount.toFixed(2) }}</span>
         </div>
         <h3 class="box-title">Select a payment method</h3>
+
         <div class="box-body">
           <div class="pay-methods">
             <div 
@@ -192,6 +210,7 @@ const handleSuccessfulPayment = async (cartStore) => {
                 :alt="payMethods.find(m => m.id === payMethod)?.name"
                 class="qrcode-img"
               >
+
               <p class="qrcode-tip">Please use{{ payMethod === 'alipay' ? 'Alipay' : 'WeChat' }}Scan the QR code to pay</p>
               
               <!-- 支付标识字符串 -->
@@ -200,6 +219,7 @@ const handleSuccessfulPayment = async (cartStore) => {
                 <p class="payment-id">{{ paymentId }}</p>
                 <p class="payment-id-tip">Please note this payment identifier when making a transfer</p>
                 <p class="payment-id-tip">（The logo contains: payment date and time + 4 letters）</p>
+
               </div>
             </div>
           </div>
@@ -213,6 +233,7 @@ const handleSuccessfulPayment = async (cartStore) => {
               label-width="120px"
               class="card-form"
             >
+
               <el-form-item label="cardNumber" prop="cardNumber">
                 <el-input v-model="cardForm.cardNumber" placeholder="Please enter your bank card number" />
               </el-form-item>
@@ -224,12 +245,15 @@ const handleSuccessfulPayment = async (cartStore) => {
               </el-form-item>
               <el-form-item label="CVV" prop="cvv">
                 <el-input v-model="cardForm.cvv" placeholder="Please enter the CVV code" />
+
               </el-form-item>
             </el-form>
           </div>
         </div>
         <div class="submit">
+
           <el-button size="large" style="background-color: #ff66b3;color: white" @click="confirmPay">Confirm the payment</el-button>
+
         </div>
       </div>
     </div>

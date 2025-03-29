@@ -43,7 +43,9 @@ const getGoods = async () => {
     goods.value = res
     console.log(goods.value)
   } catch (error) {
+
     console.error("Fetch store details failed", error)
+
   }
 }
 
@@ -60,7 +62,9 @@ onMounted(() => {
     <div class="container" v-if="goods">
       <div class="bread-container">
         <el-breadcrumb separator=">">
+
           <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
+
           <!--
             错误原因：goods一开始{}  {}.categories -> undefined  -> undefined[1]
             1. 可选链的语法?.
@@ -117,6 +121,7 @@ onMounted(() => {
               </p>
               <div class="g-service">
                 <dl>
+
                   <dt>sales</dt>
                   <dd>good things were broadcast, the App coupon purchase 120 yuan dropped</dd>
                 </dl>
@@ -127,6 +132,7 @@ onMounted(() => {
                     <span>Fast refunds</span>
                     <span>Free shipping</span>
                     <a href="javascript:;">Learn more</a>
+
                   </dd>
                 </dl>
               </div>
@@ -137,7 +143,9 @@ onMounted(() => {
               <!-- 按钮组件 -->
               <div>
                 <el-button size="large" class="btn" @click="addCart">
+
                   Add to cart
+
                 </el-button>
               </div>
 

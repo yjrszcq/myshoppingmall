@@ -12,19 +12,23 @@ const isRegister = ref(false)
 
 // 登录表单数据（后面记得改一下）
 const loginForm = ref({
-  account: '',
+
+  username: '',
+
   password: '',
 })
 
 const router = useRouter()
 
 const loginrules = {
-  account: [
+
+  username: [
     {required:true,message:'The username cannot be empty!',trigger:'blur'},
   ],
   password:[
     {
       required: true,message:'The password cannot be empty！',trigger:'blur'
+
       //后面还可以添加其他规则
     }
   ]
@@ -33,6 +37,7 @@ const loginrules = {
 
 const reginsterrules = {
   username: [
+
     {required:true,message:'The username cannot be empty!',trigger:'blur'},
   ],
   password:[
@@ -50,6 +55,7 @@ const reginsterrules = {
   phone:[
     {
       required: true,message:'The telephone cannot be empty!',trigger:'blur',
+
       //后面还可以添加其他规则
     }
   ]
@@ -72,20 +78,25 @@ const toggleForm = () => {
 const loginformRef = ref(null)
 
 const dologin = () => {
-  const {account, password} = loginForm.value
+
+  const {username, password} = loginForm.value
+
   // 调用实例方法
   loginformRef.value.validate(async (valid) => {
     // valid: 所有表单都通过校验  才为true
     console.log(valid)
     // 以valid做为判断条件 如果通过校验才执行登录逻辑
     if (valid) {
-      await userStore.getUserInfo({account, password})
+
+      await userStore.getUserInfo({username, password})
+      console.log(loginForm,"form")
       // 1. 提示用户
       ElMessage({type: 'success', message: 'success'})
       // 2. 跳转首页
       router.replace({path: '/'})
     } else {
       ElMessage({type: 'error', message: 'error！'})
+
     }
   })
 }
@@ -98,6 +109,7 @@ const doregister = () => {
       try {
         await registerUser(registerForm.value)  // 直接传递整个表单数据
 
+
         ElMessage({type: 'success', message: 'success'})
         isRegister.value = false  // 注册成功后，自动切换回登录界面
       } catch (error) {
@@ -105,6 +117,7 @@ const doregister = () => {
       }
     } else {
       ElMessage({type: 'error', message: 'Registration failed! Please check the inputs'})
+
     }
   })
 }
@@ -121,7 +134,9 @@ const doregister = () => {
           <RouterLink to="/">TafeiMall</RouterLink>
         </h1>
         <RouterLink class="entry" to="/">
+
           Go to the homepage
+
           <i class="iconfont icon-angle-right"></i>
           <i class="iconfont icon-angle-right"></i>
         </RouterLink>
@@ -131,8 +146,10 @@ const doregister = () => {
     <section class="login-section">
       <div class="wrapper">
         <nav>
+
           <a @click="isRegister = false" :style="{ color: !isRegister ? '#ff66b3' : '#333' }">Account login</a>
           <a @click="isRegister = true" :style="{ color: isRegister ? '#ff66b3' : '#333' }">Account Registration</a>
+
         </nav>
 
         <!-- 登录表单 -->
@@ -140,10 +157,12 @@ const doregister = () => {
           <div class="form">
             <el-form ref="loginformRef" :model="loginForm" :rules="loginrules" label-position="right" label-width="60px"
                      status-icon>
-              <el-form-item prop="account" label="account">
-                <el-input v-model="loginForm.account"/>
+
+              <el-form-item prop="username" label="account">
+                <el-input v-model="loginForm.username"/>
               </el-form-item>
               <el-form-item prop="password" label="password">
+
                 <el-input v-model="loginForm.password"/>
               </el-form-item>
               <!--              后端没有提供相应的接口，可以考虑在后面的版本添加上去-->
@@ -154,8 +173,11 @@ const doregister = () => {
               <!--              </el-form-item>-->
               <el-form-item>
                 <div class="btn-group">
+
                   <el-button class="subBtn" @click="dologin">login</el-button>
                   <el-button class="subBtn" @click="toggleForm">enroll</el-button>
+
+
                 </div>
               </el-form-item>
             </el-form>
@@ -167,6 +189,7 @@ const doregister = () => {
           <div class="form">
             <el-form ref="registerformRef" :model="registerForm" :rules="reginsterrules" label-position="right"
                      label-width="70px" status-icon>
+
               <el-form-item prop="username" label="username">
                 <el-input v-model="registerForm.username"/>
               </el-form-item>
@@ -177,6 +200,7 @@ const doregister = () => {
                 <el-input v-model="registerForm.email"/>
               </el-form-item>
               <el-form-item prop="phone" label="phone">
+
                 <el-input v-model="registerForm.phone"/>
               </el-form-item>
               <el-form-item label-width="22px">
@@ -186,8 +210,10 @@ const doregister = () => {
               </el-form-item>
               <el-form-item>
                 <div class="btn-group">
+
                   <el-button class="subBtn" @click="doregister">Submit your registration</el-button>
                   <el-button class="subBtn" @click="toggleForm">Go back to sign in</el-button>
+
                 </div>
               </el-form-item>
             </el-form>

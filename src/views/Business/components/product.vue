@@ -3,9 +3,11 @@ import { ref, onMounted } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { getproductsList, deleteProducts, reviseProducts, addProducts } from '../../../apis/business';
 const products = ref([
+
   { id: 1, name: 'goods A', price: 100, stock: 50 },
   { id: 2, name: 'goods B', price: 200, stock: 30 },
   { id: 3, name: 'goods C', price: 300, stock: 20 },
+
 ]);
 //根据接口获取数据
 onMounted(async () => {
@@ -29,16 +31,20 @@ const handleEdit = (row) => {
 }
 
 const handleDelete = (row) => {
+
   ElMessageBox.confirm('Are you sure you want to delete the item?', 'prompt', {
     confirmButtonText: 'yes',
     cancelButtonText: 'no',
+
     type: 'warning',
   }).then(() => {
     console.log(row.productId);
     
     deleteProducts(row.productId).then(() => {
       getproducts()
+
       ElMessage.success('success');
+
     })
     
   });
@@ -84,15 +90,19 @@ const handleSubmit = async () => {
   try {
     if (dialogType.value === 'add') {
       await addProducts(productForm.value)
+
       ElMessage.success('added successfully')
     } else {
       await reviseProducts(productForm.value)
       ElMessage.success('updated successfully')
+
     }
     dialogVisible.value = false
     getproducts()
   } catch (error) {
+
     ElMessage.error('failed')
+
   }
 }
 </script>
@@ -101,12 +111,15 @@ const handleSubmit = async () => {
   <div class="management-container">
     <div class="header">
       <div class="title-row">
+
         <h2 class="title">Product Management</h2>
         <el-button @click="handleAdd">Add product</el-button>
+
       </div>
       
       <el-table :data="products" style="width: 100%" border class="pink-table">
         <el-table-column prop="productId" label="ID" width="50"></el-table-column>
+
         <el-table-column prop="name" label="name" width="200"></el-table-column>
         <el-table-column prop="description" label="description"></el-table-column>
         <el-table-column prop="price" label="price" width="100"></el-table-column>
@@ -115,6 +128,7 @@ const handleSubmit = async () => {
           <template #default="scope">
             <el-button size="small" @click="handleEdit(scope.row)">edit</el-button>
             <el-button size="small" type="danger" @click="handleDelete(scope.row)">delete</el-button>
+
           </template>
         </el-table-column>
       </el-table>
@@ -122,11 +136,14 @@ const handleSubmit = async () => {
 
     <!-- 新增/编辑商品对话框 -->
     <el-dialog
+
       :title="dialogType === 'add' ? 'add product' : 'edit product'"
+
       v-model="dialogVisible"
       width="500px"
     >
       <el-form :model="productForm" label-width="100px">
+
         <el-form-item label="name">
           <el-input v-model="productForm.name"></el-input>
         </el-form-item>
@@ -137,13 +154,16 @@ const handleSubmit = async () => {
           <el-input-number v-model="productForm.price" :min="0"></el-input-number>
         </el-form-item>
         <el-form-item label="stock">
+
           <el-input-number v-model="productForm.stock" :min="0"></el-input-number>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
+
           <el-button @click="dialogVisible = false">cancel</el-button>
           <el-button type="primary" @click="handleSubmit">ok</el-button>
+
         </span>
       </template>
     </el-dialog>

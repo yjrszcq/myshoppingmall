@@ -11,13 +11,16 @@
           <el-sub-menu index="1">
             <template #title>
               <el-icon><location /></el-icon>
+
               <span >My Products</span>
             </template>
               <el-menu-item index="/product">Product Management</el-menu-item>
+
           </el-sub-menu>
           <el-sub-menu index="2">
             <template #title>
               <el-icon><location /></el-icon>
+
               <span >My Orders</span>
             </template>
             <el-menu-item index="/order">Order Management</el-menu-item>
@@ -27,6 +30,7 @@
             <el-popconfirm @confirm="confirm" title="Confirm Logout?" confirm-button-text="Confirm" cancel-button-text="Cancel">
               <template #reference>
                 <a style="width: 1000px">Logout</a>
+
               </template>
             </el-popconfirm>
           </el-menu-item>

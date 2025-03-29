@@ -3,7 +3,9 @@ import { onMounted, ref } from "vue";
 import { viewsOrders } from "../../../apis/vip.js";
 // tab列表
 const tabTypes = [
+
   { name: "all", label: "all" },
+
   //   此处后端没有给接口，可以作为后面的扩展内容
   // { name: "unpay", label: "待付款" },
   // { name: "deliver", label: "待发货" },
@@ -50,12 +52,14 @@ const pageChange = (page) => {
 // 通过不同数值展示订单不同的状态
 const formatPayState = (payState) => {
   const stateMap = {
+
     1: "Pending payment",
     2: "To be shipped",
     3: "To be received",
     4: "To be evaluated",
     5: "Done",
     6: "Canceled",
+
   };
   return stateMap[payState];
 };
@@ -69,18 +73,22 @@ const formatPayState = (payState) => {
 
       <div class="main-container">
         <div class="holder-container" v-if="orderList.length == 0">
+
           <el-empty description="No order data yet" />
+
         </div>
         <div >
           <!-- 订单列表 -->
           <div class="order-item" v-for="order in orderList" :key="order.productId">
             <div class="head">
+
               <span>Product Name:{{  order.productName }}</span>
               <span>Price:{{ order.price }}yuan</span>
               <span>Order Number:{{ order.productId }}</span>
               <!-- 未付款，倒计时时间还有 -->
               <span class="down-time">
                 <b>The number of units: {{order.quantity}}</b>
+
               </span>
             </div>
           </div>

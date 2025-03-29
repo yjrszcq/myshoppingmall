@@ -10,7 +10,9 @@ const total = ref(0)
 const getProductList = async () => {
 
   const res = await searchProducts({
+
     keyword: 'cell phone',
+
     page: 1,
     limit: 20,
     sort: 'price_asc'  //返回所有关键词为手机的产品
@@ -25,7 +27,9 @@ onMounted(() => {
 </script>
 
 <template>
+
   <HomePanel title="Digital products" sub-title="The frontier of science and technology leads the new world">
+
     <template #main>
       <ul class="goods-list">
         <li v-for="item in newList" :key="item.id">

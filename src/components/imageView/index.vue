@@ -14,6 +14,7 @@ const getGoods = async () => {
     goods.value = res
     console.log("Product details", goods.value)
 
+
     // mainPictures
       imageList.value = goods.value.mainPictures
   } catch (error) {

@@ -10,12 +10,12 @@ export const registerUser = (data) => {
     })
 }
 //登录用户接口
-export const loginapi = ({account,password}) => {
+export const loginapi = ({username,password}) => {
     return request({
         url: '/api/auth/login',  //记得改
         method: 'POST',
         data: {
-            account,
+            username,
             password
         }
     })

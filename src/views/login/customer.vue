@@ -12,14 +12,14 @@ const isRegister = ref(false)
 
 // 登录表单数据（后面记得改一下）
 const loginForm = ref({
-  account: '',
+  username: '',
   password: '',
 })
 
 const router = useRouter()
 
 const loginrules = {
-  account: [
+  username: [
     {required: true, message: '用户名不能为空！', trigger: 'blur'},
   ],
   password: [
@@ -72,14 +72,15 @@ const toggleForm = () => {
 const loginformRef = ref(null)
 
 const dologin = () => {
-  const {account, password} = loginForm.value
+  const {username, password} = loginForm.value
   // 调用实例方法
   loginformRef.value.validate(async (valid) => {
     // valid: 所有表单都通过校验  才为true
     console.log(valid)
     // 以valid做为判断条件 如果通过校验才执行登录逻辑
     if (valid) {
-      await userStore.getUserInfo({account, password})
+      await userStore.getUserInfo({username, password})
+      console.log(loginForm,"form")
       // 1. 提示用户
       ElMessage({type: 'success', message: '登录成功'})
       // 2. 跳转首页
@@ -140,8 +141,8 @@ const doregister = () => {
           <div class="form">
             <el-form ref="loginformRef" :model="loginForm" :rules="loginrules" label-position="right" label-width="60px"
                      status-icon>
-              <el-form-item prop="account" label="账户">
-                <el-input v-model="loginForm.account"/>
+              <el-form-item prop="username" label="账户">
+                <el-input v-model="loginForm.username"/>
               </el-form-item>
               <el-form-item prop="password" label="密码">
                 <el-input v-model="loginForm.password"/>

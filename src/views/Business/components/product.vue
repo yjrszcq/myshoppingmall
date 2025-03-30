@@ -122,7 +122,7 @@ const handleSubmit = async () => {
         <el-table-column prop="description" label="description"></el-table-column>
         <el-table-column prop="price" label="price" width="100"></el-table-column>
         <el-table-column prop="stock" label="stock" width="100"></el-table-column>
-        <el-table-column label="operation"owidth="180">
+        <el-table-column label="operation" width="180">
           <template #default="scope">
             <el-button size="small" @click="handleEdit(scope.row)">edit</el-button>
             <el-button size="small" type="danger" @click="handleDelete(scope.row)">delete</el-button>

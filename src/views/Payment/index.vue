@@ -5,6 +5,7 @@ import { ElMessage } from 'element-plus'
 import { useCartStore } from '@/stores/cartStore.js'
 import { submitOrderAPI } from '@/apis/order'
 import { manageOrderAPI } from '@/apis/orderManage'
+import { get } from '@vueuse/core'
 
 const router = useRouter()
 const route = useRoute()
@@ -145,7 +146,8 @@ const handleSuccessfulPayment = async (cartStore) => {
     }
 
     // 2. 检查订单ID
-    const orderId = route.query.orderId
+    const orderId = get(cartInfo.value, 'orderId')
+    console.log('订单ID:', orderId)
     if (!orderId) {
       console.error('订单ID不存在，无法更新订单状态')
       ElMessage.error('订单信息不完整，请重新提交订单')

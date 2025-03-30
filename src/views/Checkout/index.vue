@@ -103,12 +103,12 @@ const submitOrder = async () => {
     
     // 提交订单到后端
     const response = await submitOrderAPI(cartId)
-    console.log('订单创建成功，订单ID:', response.orderId)
+    console.log('订单创建成功，订单ID:', response.orderIds[0])
     
     // 保存购物车信息到localStorage
     const cartInfo = {
       cartId: cartId,
-      orderId: response.orderId, // 保存订单ID
+      orderId: response.orderIds[0], // 保存订单ID
       goods: checkInfo.value.goods,
       summary: checkInfo.value.summary,
       address: curAddress.value
@@ -119,7 +119,7 @@ const submitOrder = async () => {
       // 在线支付，跳转到支付页面，并传递orderId
       router.push({
         path: '/payment',
-        query: { orderId: response.orderId }
+        query: { orderId: response.orderIds[0] }
       })
     } else {
       // 货到付款，跳转到银行卡信息页面

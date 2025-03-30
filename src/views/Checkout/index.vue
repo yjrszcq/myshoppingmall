@@ -6,6 +6,7 @@ import { useCartStore } from '@/stores/cartStore.js'
 import { useAddressStore } from '@/stores/addressStore'
 import { addAddressAPI } from '@/apis/vip.js'
 import { submitOrderAPI } from '@/apis/order'
+import { getCartInfoAPI } from '@/apis/cart'
 const router = useRouter()
 const checkInfo = ref({})  // 订单对象
 const curAddress = ref({})  // 地址对象
@@ -91,8 +92,14 @@ const submitOrder = async () => {
   }
   
   try {
-    // 生成购物车ID
-    const cartId = Date.now().toString() + Math.random().toString(36).substr(2, 9)
+    // 获取购物车信息
+    const cartResponse = await getCartInfoAPI()
+    const cartId = cartResponse.cartId
+    
+    if (!cartId) {
+      ElMessage.error('获取购物车信息失败')
+      return
+    }
     
     // 提交订单到后端
     const response = await submitOrderAPI(cartId)

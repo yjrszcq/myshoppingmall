@@ -43,3 +43,14 @@ export const updateCartItemQuantityAPI = ({ itemId,quantity }) => {
     }
   })
 }
+
+/**
+ * 获取购物车信息
+ * @returns {Promise<Object>} - 返回购物车信息，包含cartId等
+ */
+export const getCartInfoAPI = () => {
+    return request({
+        url: '/api/cart',
+        method: 'GET'
+    });
+};

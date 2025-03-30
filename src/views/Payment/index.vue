@@ -1,12 +1,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useCartStore } from '@/stores/cartStore.js'
 import { submitOrderAPI } from '@/apis/order'
 import { manageOrderAPI } from '@/apis/orderManage'
 
 const router = useRouter()
+const route = useRoute()
 const payMethod = ref('alipay') // 默认支付宝支付
 
 // 生成随机标识字符串
@@ -143,10 +144,10 @@ const handleSuccessfulPayment = async (cartStore) => {
       return
     }
 
-    // 2. 检查购物车信息
-    const cartInfo = JSON.parse(localStorage.getItem('cartInfo') || '{}')
-    if (!cartInfo.orderId) {
-      console.error('订单信息不完整，无法更新订单状态')
+    // 2. 检查订单ID
+    const orderId = route.query.orderId
+    if (!orderId) {
+      console.error('订单ID不存在，无法更新订单状态')
       ElMessage.error('订单信息不完整，请重新提交订单')
       router.push('/cart')
       return
@@ -154,7 +155,7 @@ const handleSuccessfulPayment = async (cartStore) => {
 
     // 3. 管理订单（发货）
     try {
-      const manageResponse = await manageOrderAPI(cartInfo.orderId, {
+      const manageResponse = await manageOrderAPI(orderId, {
         action: 'ship',
         trackingNumber: `SF${Date.now()}` // 生成一个示例物流单号
       })

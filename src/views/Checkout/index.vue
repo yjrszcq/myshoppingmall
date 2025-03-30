@@ -116,8 +116,11 @@ const submitOrder = async () => {
     localStorage.setItem('cartInfo', JSON.stringify(cartInfo))
     
     if (payMethod.value === 'online') {
-      // 在线支付，跳转到支付页面
-      router.push('/payment')
+      // 在线支付，跳转到支付页面，并传递orderId
+      router.push({
+        path: '/payment',
+        query: { orderId: response.orderId }
+      })
     } else {
       // 货到付款，跳转到银行卡信息页面
       router.push('/bank-info')

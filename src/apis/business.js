@@ -2,10 +2,11 @@
 import request from '@/utils/http.js'
 
 // 查看商品
-export const getproductsList = () => {
+export const getproductsList = (data) => {
     return request({
         url: '/api/seller/products',
-        method: 'get'
+        method: 'get',
+        data
     })
 }
 //修改商品信息
@@ -27,18 +28,20 @@ export const deleteProducts = (productId) => {
 }
 
 //上架商品
-export const putawayProducts = () => {
+export const putawayProducts = (data) => {
     return request({
         url: `/api/seller/products`,
         method: 'post',
+        data
     })
 }
 
 //查看订单
-export const viewOrders = () => {
+export const viewOrders = (data) => {
     return request({
         url: `/api/seller/orders`,
         method: 'get',
+        data
     })
 }
 
@@ -51,9 +54,10 @@ export const manageOrders = (orderId) => {
 }
 
 //添加商品
-export const addProducts = () => {
+export const addProducts = (data) => {
     return request({
         url: `/api/seller/products`,
         method: 'post',
+        data
     })
 }

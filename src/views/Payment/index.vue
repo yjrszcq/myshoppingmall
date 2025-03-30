@@ -3,40 +3,39 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useCartStore } from '@/stores/cartStore.js'
+import { submitOrderAPI } from '@/apis/order'
+import { manageOrderAPI } from '@/apis/orderManage'
 
 const router = useRouter()
 const payMethod = ref('alipay') // 默认支付宝支付
 
-// 生成支付标识字符串
+// 生成随机标识字符串
 const generatePaymentId = () => {
-  // 获取当前日期
-  const now = new Date()
-  const year = now.getFullYear().toString().slice(-2) // 年份后两位
-  const month = (now.getMonth() + 1).toString().padStart(2, '0') // 月份，补零
-  const day = now.getDate().toString().padStart(2, '0') // 日期，补零
-  const hour = now.getHours().toString().padStart(2, '0') // 小时，补零
-  const minute = now.getMinutes().toString().padStart(2, '0') // 分钟，补零
-  
-  // 生成4位随机字母（不包含容易混淆的字母）
-  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ' // 排除了容易混淆的I和O
-  let randomLetters = ''
-  for (let i = 0; i < 4; i++) {
-    randomLetters += letters.charAt(Math.floor(Math.random() * letters.length))
-  }
-  
-  // 组合支付标识：PAY + 年月日时分 + 4位随机字母
-  return `PAY${year}${month}${day}${hour}${minute}${randomLetters}`
+  const timestamp = Date.now().toString().slice(-6)
+  const random = Math.random().toString(36).substring(2, 8)
+  return `PAY${timestamp}${random}`
 }
 
 // 支付标识字符串
 const paymentId = ref(generatePaymentId())
 
-// 从本地存储获取支付金额
+// 从本地存储获取支付金额和购物车信息
 const totalAmount = ref(0)
+const cartInfo = ref(null)
+
 onMounted(() => {
-  const cartInfo = JSON.parse(localStorage.getItem('cartInfo') || '{}')
-  if (cartInfo.summary) {
-    totalAmount.value = cartInfo.summary.totalPayPrice
+  const storedCartInfo = JSON.parse(localStorage.getItem('cartInfo') || '{}')
+  console.log('从localStorage获取的购物车信息:', storedCartInfo)
+  cartInfo.value = storedCartInfo
+  if (storedCartInfo.summary) {
+    totalAmount.value = storedCartInfo.summary.totalPayPrice
+  }
+  
+  // 检查购物车信息是否完整
+  if (!storedCartInfo.cartId) {
+    console.error('购物车信息不完整，缺少cartId:', storedCartInfo)
+    ElMessage.error('购物车信息不完整，请重新选择商品')
+    router.push('/cart')
   }
 })
 
@@ -44,25 +43,19 @@ onMounted(() => {
 const payMethods = [
   { 
     id: 'alipay', 
-
-    name: 'Alipay payment', 
-
+    name: '支付宝支付', 
     icon: '/src/assets/images/alipay.svg',
     qrcode: '/src/assets/images/alipay_qrcode.jpg'
   },
   { 
     id: 'wechat', 
-
-    name: 'WeChat Pay', 
-
+    name: '微信支付', 
     icon: '/src/assets/images/wechat.svg',
     qrcode: '/src/assets/images/wechat_qrcode.jpg'
   },
   { 
     id: 'card', 
-
-    name: 'Pay by card', 
-
+    name: '银行卡支付', 
     icon: '/src/assets/images/card.svg'
   }
 ]
@@ -78,7 +71,6 @@ const cardForm = ref({
 // 表单验证规则
 const rules = {
   cardNumber: [
-
     { required: true, message: 'Please enter your bank card number', trigger: 'blur' },
     { pattern: /^\d{16,19}$/, message: 'Please enter the correct card number', trigger: 'blur' }
   ],
@@ -92,7 +84,6 @@ const rules = {
   cvv: [
     { required: true, message: 'Please enter the CVV code', trigger: 'blur' },
     { pattern: /^\d{3,4}$/, message: 'Please enter the correct CVV code', trigger: 'blur' }
-
   ]
 }
 
@@ -108,31 +99,37 @@ const selectPayMethod = (method) => {
 // 确认支付
 const confirmPay = async () => {
   const cartStore = useCartStore()
+  console.log('当前购物车信息:', cartInfo.value)
+
+  // 检查购物车信息
+  if (!cartInfo.value || !cartInfo.value.cartId) {
+    console.error('提交订单时购物车信息不完整:', cartInfo.value)
+    ElMessage.error('订单信息不完整，请重新选择商品')
+    router.push('/cart')
+    return
+  }
 
   if (payMethod.value === 'card') {
     if (!formRef.value) return
 
     try {
       await formRef.value.validate()
-
-      // 支付成功后的逻辑
       await handleSuccessfulPayment(cartStore)
-
-
-      ElMessage.success('success')
+      ElMessage.success('支付成功')
       router.push('/member/order')
     } catch (error) {
-      ElMessage.error('Please check that your card details are correct')
-
+      console.error('支付失败:', error)
+      ElMessage.error('请检查银行卡信息是否正确')
     }
   } else {
-    // 非银行卡支付的成功逻辑
-    await handleSuccessfulPayment(cartStore)
-
-
-    ElMessage.success('success')
-
-    router.push('/member/order')
+    try {
+      await handleSuccessfulPayment(cartStore)
+      ElMessage.success('支付成功')
+      router.push('/member/order')
+    } catch (error) {
+      console.error('支付失败:', error)
+      ElMessage.error('支付失败，请重试')
+    }
   }
 }
 
@@ -140,39 +137,55 @@ const confirmPay = async () => {
 const handleSuccessfulPayment = async (cartStore) => {
   try {
     // 1. 获取选中的商品（准备移除）
-    const selectedItems = cartStore.cartList.filter(item => item.selected)
-
-    // 2. 如果没有选中商品，理论上不应该发生，因为结算前应该检查
-    if (selectedItems.length === 0) {
-
+    const selectedGoods = cartStore.cartList.filter(item => item.selected)
+    if (selectedGoods.length === 0) {
       console.warn('The payment was successful, but the item that needs to be removed is not selected')
-
       return
     }
 
-    // 3. 根据登录状态处理购物车
+    // 2. 检查购物车信息
+    const cartInfo = JSON.parse(localStorage.getItem('cartInfo') || '{}')
+    if (!cartInfo.orderId) {
+      console.error('订单信息不完整，无法更新订单状态')
+      ElMessage.error('订单信息不完整，请重新提交订单')
+      router.push('/cart')
+      return
+    }
+
+    // 3. 管理订单（发货）
+    try {
+      const manageResponse = await manageOrderAPI(cartInfo.orderId, {
+        action: 'ship',
+        trackingNumber: `SF${Date.now()}` // 生成一个示例物流单号
+      })
+      console.log('订单状态更新成功:', manageResponse.status)
+      ElMessage.success('订单状态更新成功')
+    } catch (manageError) {
+      console.error('订单状态更新失败:', manageError)
+      ElMessage.error('订单状态更新失败，请重试')
+      return
+    }
+    
+    // 4. 清理购物车
     if (cartStore.isLogin) {
       // 已登录用户：调用API批量删除
-      const deletePromises = selectedItems.map(item =>
+      const deletePromises = selectedGoods.map(item =>
           cartStore.delCart(item.productId)
       )
       await Promise.all(deletePromises)
     } else {
       // 未登录用户：本地移除选中的商品
-      selectedItems.forEach(item => {
+      selectedGoods.forEach(item => {
         cartStore.delCart(item.productId)
       })
     }
-
-    // 4. 可以在这里添加订单创建逻辑（如果需要）
-    // await createOrderAPI(selectedItems)
-
+    
+    // 5. 清除本地存储的购物车信息
+    localStorage.removeItem('cartInfo')
+    
   } catch (error) {
-
-    console.error('The payment was successful but the cart update failed:', error)
-
-    // 这里可以选择不提示用户，因为支付已经成功了
-    // 或者记录错误日志以便后续处理
+    console.error('支付处理失败:', error)
+    ElMessage.error('订单处理失败，请重试')
   }
 }
 </script>
@@ -182,7 +195,6 @@ const handleSuccessfulPayment = async (cartStore) => {
     <div class="container">
       <div class="wrapper">
         <div class="payment-amount">
-
           <span class="amount-label">Payment Amount:</span>
           <span class="amount-value">¥{{ totalAmount.toFixed(2) }}</span>
         </div>
@@ -219,7 +231,6 @@ const handleSuccessfulPayment = async (cartStore) => {
                 <p class="payment-id">{{ paymentId }}</p>
                 <p class="payment-id-tip">Please note this payment identifier when making a transfer</p>
                 <p class="payment-id-tip">（The logo contains: payment date and time + 4 letters）</p>
-
               </div>
             </div>
           </div>
@@ -233,7 +244,6 @@ const handleSuccessfulPayment = async (cartStore) => {
               label-width="120px"
               class="card-form"
             >
-
               <el-form-item label="cardNumber" prop="cardNumber">
                 <el-input v-model="cardForm.cardNumber" placeholder="Please enter your bank card number" />
               </el-form-item>
@@ -245,15 +255,12 @@ const handleSuccessfulPayment = async (cartStore) => {
               </el-form-item>
               <el-form-item label="CVV" prop="cvv">
                 <el-input v-model="cardForm.cvv" placeholder="Please enter the CVV code" />
-
               </el-form-item>
             </el-form>
           </div>
         </div>
         <div class="submit">
-
           <el-button size="large" style="background-color: #ff66b3;color: white" @click="confirmPay">Confirm the payment</el-button>
-
         </div>
       </div>
     </div>

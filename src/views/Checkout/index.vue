@@ -4,7 +4,8 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useCartStore } from '@/stores/cartStore.js'
 import { useAddressStore } from '@/stores/addressStore'
-import { addAddressAPI } from '@/apis/vip.js';
+import { addAddressAPI } from '@/apis/vip.js'
+import { submitOrderAPI } from '@/apis/order'
 const router = useRouter()
 const checkInfo = ref({})  // 订单对象
 const curAddress = ref({})  // 地址对象
@@ -83,20 +84,40 @@ const changeDeliveryTime = (timeId) => {
 }
 
 // 提交订单
-const submitOrder = () => {
+const submitOrder = async () => {
   if (!curAddress.value) {
-
     ElMessage.warning('Please select a shipping address')
-
     return
   }
   
-  if (payMethod.value === 'online') {
-    // 在线支付，跳转到支付页面
-    router.push('/payment')
-  } else {
-    // 货到付款，跳转到银行卡信息页面
-    router.push('/bank-info')
+  try {
+    // 生成购物车ID
+    const cartId = Date.now().toString() + Math.random().toString(36).substr(2, 9)
+    
+    // 提交订单到后端
+    const response = await submitOrderAPI(cartId)
+    console.log('订单创建成功，订单ID:', response.orderId)
+    
+    // 保存购物车信息到localStorage
+    const cartInfo = {
+      cartId: cartId,
+      orderId: response.orderId, // 保存订单ID
+      goods: checkInfo.value.goods,
+      summary: checkInfo.value.summary,
+      address: curAddress.value
+    }
+    localStorage.setItem('cartInfo', JSON.stringify(cartInfo))
+    
+    if (payMethod.value === 'online') {
+      // 在线支付，跳转到支付页面
+      router.push('/payment')
+    } else {
+      // 货到付款，跳转到银行卡信息页面
+      router.push('/bank-info')
+    }
+  } catch (error) {
+    console.error('订单提交失败:', error)
+    ElMessage.error('订单提交失败，请重试')
   }
 }
 

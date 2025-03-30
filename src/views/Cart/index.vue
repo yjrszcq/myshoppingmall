@@ -1,60 +1,79 @@
 <script setup>
-import { useCartStore } from '@/stores/cartStore'
-import { ElMessage } from 'element-plus'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useCartStore } from "@/stores/cartStore";
+import { ElMessage } from "element-plus";
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { getCartContentsAPI } from "@/apis/cart.js";
+import { storeToRefs } from "pinia";
 
-const cartStore = useCartStore()
-const router = useRouter()
+const cartStore = useCartStore();
+const router = useRouter();
+
+const { cartList } = storeToRefs(cartStore);
+const { getCart, updateQuantity, delCart } = cartStore;
 
 const singleCheck = (productId, selected) => {
-  const item = cartStore.cartList.find((item) => item.productId === productId)
+  const item = cartStore.cartList.find((item) => item.productId === productId);
   if (item) {
-    item.selected = selected
+    item.selected = selected;
   }
-}
+};
 
-const allCheck = (selected)=> {
-  cartStore.allCheck(selected)
-}
+const allCheck = (selected) => {
+  cartStore.allCheck(selected);
+};
 
 // 下单结算
 const checkout = () => {
   // 保存选中的商品信息到本地存储
-  const selectedGoods = cartStore.cartList.filter(item => item.selected)
+  const selectedGoods = cartStore.cartList.filter((item) => item.selected);
   if (selectedGoods.length === 0) {
+    ElMessage.warning("Please select the product you want to check");
 
-    ElMessage.warning('Please select the product you want to check')
-
-    return
+    return;
   }
-  
+
   // 计算商品总价和应付总额
-  const totalPrice = selectedGoods.reduce((sum, item) => sum + item.price * item.count, 0)
-  const postFee = 10 // 运费
-  const totalPayPrice = totalPrice + postFee
-  
+  const totalPrice = selectedGoods.reduce(
+    (sum, item) => sum + item.price * item.count,
+    0
+  );
+  const postFee = 10; // 运费
+  const totalPayPrice = totalPrice + postFee;
+
   // 将选中的商品信息和金额信息保存到本地存储
-  localStorage.setItem('cartInfo', JSON.stringify({
-    goods: selectedGoods.map(item => ({
-      id: item.id,
-      name: item.name,
-      picture: item.picture,
-      price: item.price,
-      count: item.count,
-      attrsText: item.attrsText
-    })),
-    summary: {
-      goodsCount: selectedGoods.reduce((sum, item) => sum + item.count, 0),
-      totalPrice: totalPrice,
-      postFee: postFee,
-      totalPayPrice: totalPayPrice
-    }
-  }))
-  
+  localStorage.setItem(
+    "cartInfo",
+    JSON.stringify({
+      goods: selectedGoods.map((item) => ({
+        id: item.id,
+        name: item.name,
+        picture: item.picture,
+        price: item.price,
+        count: item.count,
+        attrsText: item.attrsText,
+      })),
+      summary: {
+        goodsCount: selectedGoods.reduce((sum, item) => sum + item.count, 0),
+        totalPrice: totalPrice,
+        postFee: postFee,
+        totalPayPrice: totalPayPrice,
+      },
+    })
+  );
+
   // 跳转到结算页面
-  router.push('/checkout')
-}
+  router.push("/checkout");
+};
+
+const onChange = (item) => {
+  const { itemId, quantity } = item;
+  updateQuantity(itemId, quantity);
+};
+
+onMounted(() => {
+  getCart();
+});
 </script>
 
 <template>
@@ -63,92 +82,109 @@ const checkout = () => {
       <div class="cart">
         <table>
           <thead>
-          <tr>
-            <th width="120">
-              <el-checkbox :model-value="cartStore.isAll" @change="allCheck"/>
-            </th>
+            <tr>
+              <th width="120">
+                <el-checkbox
+                  :model-value="cartStore.isAll"
+                  @change="allCheck"
+                />
+              </th>
 
-            <th width="400">Product information</th>
-            <th width="220">unit price</th>
-            <th width="180">quantity</th>
-            <th width="180">total</th>
-            <th width="140">operation</th>
-
-          </tr>
+              <th width="400">Product information</th>
+              <th width="220">unit price</th>
+              <th width="180">quantity</th>
+              <th width="180">total</th>
+              <th width="140">operation</th>
+            </tr>
           </thead>
           <!-- 商品列表 -->
           <tbody>
-          <tr v-for="i in cartStore.cartList" :key="i.id">
-            <td>
+            <tr v-for="i in cartStore.cartList" :key="i.id">
+              <td>
                 <!-- 单选框 -->
-              <el-checkbox :model-value="i.selected" @change="(selected)=>singleCheck(i.productId,selected)" />
-            </td>
-            <td>
-              <div class="goods">
-                <RouterLink to="/"><img :src="i.picture" alt="" /></RouterLink>
-                <div>
-                  <p class="name ellipsis">
-                    {{ i.name }}
-                  </p>
+                <el-checkbox
+                  :model-value="i.selected"
+                  @change="(selected) => singleCheck(i.productId, selected)"
+                />
+              </td>
+              <td>
+                <div class="goods">
+                  <RouterLink to="/"
+                    ><img :src="i.picture" alt=""
+                  /></RouterLink>
+                  <div>
+                    <p class="name ellipsis">
+                      {{ i.name }}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </td>
-            <td class="tc">
-              <p>&yen;{{ i.price }}</p>
-            </td>
-            <td class="tc">
-              <el-input-number v-model="i.quantity":min="1" />
-            </td>
-            <td class="tc">
-              <p class="f16 red">&yen;{{ (i.price * i.quantity).toFixed(2) }}</p>
-            </td>
-            <td class="tc">
-              <p>
-
-                <el-popconfirm title="Do you confirm the deletion?" confirm-button-text="yes" cancel-button-text="no" @confirm="cartStore.delCart(i.name)">
-                  <template #reference>
-                    <a href="javascript:;">delete</a>
-
-                  </template>
-                </el-popconfirm>
-              </p>
-            </td>
-          </tr>
-          <tr v-if="cartStore.cartList.length === 0">
-            <td colspan="6">
-              <div class="cart-none">
-
-                <el-empty description="The cart list is empty">
-                  <el-button style="background-color: #ff66b3;color: white" @click="$router.push('/')">Feel free to take a look</el-button>
-
-                </el-empty>
-              </div>
-            </td>
-          </tr>
+              </td>
+              <td class="tc">
+                <p>&yen;{{ i.price }}</p>
+              </td>
+              <td class="tc">
+                <el-input-number
+                  @change="onChange(i)"
+                  v-model="i.quantity"
+                  :min="1"
+                />
+              </td>
+              <td class="tc">
+                <p class="f16 red">
+                  &yen;{{ (i.price * i.quantity).toFixed(2) }}
+                </p>
+              </td>
+              <td class="tc">
+                <p>
+                  <el-popconfirm
+                    title="Do you confirm the deletion?"
+                    confirm-button-text="yes"
+                    cancel-button-text="no"
+                    @confirm="delCart(i.itemId)"
+                  >
+                    <template #reference>
+                      <a href="javascript:;">delete</a>
+                    </template>
+                  </el-popconfirm>
+                </p>
+              </td>
+            </tr>
+            <tr v-if="cartStore.cartList.length === 0">
+              <td colspan="6">
+                <div class="cart-none">
+                  <el-empty description="The cart list is empty">
+                    <el-button
+                      style="background-color: #ff66b3; color: white"
+                      @click="$router.push('/')"
+                      >Feel free to take a look</el-button
+                    >
+                  </el-empty>
+                </div>
+              </td>
+            </tr>
           </tbody>
-
         </table>
       </div>
       <!-- 操作栏 -->
       <div class="action">
         <div class="batch">
-
-          Total {{cartStore.allCount}} products, {{cartStore.selectedCount}} selected, total:
-          <span class="red">¥ {{cartStore.selectedPrice.toFixed(2)}} </span>
+          Total {{ cartStore.allCount }} products,
+          {{ cartStore.selectedCount }} selected, total:
+          <span class="red">¥ {{ cartStore.selectedPrice.toFixed(2) }} </span>
         </div>
         <div class="total">
-          <el-button size="large" style="background-color: #ff66b3;color: white" @click="checkout">Place an order for settlement</el-button>
-
+          <el-button
+            size="large"
+            style="background-color: #ff66b3; color: white"
+            @click="checkout"
+            >Place an order for settlement</el-button
+          >
         </div>
-        <div>
-        </div>
+        <div></div>
       </div>
     </div>
   </div>
 </template>
-
-
-
 
 <style scoped lang="scss">
 .xtx-cart-page {
@@ -228,7 +264,7 @@ const checkout = () => {
       height: 100px;
     }
 
-    >div {
+    > div {
       width: 280px;
       font-size: 16px;
       padding-left: 10px;
@@ -273,7 +309,5 @@ const checkout = () => {
     font-weight: normal;
     line-height: 50px;
   }
-
 }
-
 </style>

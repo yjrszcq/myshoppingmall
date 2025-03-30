@@ -10,9 +10,9 @@ export const getproductsList = (data) => {
     })
 }
 //修改商品信息
-export const reviseProducts = (data) => {
+export const reviseProducts = (data,productId) => {
     return request({
-        url: `/api/seller/products`,
+        url: `/api/seller/products/${productId}`,
         method: 'put',
         data
     })

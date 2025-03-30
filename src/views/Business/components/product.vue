@@ -2,13 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { getproductsList, deleteProducts, reviseProducts, addProducts } from '../../../apis/business';
-const products = ref([
-
-  { id: 1, name: 'goods A', price: 100, stock: 50 },
-  { id: 2, name: 'goods B', price: 200, stock: 30 },
-  { id: 3, name: 'goods C', price: 300, stock: 20 },
-
-]);
+const products = ref([]);
 //根据接口获取数据
 onMounted(async () => {
   getproducts()
@@ -24,9 +18,13 @@ const getproducts = async () => {
   total.value = res.total
 }
 
+const productId = ref(0)
 const handleEdit = (row) => {
   dialogType.value = 'edit'
   productForm.value = { ...row }
+  productId.value = row.productId
+  console.log(productId.value,"商品id");
+  
   dialogVisible.value = true
 }
 
@@ -91,10 +89,10 @@ const handleSubmit = async () => {
     if (dialogType.value === 'add') {
       await addProducts(productForm.value)
 
-      ElMessage.success('added successfully')
+      ElMessage.success('新增成功')
     } else {
-      await reviseProducts(productForm.value)
-      ElMessage.success('updated successfully')
+      await reviseProducts(productForm.value,productId.value)
+      ElMessage.success('修改成功')
 
     }
     dialogVisible.value = false

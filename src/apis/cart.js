@@ -24,11 +24,11 @@ export const getCartContentsAPI = () => {
 // 删除购物车
 export const deleteCartItemAPI = (itemId) => {
   return request({
-    url: '/api/cart/items/{itemId}',
+    url: `/api/cart/items/${itemId}`,
     method: 'DELETE',
-    data: {
-      itemId
-      }
+    // data: {
+    //   itemId
+    //   }
   })
 }
 

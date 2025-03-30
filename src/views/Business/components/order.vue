@@ -3,9 +3,11 @@ import { ref, onMounted } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { viewOrders, manageOrders } from '@/apis/business';
 const orders = ref([
-  { id: 1, orderNo: 'ORD001', customer: '张三', total: 299, status: '待发货', createTime: '2024-01-20' },
-  { id: 2, orderNo: 'ORD002', customer: '李四', total: 599, status: '已发货', createTime: '2024-01-19' },
-  { id: 3, orderNo: 'ORD003', customer: '王五', total: 899, status: '已完成', createTime: '2024-01-18' },
+
+  { id: 1, orderNo: 'ORD001', customer: 'Aaa', total: 299, status: 'to be shipped', createTime: '2024-01-20' },
+  { id: 2, orderNo: 'ORD002', customer: 'Bbb', total: 599, status: 'Shipped', createTime: '2024-01-19' },
+  { id: 3, orderNo: 'ORD003', customer: 'Ccc', total: 899, status: 'Shipped', createTime: '2024-01-18' },
+
 ]);
 
 //根据接口获取数据
@@ -16,45 +18,55 @@ onMounted(async () => {
 //获取数据函数
 const getOrders = async () => {
   const res = await viewOrders()
-  console.log(res,"成功");
+
+  console.log(res,"success");
+
   
   orders.value = res.itemList
 }
 
 const handleOrderStatus = async (row) => {
-  ElMessageBox.confirm(`是否将订单${row.orderId}标记为已完成？`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+
+  ElMessageBox.confirm(`Do you mark the order ${row.orderId} as completed?`, 'prompt', {
+    confirmButtonText: 'yes',
+    cancelButtonText: 'no',
+
     type: 'success',
   }).then(async () => {
     try {
       await manageOrders({
         orderId: row.orderId,
-        status: '已完成'
+
+        status: 'done'
       })
-      ElMessage.success('订单状态已更新');
+      ElMessage.success('The order status has been updated');
       getOrders(); // 刷新订单列表
     } catch (error) {
-      ElMessage.error('更新失败');
+      ElMessage.error('error');
+
     }
   });
 };
 
 const handleAcceptOrder = async (row) => {
-  ElMessageBox.confirm(`是否接受订单${row.orderId}？`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+
+  ElMessageBox.confirm(`Do you accept orders ${row.orderId}?`, 'prompt', {
+    confirmButtonText: 'yes',
+    cancelButtonText: 'no',
+
     type: 'success',
   }).then(async () => {
     try {
       await manageOrders({
         orderId: row.orderId,
-        status: '已接单'
+
+        status: 'done'
       })
-      ElMessage.success('已接受订单');
+      ElMessage.success('The order has been accepted');
       getOrders(); // 刷新订单列表
     } catch (error) {
-      ElMessage.error('接单失败');
+      ElMessage.error('error');
+
     }
   });
 };
@@ -77,36 +89,45 @@ const handleSizeChange = (val) => {
 <template>
   <div class="management-container">
     <div class="header">
-      <h2 class="title">订单管理</h2>
+
+      <h2 class="title">Order management</h2>
       <el-table :data="orders" style="width: 100%" border class="pink-table">
-        <el-table-column prop="orderId" label="订单号" width="120"></el-table-column>
-        <el-table-column prop="productName" label="订单名称" ></el-table-column>
-        <el-table-column prop="price" label="订单金额" width="120">
+        <el-table-column prop="orderId" label="orderId" width="120"></el-table-column>
+        <el-table-column prop="productName" label="productName" ></el-table-column>
+        <el-table-column prop="price" label="price" width="120">
+
+
           <template #default="scope">
             ¥{{ scope.row.price }}
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="订单状态" width="120">
+
+        <el-table-column prop="status" label="status" width="120">
           <template #default="scope">
             <el-tag :type="'success'">
-              {{ '已完成' }}
+              {{ 'success' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
-        <el-table-column label="操作" width="240">
+        <el-table-column prop="createTime" label="createTime" width="180"></el-table-column>
+        <el-table-column label="operate" width="240">
+
           <template #default="scope">
             <el-button 
               size="small" 
               type="success" 
               @click="handleOrderStatus(scope.row)">
-              完成订单
+
+              Complete the order
+
             </el-button>
             <el-button 
               size="small" 
               type="info" 
               @click="handleAcceptOrder(scope.row)">
-              接受订单
+
+              Accept orders
+
             </el-button>
           </template>
         </el-table-column>

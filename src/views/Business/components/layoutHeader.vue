@@ -11,22 +11,26 @@
           <el-sub-menu index="1">
             <template #title>
               <el-icon><location /></el-icon>
-              <span >我的商品</span>
+
+              <span >My Products</span>
             </template>
-              <el-menu-item index="/product">商品管理</el-menu-item>
+              <el-menu-item index="/product">Product Management</el-menu-item>
+
           </el-sub-menu>
           <el-sub-menu index="2">
             <template #title>
               <el-icon><location /></el-icon>
-              <span >我的订单</span>
+
+              <span >My Orders</span>
             </template>
-            <el-menu-item index="/order">订单管理</el-menu-item>
+            <el-menu-item index="/order">Order Management</el-menu-item>
           </el-sub-menu>
           <el-menu-item >
             <el-icon><setting /></el-icon>
-            <el-popconfirm @confirm="confirm" title="确认退出吗?" confirm-button-text="确认" cancel-button-text="取消">
+            <el-popconfirm @confirm="confirm" title="Confirm Logout?" confirm-button-text="Confirm" cancel-button-text="Cancel">
               <template #reference>
-                <a style="width: 1000px">退出登录</a>
+                <a style="width: 1000px">Logout</a>
+
               </template>
             </el-popconfirm>
           </el-menu-item>

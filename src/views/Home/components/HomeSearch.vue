@@ -29,7 +29,9 @@ const fetchProducts = async () => {
     products.value = res.results;
     total.value = res.total;
   } catch (error) {
-    console.error('搜索失败:', error);
+
+    console.error('error:', error);
+
   }
 };
 
@@ -48,18 +50,22 @@ watch(() => route.query.keyword, (newKeyword) => {
 
 <template>
   <div class="search-page">
-    <h2 style="color: palevioletred">搜索结果: "{{ keyword }}"</h2>
+
+    <h2 style="color: palevioletred">result: "{{ keyword }}"</h2>
 
     <!-- 搜索无结果 -->
     <div v-if="products.length === 0">
-      <HomePanel title="没有找到喵" sub-title="私密马赛呜呜呜">
+      <HomePanel title="404 NotFind" sub-title="QWQ">
+
 
       </HomePanel>
     </div>
 
     <!-- 搜索结果展示 -->
     <div v-if="products.length !== 0">
-      <HomePanel title="为您找到：" sub-title="不用谢喵" >
+
+      <HomePanel title="Found for you:" sub-title="Please say thank you" >
+
         <template #main>
           <ul class="product-list">
             <li v-for="item in products" :key="item.id">

@@ -23,7 +23,9 @@ const checkout = () => {
   // 保存选中的商品信息到本地存储
   const selectedGoods = cartStore.cartList.filter(item => item.selected)
   if (selectedGoods.length === 0) {
-    ElMessage.warning('请选择要结算的商品')
+
+    ElMessage.warning('Please select the product you want to check')
+
     return
   }
   
@@ -65,11 +67,13 @@ const checkout = () => {
             <th width="120">
               <el-checkbox :model-value="cartStore.isAll" @change="allCheck"/>
             </th>
-            <th width="400">商品信息</th>
-            <th width="220">单价</th>
-            <th width="180">数量</th>
-            <th width="180">小计</th>
-            <th width="140">操作</th>
+
+            <th width="400">Product information</th>
+            <th width="220">unit price</th>
+            <th width="180">quantity</th>
+            <th width="180">total</th>
+            <th width="140">operation</th>
+
           </tr>
           </thead>
           <!-- 商品列表 -->
@@ -100,9 +104,11 @@ const checkout = () => {
             </td>
             <td class="tc">
               <p>
-                <el-popconfirm title="确认删除吗?" confirm-button-text="确认" cancel-button-text="取消" @confirm="cartStore.delCart(i.name)">
+
+                <el-popconfirm title="Do you confirm the deletion?" confirm-button-text="yes" cancel-button-text="no" @confirm="cartStore.delCart(i.name)">
                   <template #reference>
-                    <a href="javascript:;">删除</a>
+                    <a href="javascript:;">delete</a>
+
                   </template>
                 </el-popconfirm>
               </p>
@@ -111,8 +117,10 @@ const checkout = () => {
           <tr v-if="cartStore.cartList.length === 0">
             <td colspan="6">
               <div class="cart-none">
-                <el-empty description="购物车列表为空">
-                  <el-button style="background-color: #ff66b3;color: white" @click="$router.push('/')">随便逛逛</el-button>
+
+                <el-empty description="The cart list is empty">
+                  <el-button style="background-color: #ff66b3;color: white" @click="$router.push('/')">Feel free to take a look</el-button>
+
                 </el-empty>
               </div>
             </td>
@@ -124,11 +132,13 @@ const checkout = () => {
       <!-- 操作栏 -->
       <div class="action">
         <div class="batch">
-          共 {{cartStore.allCount}} 件商品，已选择 {{cartStore.selectedCount}} 件，商品合计：
+
+          Total {{cartStore.allCount}} products, {{cartStore.selectedCount}} selected, total:
           <span class="red">¥ {{cartStore.selectedPrice.toFixed(2)}} </span>
         </div>
         <div class="total">
-          <el-button size="large" style="background-color: #ff66b3;color: white" @click="checkout">下单结算</el-button>
+          <el-button size="large" style="background-color: #ff66b3;color: white" @click="checkout">Place an order for settlement</el-button>
+
         </div>
         <div>
         </div>

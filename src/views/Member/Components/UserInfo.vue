@@ -6,32 +6,40 @@ const userStore = {}
 const likeList = ref([
   {
     "productId": "3995454",
-    "name": "黑科技专利款100%防水保暖针织毛线帽",
-    "desc": "黑科技专利，做到真正的保暖防水",
+
+    "name": "Black technology patented 100% waterproof and warm knitted beanie",
+    "desc": "Black technology patent, to achieve real warmth and waterproof",
+
     "price": "135.00",
     "thumbnail": "https://yanxuan-item.nosdn.127.net/3683d874b9623434a10b4ab0c2e6be9f.png",
     "orderNum": 3989
   },
   {
     "productId": "4027998",
-    "name": "亮碟多效合一洗涤块495g",
-    "desc": "洗碗机专用，强力去污",
+
+    "name": "Bright disc all-in-one washing block 495g",
+    "desc": "Dishwasher only, strong decontamination",
+
     "price": "69.90",
     "thumbnail": "https://yanxuan-item.nosdn.127.net/e07c2b63765cf9f4a46d489c6e09c1c1.jpg",
     "orderNum": 7798
   },
   {
     "productId": "4026809",
-    "name": "亚洲头围城市运动通勤电动车头盔",
-    "desc": "亚洲头型设计3C认证城市通勤",
+
+    "name": "Asian Head Circumference Urban Sports Commuter Electric Vehicle Helmet",
+    "desc": "Asian Head Design 3C Certified City Commuting",
+
     "price": "158.00",
     "thumbnail": "https://yanxuan-item.nosdn.127.net/ae521f6d97560598f3e6b3ddaed477c0.png",
     "orderNum": 12705
   },
   {
     "productId": "4023839",
-    "name": "日本冰块冰球制冰模具",
-    "desc": "轻轻一拍，轻松取冰",
+
+    "name": "Japanese ice cube ice puck ice mold",
+    "desc": "Gently pat for easy ice",
+
     "price": "29.80",
     "thumbnail": "https://yanxuan-item.nosdn.127.net/2be38fc160992fe41f7d4a45bd0f90e5.png",
     "orderNum": 9800
@@ -62,7 +70,9 @@ const likeList = ref([
       <RouterLink to="/member/address">
         <a href="javascript:;">
           <span class="iconfont icon-dw"></span>
-          <p>地址管理</p>
+
+          <p>Address management</p>
+
         </a>
       </RouterLink>
     </div>
@@ -70,7 +80,9 @@ const likeList = ref([
   <div class="like-container">
     <div class="home-panel">
       <div class="header">
-        <h4 data-v-bcb266e0="">猜你喜欢 </h4>
+
+        <h4 data-v-bcb266e0="">You may also like it </h4>
+
       </div>
       <div class="goods-list">
         <GoodsItem v-for="good in likeList" :key="good.id" :goods="good" />

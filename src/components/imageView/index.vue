@@ -12,12 +12,13 @@ const getGoods = async () => {
     const res = await getProductById(route.params.id)
     console.log("res",res)
     goods.value = res
-    console.log("商品详情", goods.value)
+    console.log("Product details", goods.value)
+
 
     // mainPictures
       imageList.value = goods.value.mainPictures
   } catch (error) {
-    console.error("获取商品详情失败", error)
+    console.error("Fetch store details failed", error)
   }
 }
 

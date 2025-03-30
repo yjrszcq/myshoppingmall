@@ -17,7 +17,9 @@ const getProductList = async () => {
   })
   newList.value = res.results
   total.value = res.total
-  console.log('商品3',res)
+
+  console.log('product3',res)
+
 }
 
 onMounted(() => {
@@ -26,7 +28,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <HomePanel title="全国美食" sub-title="新鲜好吃 喵喵喵喵">
+
+  <HomePanel title="National cuisine" sub-title="Fresh and delicious">
+
     <template #main>
       <ul class="goods-list">
         <li v-for="item in newList" :key="item.id">

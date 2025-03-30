@@ -30,21 +30,23 @@ const confirm = () =>{
         <template v-if="Userstore.userInfo.sessionId">
           <li><a href="javascript:;" @click="goToUser"><i class="iconfont icon-user"></i>{{ Userstore.userInfo.userAccount }}</a></li>
           <li>
-            <el-popconfirm @confirm="confirm" title="确认退出吗?" confirm-button-text="确认" cancel-button-text="取消">
+
+            <el-popconfirm @confirm="confirm" title="Are you sure?" confirm-button-text="yes" cancel-button-text="no">
               <template #reference>
-                <a >退出登录</a>
+                <a >Sign out</a>
               </template>
             </el-popconfirm>
           </li>
-          <li><a href="javascript:;" @click="goToUser">会员中心</a></li>
-          <li><a href="javascript:;" @click="$router.push('/cart')"><i class="iconfont icon-cart" ></i>购物车</a></li>
+          <li><a href="javascript:;" @click="goToUser">Member Center</a></li>
+          <li><a href="javascript:;" @click="$router.push('/cart')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
         </template>
         <template v-else>
-          <li><a href="javascript:;" @click="$router.push('/login')">请先登录</a></li>
-          <li><a href="javascript:;" @click="$router.push('/login')"><i class="iconfont icon-cart" ></i>购物车</a></li>
-          <li><a href="javascript:;">帮助中心</a></li>
-          <li><a href="javascript:;">关于我们</a></li>
-          <li><a href="javascript:;" @click="goToBusiness">商家版</a></li>
+          <li><a href="javascript:;" @click="$router.push('/login')">Please log in first</a></li>
+          <li><a href="javascript:;" @click="$router.push('/login')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
+          <li><a href="javascript:;">Help Center</a></li>
+          <li><a href="javascript:;">About us</a></li>
+          <li><a href="javascript:;" @click="goToBusiness">Merchant Edition</a></li>
+
         </template>
       </ul>
     </div>

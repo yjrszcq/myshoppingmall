@@ -48,10 +48,13 @@ const submitBankInfo = async () => {
   
   try {
     await formRef.value.validate()
-    ElMessage.success('银行卡信息提交成功')
+
+    ElMessage.success('The bank card information has been submitted successfully')
     router.push('/member/user')
   } catch (error) {
-    ElMessage.error('请检查银行卡信息是否正确，并重新输入')
+    ElMessage.error('Please check that your card details are correct and re-enter them')
+
+
   }
 }
 </script>
@@ -60,20 +63,26 @@ const submitBankInfo = async () => {
   <div class="bank-info-page">
     <div class="container">
       <div class="wrapper">
-        <h3 class="box-title">银行卡信息</h3>
+
+        <h3 class="box-title">Bank Card Information</h3>
+
         <div class="box-body">
           <!-- 添加担保金额提示 -->
           <div class="amount-notice">
             <el-alert
-              title="担保金额"
+
+              title="Deposit Amount"
+
               type="info"
               :closable="false"
               show-icon
             >
               <template #default>
-                <p>您需要担保的金额为：<span class="amount">¥{{ totalAmount.toFixed(2) }}</span></p>
-                <p class="notice">此金额包含商品总价、运费以及货到付款手续费(5元)</p>
-                <p class="notice">请确保您的银行卡余额充足，以便完成支付。</p>
+
+                <p>You need to deposit an amount of: <span class="amount">¥{{ totalAmount.toFixed(2) }}</span></p>
+                <p class="notice">This amount includes the total price of the product, shipping fees, and COD handling fee (5 yuan)</p>
+                <p class="notice">Please ensure that your bank card balance is sufficient to complete the payment.</p>
+
               </template>
             </el-alert>
           </div>
@@ -81,8 +90,10 @@ const submitBankInfo = async () => {
           <!-- 担保提示信息 -->
           <div class="notice-box">
             <i class="el-icon-warning"></i>
-            <span>温馨提示：</span>
-            <p>为了确保您的订单安全，我们需要您提供银行卡信息作为信用担保。您的银行卡信息仅用于担保，不会产生任何实际扣款。</p>
+
+            <span>Warm Reminder:</span>
+            <p>In order to ensure the security of your order, we need you to provide bank card information as a credit guarantee. Your bank card information is only used for guarantee and will not result in any actual deduction.</p>
+
           </div>
 
           <el-form
@@ -92,26 +103,31 @@ const submitBankInfo = async () => {
             label-width="120px"
             class="bank-form"
           >
-            <el-form-item label="银行卡号" prop="cardNumber">
-              <el-input v-model="bankForm.cardNumber" placeholder="请输入银行卡号" />
-              <div class="form-tip">请输入16-19位数字的银行卡号</div>
+
+            <el-form-item label="Bank Card Number" prop="cardNumber">
+              <el-input v-model="bankForm.cardNumber" placeholder="Please enter your bank card number" />
+              <div class="form-tip">Please enter a 16-19 digit bank card number</div>
             </el-form-item>
-            <el-form-item label="持卡人姓名" prop="cardHolder">
-              <el-input v-model="bankForm.cardHolder" placeholder="请输入持卡人姓名" />
-              <div class="form-tip">请输入与银行卡一致的持卡人姓名</div>
+            <el-form-item label="Cardholder Name" prop="cardHolder">
+              <el-input v-model="bankForm.cardNumber" placeholder="Please enter your bank card number" />
+              <div class="form-tip">Please enter a 16-19 digit bank card number</div>
             </el-form-item>
-            <el-form-item label="有效期" prop="expiryDate">
-              <el-input v-model="bankForm.expiryDate" placeholder="请输入有效期(MM/YY)" />
-              <div class="form-tip">请输入卡片正面的有效期，格式为MM/YY（如：12/25）</div>
+            
+            <el-form-item label="Cardholder Name" prop="cardHolder">
+              <el-input v-model="bankForm.cardHolder" placeholder="Please enter the cardholder's name" />
+              <div class="form-tip">Please enter the cardholder's name consistent with the bank card</div>
             </el-form-item>
-            <el-form-item label="CVV码" prop="cvv">
-              <el-input v-model="bankForm.cvv" placeholder="请输入CVV码" />
-              <div class="form-tip">请输入卡片背面的3位数字安全码</div>
+            <el-form-item label="Expiry Date" prop="expiryDate">
+              <el-input v-model="bankForm.expiryDate" placeholder="Please enter the expiry date (MM/YY)" />
+              <div class="form-tip">Please enter the expiry date on the front of the card, in the format MM/YY (e.g., 12/25)</div>
+
             </el-form-item>
           </el-form>
         </div>
         <div class="submit">
-          <el-button size="large" style="background-color: #ff66b3;color: white" @click="submitBankInfo">提交信息</el-button>
+
+          <el-button size="large" style="background-color: #ff66b3;color: white" @click="submitBankInfo">Submit Information</el-button>
+
         </div>
       </div>
     </div>

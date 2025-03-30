@@ -43,7 +43,9 @@ const getGoods = async () => {
     goods.value = res
     console.log(goods.value)
   } catch (error) {
-    console.error("获取商品详情失败", error)
+
+    console.error("Fetch store details failed", error)
+
   }
 }
 
@@ -60,7 +62,9 @@ onMounted(() => {
     <div class="container" v-if="goods">
       <div class="bread-container">
         <el-breadcrumb separator=">">
-          <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+
+          <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
+
           <!--
             错误原因：goods一开始{}  {}.categories -> undefined  -> undefined[1]
             1. 可选链的语法?.
@@ -117,16 +121,18 @@ onMounted(() => {
               </p>
               <div class="g-service">
                 <dl>
-                  <dt>促销</dt>
-                  <dd>12月好物放送，App领券购买直降120元</dd>
+
+                  <dt>sales</dt>
+                  <dd>good things were broadcast, the App coupon purchase 120 yuan dropped</dd>
                 </dl>
                 <dl>
-                  <dt>服务</dt>
+                  <dt>serve</dt>
                   <dd>
-                    <span>无忧退货</span>
-                    <span>快速退款</span>
-                    <span>免费包邮</span>
-                    <a href="javascript:;">了解详情</a>
+                    <span>Hassle-free returns</span>
+                    <span>Fast refunds</span>
+                    <span>Free shipping</span>
+                    <a href="javascript:;">Learn more</a>
+
                   </dd>
                 </dl>
               </div>
@@ -137,7 +143,9 @@ onMounted(() => {
               <!-- 按钮组件 -->
               <div>
                 <el-button size="large" class="btn" @click="addCart">
-                  加入购物车
+
+                  Add to cart
+
                 </el-button>
               </div>
 

@@ -25,7 +25,9 @@ export const useProductSearchStore = defineStore('productSearch', {
             try {
                 this.loading = true
                 const params = {
-                    keyword: '手机',
+
+                    keyword: 'cell phone',
+
                     page: options.page || 1,
                     limit: options.limit || 10,
                     sort: options.sort || ''
@@ -54,7 +56,9 @@ export const useProductSearchStore = defineStore('productSearch', {
             try {
                 this.loading = true
                 const params = {
-                    keyword: '美食',
+
+                    keyword: 'delicacies',
+
                     page: options.page || 1,
                     limit: options.limit || 10,
                     sort: options.sort || ''
@@ -82,7 +86,9 @@ export const useProductSearchStore = defineStore('productSearch', {
             try {
                 this.loading = true
                 const params = {
-                    keyword: '衣服',
+
+                    keyword: 'clothes',
+
                     page: options.page || 1,
                     limit: options.limit || 10,
                     sort: options.sort || ''

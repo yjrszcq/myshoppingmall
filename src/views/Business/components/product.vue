@@ -3,9 +3,11 @@ import { ref, onMounted } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { getproductsList, deleteProducts, reviseProducts, addProducts } from '../../../apis/business';
 const products = ref([
-  { id: 1, name: '商品A', price: 100, stock: 50 },
-  { id: 2, name: '商品B', price: 200, stock: 30 },
-  { id: 3, name: '商品C', price: 300, stock: 20 },
+
+  { id: 1, name: 'goods A', price: 100, stock: 50 },
+  { id: 2, name: 'goods B', price: 200, stock: 30 },
+  { id: 3, name: 'goods C', price: 300, stock: 20 },
+
 ]);
 //根据接口获取数据
 onMounted(async () => {
@@ -29,16 +31,20 @@ const handleEdit = (row) => {
 }
 
 const handleDelete = (row) => {
-  ElMessageBox.confirm('确定删除该商品吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+
+  ElMessageBox.confirm('Are you sure you want to delete the item?', 'prompt', {
+    confirmButtonText: 'yes',
+    cancelButtonText: 'no',
+
     type: 'warning',
   }).then(() => {
     console.log(row.productId);
     
     deleteProducts(row.productId).then(() => {
       getproducts()
-      ElMessage.success('商品已删除');
+
+      ElMessage.success('success');
+
     })
     
   });
@@ -84,15 +90,19 @@ const handleSubmit = async () => {
   try {
     if (dialogType.value === 'add') {
       await addProducts(productForm.value)
-      ElMessage.success('商品添加成功')
+
+      ElMessage.success('added successfully')
     } else {
       await reviseProducts(productForm.value)
-      ElMessage.success('商品更新成功')
+      ElMessage.success('updated successfully')
+
     }
     dialogVisible.value = false
     getproducts()
   } catch (error) {
-    ElMessage.error('操作失败')
+
+    ElMessage.error('failed')
+
   }
 }
 </script>
@@ -101,20 +111,24 @@ const handleSubmit = async () => {
   <div class="management-container">
     <div class="header">
       <div class="title-row">
-        <h2 class="title">商品管理</h2>
-        <el-button @click="handleAdd">新增商品</el-button>
+
+        <h2 class="title">Product Management</h2>
+        <el-button @click="handleAdd">Add product</el-button>
+
       </div>
       
       <el-table :data="products" style="width: 100%" border class="pink-table">
         <el-table-column prop="productId" label="ID" width="50"></el-table-column>
-        <el-table-column prop="name" label="商品名称" width="200"></el-table-column>
-        <el-table-column prop="description" label="商品介绍"></el-table-column>
-        <el-table-column prop="price" label="价格" width="100"></el-table-column>
-        <el-table-column prop="stock" label="库存" width="100"></el-table-column>
-        <el-table-column label="操作" width="180">
+
+        <el-table-column prop="name" label="name" width="200"></el-table-column>
+        <el-table-column prop="description" label="description"></el-table-column>
+        <el-table-column prop="price" label="price" width="100"></el-table-column>
+        <el-table-column prop="stock" label="stock" width="100"></el-table-column>
+        <el-table-column label="operation"owidth="180">
           <template #default="scope">
-            <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            <el-button size="small" @click="handleEdit(scope.row)">edit</el-button>
+            <el-button size="small" type="danger" @click="handleDelete(scope.row)">delete</el-button>
+
           </template>
         </el-table-column>
       </el-table>
@@ -122,28 +136,34 @@ const handleSubmit = async () => {
 
     <!-- 新增/编辑商品对话框 -->
     <el-dialog
-      :title="dialogType === 'add' ? '新增商品' : '编辑商品'"
+
+      :title="dialogType === 'add' ? 'add product' : 'edit product'"
+
       v-model="dialogVisible"
       width="500px"
     >
       <el-form :model="productForm" label-width="100px">
-        <el-form-item label="商品名称">
+
+        <el-form-item label="name">
           <el-input v-model="productForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="商品介绍">
+        <el-form-item label="description">
           <el-input v-model="productForm.description" type="textarea"></el-input>
         </el-form-item>
-        <el-form-item label="价格">
+        <el-form-item label="price">
           <el-input-number v-model="productForm.price" :min="0"></el-input-number>
         </el-form-item>
-        <el-form-item label="库存">
+        <el-form-item label="stock">
+
           <el-input-number v-model="productForm.stock" :min="0"></el-input-number>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit">确定</el-button>
+
+          <el-button @click="dialogVisible = false">cancel</el-button>
+          <el-button type="primary" @click="handleSubmit">ok</el-button>
+
         </span>
       </template>
     </el-dialog>

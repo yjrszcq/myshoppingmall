@@ -1,7 +1,10 @@
 <script setup>
+
+
 import {ref} from 'vue'
 import {ElMessage} from 'element-plus'
 import {registerUser} from '@/apis/login.js'  // 刚才写的接口
+
 import {useRouter} from "vue-router";
 import {useUserstore} from '@/stores/user.js'
 
@@ -12,19 +15,23 @@ const isRegister = ref(false)
 
 // 登录表单数据（后面记得改一下）
 const loginForm = ref({
-  username: '',
-  password: '',
+
+  username:'',
+  password:'',
+
 })
 
 const router = useRouter()
 
 const loginrules = {
+
   username: [
-    {required: true, message: '用户名不能为空！', trigger: 'blur'},
+    {required: true, message :'The username cannot be empty!', trigger :'blur'},
   ],
   password: [
     {
-      required: true, message: '密码不能为空', trigger: 'blur'
+      required: true, message :'The password cannot be empty！', trigger :'blur'
+
       //后面还可以添加其他规则
     }
   ]
@@ -33,23 +40,25 @@ const loginrules = {
 
 const reginsterrules = {
   username: [
-    {required: true, message: '用户名不能为空！', trigger: 'blur'},
+
+    {required: true, message :'The username cannot be empty!', trigger :'blur'},
   ],
   password: [
     {
-      required: true, message: '密码不能为空', trigger: 'blur',
+      required: true, message :'The password cannot be empty!', trigger :'blur',
       //后面还可以添加其他规则
     }
   ],
   email: [
     {
-      required: true, message: '邮箱不能为空', trigger: 'blur',
+      required: true, message :'The email cannot be empty!', trigger :'blur',
       //后面还可以添加其他规则
     }
   ],
   phone: [
     {
-      required: true, message: '电话不能为空', trigger: 'blur',
+      required: true, message :'The telephone cannot be empty!', trigger :'blur',
+
       //后面还可以添加其他规则
     }
   ]
@@ -72,21 +81,24 @@ const toggleForm = () => {
 const loginformRef = ref(null)
 
 const dologin = () => {
-  const {username, password} = loginForm.value
+
+  const { username, password } = loginForm.value
+
   // 调用实例方法
   loginformRef.value.validate(async (valid) => {
     // valid: 所有表单都通过校验  才为true
     console.log(valid)
     // 以valid做为判断条件 如果通过校验才执行登录逻辑
     if (valid) {
-      await userStore.getUserInfo({username, password})
-      console.log(loginForm,"form")
+
+      await userStore.getUserInfo({username,password})
       // 1. 提示用户
-      ElMessage({type: 'success', message: '登录成功'})
+      ElMessage({type: 'success', message: 'success'})
       // 2. 跳转首页
-      router.replace({path: '/business'})
+      router.replace({ path: '/business' })
     } else {
-      ElMessage({type: 'error', message: '登录失败！'})
+      ElMessage({ type: 'error', message: 'error！' })
+
     }
   })
 }
@@ -99,13 +111,15 @@ const doregister = () => {
       try {
         await registerUser(registerForm.value)  // 直接传递整个表单数据
 
-        ElMessage({type: 'success', message: '注册成功'})
+
+        ElMessage({type: 'success', message: 'success'})
         isRegister.value = false  // 注册成功后，自动切换回登录界面
       } catch (error) {
-        ElMessage({type: 'error', message: error.response?.data?.message || '注册失败！'})
+        ElMessage({type: 'error', message: error.response?.data?.message || 'error！'})
       }
     } else {
-      ElMessage({type: 'error', message: '注册失败！请检查输入'})
+      ElMessage({type: 'error', message: 'Registration failed! Please check the inputs'})
+
     }
   })
 }
@@ -122,7 +136,9 @@ const doregister = () => {
           <RouterLink to="/">TafeiMall</RouterLink>
         </h1>
         <RouterLink class="entry" to="/">
-          进入网站首页
+
+          Go to the homepage
+
           <i class="iconfont icon-angle-right"></i>
           <i class="iconfont icon-angle-right"></i>
         </RouterLink>
@@ -132,20 +148,23 @@ const doregister = () => {
     <section class="login-section">
       <div class="wrapper">
         <nav>
-          <a @click="isRegister = false" :style="{ color: !isRegister ? '#ff66b3' : '#333' }">账户登录</a>
-          <a @click="isRegister = true" :style="{ color: isRegister ? '#ff66b3' : '#333' }">账户注册</a>
+
+          <a @click="isRegister = false" :style="{ color: !isRegister ? '#ff66b3' : '#333' }">Account login</a>
+          <a @click="isRegister = true" :style="{ color: isRegister ? '#ff66b3' : '#333' }">Account Registration</a>
+
         </nav>
 
         <!-- 登录表单 -->
         <div class="account-box" v-if="!isRegister">
           <div class="form">
-            <el-form ref="loginformRef" :model="loginForm" :rules="loginrules" label-position="right" label-width="60px"
-                     status-icon>
-              <el-form-item prop="username" label="账户">
+
+            <el-form ref="loginformRef" :model="loginForm" :rules="loginrules" label-position="right" label-width="60px"status-icon>
+              <el-form-item prop="username" label="username">
                 <el-input v-model="loginForm.username"/>
               </el-form-item>
-              <el-form-item prop="password" label="密码">
+              <el-form-item prop="password" label="password">
                 <el-input v-model="loginForm.password"/>
+
               </el-form-item>
               <!--              后端没有提供相应的接口，可以考虑在后面的版本添加上去-->
               <!--              <el-form-item label-width="22px">-->
@@ -155,8 +174,10 @@ const doregister = () => {
               <!--              </el-form-item>-->
               <el-form-item>
                 <div class="btn-group">
-                  <el-button class="subBtn" @click="dologin">登录</el-button>
-                  <el-button class="subBtn" @click="toggleForm">注册</el-button>
+
+                  <el-button class="subBtn" @click="dologin">login</el-button>
+                  <el-button class="subBtn" @click="toggleForm">enroll</el-button>
+
                 </div>
               </el-form-item>
             </el-form>
@@ -166,29 +187,30 @@ const doregister = () => {
         <!-- 注册表单 -->
         <div class="account-box" v-if="isRegister">
           <div class="form">
-            <el-form ref="registerformRef" :model="registerForm" :rules="reginsterrules" label-position="right"
-                     label-width="70px" status-icon>
-              <el-form-item prop="username" label="用户名">
+
+            <el-form ref="registerformRef" :model="registerForm" :rules="reginsterrules" label-position="right" label-width="70px" status-icon>
+              <el-form-item prop="username" label="username">
                 <el-input v-model="registerForm.username"/>
               </el-form-item>
-              <el-form-item prop="password" label="密码">
+              <el-form-item prop="password" label="password">
                 <el-input v-model="registerForm.password" type="password"/>
               </el-form-item>
-              <el-form-item prop="email" label="邮箱">
+              <el-form-item prop="email" label="email">
                 <el-input v-model="registerForm.email"/>
               </el-form-item>
-              <el-form-item prop="phone" label="手机号">
+              <el-form-item prop="phone" label="phone">
                 <el-input v-model="registerForm.phone"/>
               </el-form-item>
               <el-form-item label-width="22px">
-                <!--                <el-checkbox size="large">-->
-                <!--                  我已同意隐私条款和服务条款-->
-                <!--                </el-checkbox>-->
+<!--                <el-checkbox size="large">-->
+<!--                  我已同意隐私条款和服务条款-->
+<!--                </el-checkbox>-->
               </el-form-item>
               <el-form-item>
                 <div class="btn-group">
-                  <el-button class="subBtn" @click="doregister">提交注册</el-button>
-                  <el-button class="subBtn" @click="toggleForm">返回登录</el-button>
+                  <el-button class="subBtn" @click="doregister">Submit your registration</el-button>
+                  <el-button class="subBtn" @click="toggleForm">Go back to sign in</el-button>
+
                 </div>
               </el-form-item>
             </el-form>
@@ -310,7 +332,9 @@ const doregister = () => {
       color: #999;
       display: inline-block;
 
+
       ~ a {
+
         border-left: 1px solid #ccc;
       }
     }
@@ -341,7 +365,9 @@ const doregister = () => {
         position: relative;
         height: 36px;
 
+
         > i {
+
           width: 34px;
           height: 34px;
           background: #cfcdcd;
@@ -386,7 +412,9 @@ const doregister = () => {
         }
       }
 
+
       > .error {
+
         position: absolute;
         font-size: 12px;
         line-height: 28px;
@@ -445,7 +473,9 @@ const doregister = () => {
 .btn-group {
   display: flex;
   justify-content: center; /* 水平居中 */
+
   gap: 40px; /* 按钮之间的间距，自己调整 */
+
 }
 
 </style>

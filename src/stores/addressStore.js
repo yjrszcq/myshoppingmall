@@ -13,7 +13,9 @@ export const useAddressStore = defineStore('address', () => {
             const response = await getAddressListAPI();
             addressList.value = response.address || [];
         } catch (error) {
-            console.error('获取地址列表失败:', error);
+
+            console.error('Failed to get address list:', error);
+
         }
     };
 
@@ -24,7 +26,9 @@ export const useAddressStore = defineStore('address', () => {
             // 添加成功后重新获取地址列表
             await getAddressList();
         } catch (error) {
-            console.error('添加地址失败:', error);
+
+            console.error('Failed to add address: ', error);
+
         }
     };
 
@@ -35,7 +39,9 @@ export const useAddressStore = defineStore('address', () => {
             // 更新成功后重新获取地址列表
             await getAddressList();
         } catch (error) {
-            console.error('更新地址失败:', error);
+
+            console.error('Failed to update address:', error);
+
         }
     };
 
@@ -46,7 +52,10 @@ export const useAddressStore = defineStore('address', () => {
             // 删除成功后重新获取地址列表
             await getAddressList();
         } catch (error) {
-            console.error('删除地址失败:', error);
+
+            console.error('Failed to delete address:', error);
+
+
         }
     };
 

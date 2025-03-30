@@ -5,7 +5,8 @@ import request from '@/utils/http'
 export const viewsOrders = (params) => {
     return request({
         url: '/api/orders',
-        params
+        method: 'GET',
+        // params
     })
 }
 

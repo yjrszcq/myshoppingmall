@@ -3,8 +3,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { ElMessage } from "element-plus";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-//import { getCartContentsAPI } from "@/apis/cart.js";
-import { storeToRefs } from "pinia";
+
 
 const cartStore = useCartStore();
 const router = useRouter();

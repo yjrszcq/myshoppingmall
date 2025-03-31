@@ -2,27 +2,16 @@
 import { ref, onMounted } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { viewOrders, manageOrders } from '@/apis/business';
-const orders = ref([
+const orders = ref([]);
 
-  { id: 1, orderNo: 'ORD001', customer: 'Aaa', total: 299, status: 'to be shipped', createTime: '2024-01-20' },
-  { id: 2, orderNo: 'ORD002', customer: 'Bbb', total: 599, status: 'Shipped', createTime: '2024-01-19' },
-  { id: 3, orderNo: 'ORD003', customer: 'Ccc', total: 899, status: 'Shipped', createTime: '2024-01-18' },
 
-]);
-
-//根据接口获取数据
-onMounted(async () => {
-  getOrders()
-})
 
 //获取数据函数
 const getOrders = async () => {
   const res = await viewOrders()
-
   console.log(res,"success");
-
-  
   orders.value = res.itemList
+  console.log(orders,"orders")
 }
 
 const handleOrderStatus = async (row) => {
@@ -84,6 +73,11 @@ const handleSizeChange = (val) => {
   pageSize.value = val
   // 这里可以添加获取对应条数数据的逻辑
 }
+
+//根据接口获取数据
+onMounted(async () => {
+  getOrders()
+})
 </script>
 
 <template>

@@ -105,6 +105,7 @@ const handleAdd = () => {
   isEdit.value = false;
   dialogVisible.value = true;
   Object.keys(addressForm).forEach(key => addressForm[key] = '');
+  fetchAddressList(); // 重新获取列表
 };
 
 // 编辑地址
@@ -113,18 +114,20 @@ const handleEdit = (address) => {
   dialogVisible.value = true;
   editIndex.value = addressList.value.indexOf(address);
   Object.assign(addressForm, address);
+  fetchAddressList(); // 重新获取列表
 };
 
 // 删除地址
-const handleDelete = async (addressId) => {
+// 删除地址
+const handleDelete = async (index) => {
   try {
+    const addressId = addressList.value[index].addressId; // Get the addressId from the address object
     await addressStore.deleteAddress(addressId);
-
     ElMessage.success('The deletion is successful');
     await fetchAddressList(); // 重新获取列表
   } catch (error) {
     ElMessage.error('Deletion failed');
-
+    console.error(error);
   }
 };
 
@@ -132,8 +135,8 @@ const handleDelete = async (addressId) => {
 const submitForm = async () => {
   try {
     if (isEdit.value) {
+      console.log(addressList.value[editIndex.value].addressId,"editaddrid")
       addressStore.updateAddress(addressList.value[editIndex.value].addressId, addressForm);
-
       ElMessage.success('The modification was successful');
     } else {
       addressStore.addAddress(addressForm);

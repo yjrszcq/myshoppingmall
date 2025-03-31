@@ -1,57 +1,55 @@
 <template>
   <footer class="app_footer">
     <!-- 联系我们 -->
-    <div class="contact">
-      <div class="container">
-        <dl>
-<<<<<<< HEAD
-          <dt>customer service</dt>
-          <dd><i class="iconfont icon-kefu"></i> Online customer service</dd>
-          <dd><i class="iconfont icon-question"></i> Feedback</dd>
-        </dl>
-        <dl>
-          <dt>Follow us</dt>
-          <dd><i class="iconfont icon-weixin"></i> Official account</dd>
-          <dd><i class="iconfont icon-weibo"></i> Weibo</dd>
-        </dl>
-        <dl>
-          <dt>Download the APP</dt>
-          <dd class="qrcode"><img src="@/assets/images/qrcode.jpg" /></dd>
-          <dd class="download">
-            <span>Scan the QR code</span>
-            <span>Download the app now</span>
-            <a href="javascript:;">Download page</a>
-          </dd>
-        </dl>
-        <dl>
-          <dt>Service Hotline</dt>
-          <dd class="hotline">400-0000-000 <small>Monday to Sunday 8:00-18:00</small></dd>
-=======
-          <dt>客户服务</dt>
-          <dd><i class="iconfont icon-kefu"></i> 在线客服</dd>
-          <dd><i class="iconfont icon-question"></i> 问题反馈</dd>
-        </dl>
-        <dl>
-          <dt>关注我们</dt>
-          <dd><i class="iconfont icon-weixin"></i> 公众号</dd>
-          <dd><i class="iconfont icon-weibo"></i> 微博</dd>
-        </dl>
-        <dl>
-          <dt>下载APP</dt>
-          <dd class="qrcode"><img src="@/assets/images/qrcode.jpg" /></dd>
-          <dd class="download">
-            <span>扫描二维码</span>
-            <span>立马下载APP</span>
-            <a href="javascript:;">下载页面</a>
-          </dd>
-        </dl>
-        <dl>
-          <dt>服务热线</dt>
-          <dd class="hotline">400-0000-000 <small>周一至周日 8:00-18:00</small></dd>
->>>>>>> 0d913e90430345f3549a9a504781a16919ca9b92
-        </dl>
-      </div>
-    </div>
+<!--    <div class="contact">-->
+<!--      <div class="container">-->
+<!--        <dl>-->
+<!--<<<<<<< HEAD-->
+<!--          <dt>customer service</dt>-->
+<!--          <dd><i class="iconfont icon-kefu"></i> Online customer service</dd>-->
+<!--          <dd><i class="iconfont icon-question"></i> Feedback</dd>-->
+<!--        </dl>-->
+<!--        <dl>-->
+<!--          <dt>Follow us</dt>-->
+<!--          <dd><i class="iconfont icon-weixin"></i> Official</dd>-->
+<!--          <dd><i class="iconfont icon-weibo"></i> Weibo</dd>-->
+<!--        </dl>-->
+<!--        <dl>-->
+<!--          <dt>APP</dt>-->
+<!--          <dd class="qrcode"><img src="@/assets/images/qrcode.jpg" /></dd>-->
+<!--          <dd class="download">-->
+<!--            <a href="javascript:;">Download</a>-->
+<!--          </dd>-->
+<!--        </dl>-->
+<!--        <dl>-->
+<!--          <dt>Hotline</dt>-->
+<!--          <dd class="hotline">400-0000-000 <small>Monday to Sunday 8:00-18:00</small></dd>-->
+<!--=======-->
+<!--          <dt>客户服务</dt>-->
+<!--          <dd><i class="iconfont icon-kefu"></i> 在线客服</dd>-->
+<!--          <dd><i class="iconfont icon-question"></i> 问题反馈</dd>-->
+<!--        </dl>-->
+<!--        <dl>-->
+<!--          <dt>关注我们</dt>-->
+<!--          <dd><i class="iconfont icon-weixin"></i> 公众号</dd>-->
+<!--          <dd><i class="iconfont icon-weibo"></i> 微博</dd>-->
+<!--        </dl>-->
+<!--        <dl>-->
+<!--          <dt>下载APP</dt>-->
+<!--          <dd class="qrcode"><img src="@/assets/images/qrcode.jpg" /></dd>-->
+<!--          <dd class="download">-->
+<!--            <span>扫描二维码</span>-->
+<!--            <span>立马下载APP</span>-->
+<!--            <a href="javascript:;">下载页面</a>-->
+<!--          </dd>-->
+<!--        </dl>-->
+<!--        <dl>-->
+<!--          <dt>服务热线</dt>-->
+<!--          <dd class="hotline">400-0000-000 <small>周一至周日 8:00-18:00</small></dd>-->
+<!--&gt;>>>>>> 0d913e90430345f3549a9a504781a16919ca9b92-->
+<!--        </dl>-->
+<!--      </div>-->
+<!--    </div>-->
     <!-- 其它 -->
     <div class="extra">
       <div class="container">
@@ -75,19 +73,19 @@
 <<<<<<< HEAD
             <a href="javascript:;">About Us</a>
             <a href="javascript:;">Help Center</a>
-            <a href="javascript:;">After-Sales Service</a>
+            <a href="javascript:;">After-Sales</a>
             <a href="javascript:;">Delivery and Inspection</a>
-            <a href="javascript:;">Business Cooperation</a>
-            <a href="javascript:;">Search Recommendations</a>
+            <a href="javascript:;">Cooperation</a>
+            <a href="javascript:;">Recommendations</a>
             <a href="javascript:;">Friendly Links</a>
 =======
-            <a href="javascript:;">关于我们</a>
-            <a href="javascript:;">帮助中心</a>
-            <a href="javascript:;">售后服务</a>
-            <a href="javascript:;">配送与验收</a>
-            <a href="javascript:;">商务合作</a>
-            <a href="javascript:;">搜索推荐</a>
-            <a href="javascript:;">友情链接</a>
+<!--            <a href="javascript:;">关于我们</a>-->
+<!--            <a href="javascript:;">帮助中心</a>-->
+<!--            <a href="javascript:;">售后服务</a>-->
+<!--            <a href="javascript:;">配送与验收</a>-->
+<!--            <a href="javascript:;">商务合作</a>-->
+<!--            <a href="javascript:;">搜索推荐</a>-->
+<!--            <a href="javascript:;">友情链接</a>-->
 >>>>>>> 0d913e90430345f3549a9a504781a16919ca9b92
           </p>
           <p>CopyRight © Tafeimall</p>

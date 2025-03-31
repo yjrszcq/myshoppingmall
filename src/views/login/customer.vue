@@ -147,8 +147,8 @@ const doregister = () => {
       <div class="wrapper">
         <nav>
 
-          <a @click="isRegister = false" :style="{ color: !isRegister ? '#ff66b3' : '#333' }">Account login</a>
-          <a @click="isRegister = true" :style="{ color: isRegister ? '#ff66b3' : '#333' }">Account Registration</a>
+          <a @click="isRegister = false" :style="{ color: !isRegister ? '#ff66b3' : '#333' }">Login</a>
+          <a @click="isRegister = true" :style="{ color: isRegister ? '#ff66b3' : '#333' }">Register</a>
 
         </nav>
 
@@ -211,8 +211,8 @@ const doregister = () => {
               <el-form-item>
                 <div class="btn-group">
 
-                  <el-button class="subBtn" @click="doregister">Submit your registration</el-button>
-                  <el-button class="subBtn" @click="toggleForm">Go back to sign in</el-button>
+                  <el-button class="subBtn" @click="doregister">enroll</el-button>
+                  <el-button class="subBtn" @click="toggleForm">sign in</el-button>
 
                 </div>
               </el-form-item>

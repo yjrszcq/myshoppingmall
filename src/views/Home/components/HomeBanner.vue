@@ -14,11 +14,14 @@ const bannerList = [
   <div class="home-banner">
     <el-carousel height="500px" trigger="click" indicator-position="outside">
       <el-carousel-item v-for="(img, index) in bannerList" :key="index">
-        <img :src="img" alt="banner" />
+        <a href="https://space.bilibili.com/1265680561" target="_blank">
+          <img :src="img" alt="banner"/>
+        </a>
       </el-carousel-item>
     </el-carousel>
   </div>
 </template>
+
 
 
 

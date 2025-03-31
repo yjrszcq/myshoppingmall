@@ -39,12 +39,13 @@ const confirm = () =>{
           </li>
           <li><a href="javascript:;" @click="goToUser">Member Center</a></li>
           <li><a href="javascript:;" @click="$router.push('/cart')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
+          <li><a href="https://space.bilibili.com/1265680561">About us</a></li>
         </template>
         <template v-else>
-          <li><a href="javascript:;" @click="$router.push('/login')">Please log in first</a></li>
+          <li><a href="javascript:;" @click="$router.push('/login')">log in</a></li>
           <li><a href="javascript:;" @click="$router.push('/login')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
-          <li><a href="javascript:;">Help Center</a></li>
-          <li><a href="javascript:;">About us</a></li>
+<!--          <li><a href="javascript:;">Help Center</a></li>-->
+          <li><a href="https://space.bilibili.com/1265680561">About us</a></li>
           <li><a href="javascript:;" @click="goToBusiness">Merchant Edition</a></li>
 
         </template>

@@ -139,7 +139,7 @@ onMounted(() => {
                     title="Do you confirm the deletion?"
                     confirm-button-text="yes"
                     cancel-button-text="no"
-                    @confirm="delCart(i.itemId)"
+                    @confirm="delCart(i.cartItemId)"
                   >
                     <template #reference>
                       <a href="javascript:;">delete</a>

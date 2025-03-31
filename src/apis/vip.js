@@ -37,7 +37,7 @@ export const addAddressAPI = (addressData) => {
  */
 export const updateAddressAPI = (addressId, addressData) => {
     return request({
-        url: `/api/users/address/{addressId}`,
+        url: `/api/users/address/${addressId}`,  // 使用模板字符串动态插入 addressId
         method: 'PUT',
         data: addressData
     });

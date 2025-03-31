@@ -8,7 +8,6 @@ import { useCartStore } from "@/stores/cartStore";
 
 const cartStore = useCartStore();
 
-// const { addCart } = cartStore;
 
 // 商品详情对象
 const goods = ref({});
@@ -32,7 +31,7 @@ const addCart = () => {
     itemId: goods.value.itemId,
     productId: goods.value.productId,
     name: goods.value.name,
-    picture: goods.value.mainPictures[0],
+    // picture: goods.value.mainPictures[0],
     price: goods.value.price,
     quantity: quantity.value,
     selected: true,

@@ -16,7 +16,7 @@ const getGoods = async () => {
 
 
     // mainPictures
-      imageList.value = goods.value.mainPictures
+    //   imageList.value = goods.value.mainPictures
   } catch (error) {
     console.error("Fetch store details failed", error)
   }

@@ -149,8 +149,8 @@ const doregister = () => {
       <div class="wrapper">
         <nav>
 
-          <a @click="isRegister = false" :style="{ color: !isRegister ? '#ff66b3' : '#333' }">Account login</a>
-          <a @click="isRegister = true" :style="{ color: isRegister ? '#ff66b3' : '#333' }">Account Registration</a>
+          <a @click="isRegister = false" :style="{ color: !isRegister ? '#ff66b3' : '#333' }">login</a>
+          <a @click="isRegister = true" :style="{ color: isRegister ? '#ff66b3' : '#333' }">Register</a>
 
         </nav>
 

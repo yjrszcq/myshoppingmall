@@ -10,7 +10,7 @@ const orders = ref([]);
 const getOrders = async () => {
   const res = await viewOrders()
   console.log(res,"success");
-  orders.value = res.itemList
+  orders.value = res.items
   console.log(orders,"orders")
 }
 
@@ -86,7 +86,7 @@ onMounted(async () => {
 
       <h2 class="title">Order management</h2>
       <el-table :data="orders" style="width: 100%" border class="pink-table">
-        <el-table-column prop="orderId" label="orderId" width="120"></el-table-column>
+        <el-table-column prop="orderId" label="orderId" width="300"></el-table-column>
         <el-table-column prop="productName" label="productName" ></el-table-column>
         <el-table-column prop="price" label="price" width="120">
 
@@ -127,18 +127,18 @@ onMounted(async () => {
         </el-table-column>
       </el-table>
     </div>
-    <div class="pagination-container">
-      <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :page-sizes="[10, 20, 30, 50]"
-        background
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
-    </div>
+<!--    <div class="pagination-container">-->
+<!--      <el-pagination-->
+<!--        v-model:current-page="currentPage"-->
+<!--        v-model:page-size="pageSize"-->
+<!--        :page-sizes="[10, 20, 30, 50]"-->
+<!--        background-->
+<!--        layout="total, sizes, prev, pager, next, jumper"-->
+<!--        :total="total"-->
+<!--        @size-change="handleSizeChange"-->
+<!--        @current-change="handleCurrentChange"-->
+<!--      />-->
+<!--    </div>-->
   </div>
 </template>
 

@@ -1,272 +1,415 @@
 <script setup>
-import { onMounted, ref } from "vue";
-import { viewsOrders } from "@/apis/vip.js";
-// tab列表
+import { onMounted, computed } from "vue";
+import { useOrderStore } from "@/stores/orderStore";
+import { InfoFilled, ShoppingCart } from '@element-plus/icons-vue';
+import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus'
+import {useCartStore} from "@/stores/cartStore.js";
+
+const router = useRouter();
+const orderStore = useOrderStore();
+
+// tab列表，状态与后端匹配
 const tabTypes = [
+  { name: "all", label: "All", color: "" },
+  { name: "pending", label: "Pending", color: "#FFA500" },
+  { name: "paid", label: "Paid", color: "#4169E1" },
+  { name: "shipping", label: "Shipping", color: "#32CD32" },
+  { name: "finished", label: "Finished", color: "#4CAF50" },
+  { name: "canceled", label: "Canceled", color: "#F44336" },
+];
 
-  { name: "all", label: "all" },
-
-  //   此处后端没有给接口，可以作为后面的扩展内容
-  // { name: "unpay", label: "待付款" },
-  // { name: "deliver", label: "待发货" },
-  // { name: "receive", label: "待收货" },
-  // { name: "comment", label: "待评价" },
-  // { name: "complete", label: "已完成" },
-  // { name: "cancel", label: "已取消" }
-]
-// 定义订单列表
-const orderList = ref([])
-//定义参数
-const params = ref({
-  orderState: 0,
-  page: 1,
-  pageSize: 8,
-});
-// 订单总数初始值
-const total = ref(0);
-//获取订单列表使用async+await 语法,解决异步问题，将异步变成同步
-const getOrderList = async () => {
-  const res = await viewsOrders(params.value);
-  console.log(res,"res");
-  orderList.value = res.orderItem;
-  console.log(orderList.value);
-  total.value = orderList.length; //后端接口缺少订单总数，暂时用订单列表长度代替
+// 获取订单列表
+const getOrderList = () => {
+  orderStore.getOrderList();
 };
 
-// 点击tab切换分类调取订单列表
-const tabClick = (type) => {
-  // console.log(type);
-  params.value.orderState = type;
-  getOrderList();
+// 计算属性：根据 selectedStatus 过滤订单
+const filteredOrders = computed(() => orderStore.filteredOrders);
+
+// 计算订单总价
+const calculateTotal = (items) => {
+  return items.reduce((total, item) => total + (item.price * 1), 0).toFixed(2);
 };
 
-// page切换回调
-const pageChange = (page) => {
-  // console.log(page)
-  params.value.page = page;
-  getOrderList();
+// 处理 tab 切换
+const tabClick = (tabName) => {
+  orderStore.setSelectedStatus(tabName);
 };
 
-// 通过不同数值展示订单不同的状态
-const formatPayState = (payState) => {
-  const stateMap = {
-
-    1: "Pending payment",
-    2: "To be shipped",
-    3: "To be received",
-    4: "To be evaluated",
-    5: "Done",
-    6: "Canceled",
-
-  };
-  return stateMap[payState];
+// 取消订单函数
+const handleCancelOrder = async (orderId) => {
+  await orderStore.cancelOrder(orderId);
 };
+
+// 处理支付按钮点击
+const handlePayNow = (order) => {
+  const cartStore = useCartStore()
+
+  // 获取用户选中的商品
+  const selectedGoods = cartStore.cartList.filter(item => item.selected)
+
+  if (selectedGoods.length === 0) {
+    ElMessage.warning('Please select at least one product to purchase')
+    return
+  }
+
+  // 计算订单信息
+  const totalPrice = selectedGoods.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const postFee = 10 // 假设运费固定
+  const totalPayPrice = totalPrice + postFee
+
+  const orderInfo = {
+    goods: selectedGoods,
+    summary: {
+      goodsCount: selectedGoods.reduce((sum, item) => sum + item.quantity, 0),
+      totalPrice,
+      postFee,
+      totalPayPrice
+    }
+  }
+
+  // 存储订单信息到 localStorage
+  localStorage.setItem('cartInfo', JSON.stringify(orderInfo))
+
+  // 跳转到结算页面
+  router.push('/checkout')
+}
 
 onMounted(() => getOrderList());
 </script>
 
+
 <template>
   <div class="order-container">
-    <el-tabs @tab-change="tabClick">
-      <!-- tab切换 -->
-      <el-tab-pane v-for="item in tabTypes" :key="item.name" :label="item.label" />
+    <h2 class="page-title">My Orders</h2>
 
-      <div class="main-container">
-        <div class="holder-container" v-if="orderList.length == 0">
+    <el-tabs v-model="selectedStatus" @tab-change="tabClick" class="order-tabs">
+      <el-tab-pane
+          v-for="item in tabTypes"
+          :key="item.name"
+          :label="item.label"
+          :name="item.name"
+      >
+        <template #label>
+          <span :style="{ color: item.color }">{{ item.label }}</span>
+        </template>
+      </el-tab-pane>
+    </el-tabs>
 
-          <el-empty description="No order data yet" />
+    <div class="main-container">
+      <el-skeleton :rows="5" animated v-if="isLoading"/>
 
-        </div>
-        <div >
-          <!-- 订单列表 -->
-          <div class="order-item" v-for="order in orderList" :key="order.productId">
-            <div class="head">
-
-              <span>Product Name:{{  order.productName }}</span>
-              <span>Price:{{ order.price }}yuan</span>
-              <span>Order Number:{{ order.productId }}</span>
-              <!-- 未付款，倒计时时间还有 -->
-              <span class="down-time">
-                <b>The number of units: {{order.quantity}}</b>
-
-              </span>
-            </div>
-          </div>
-          <!-- 分页 -->
-          <div class="pagination-container">
-            <el-pagination background layout="prev, pager, next" />
-          </div>
-        </div>
+      <div class="empty-state" v-else-if="filteredOrders.length === 0">
+        <el-empty description="No orders found">
+          <template #image>
+            <el-icon :size="100" color="#ccc">
+              <ShoppingCart />
+            </el-icon>
+          </template>
+          <p class="empty-text">You haven't placed any orders yet</p>
+          <el-button type="primary" class="empty-button">Start Shopping</el-button>
+        </el-empty>
       </div>
 
-    </el-tabs>
-  </div>
+      <div v-else class="orders-list">
+        <div class="order-item" v-for="order in filteredOrders" :key="order.orderId">
+          <el-collapse>
+            <el-collapse-item :name="order.orderId">
+              <template #title>
+                <div class="order-header">
+                  <div class="order-meta">
+                    <span class="order-id">Order #{{ order.orderId }}</span>
+                  </div>
 
+                  <div class="order-info-right">
+                    <el-tag
+                        :color="tabTypes.find(t => t.name === order.status)?.color"
+                        effect="dark"
+                        class="status-tag fixed-width-tag"
+                    >
+                      {{ order.status.toUpperCase() }}
+                    </el-tag>
+                    <span class="order-total fixed-width-total">${{ calculateTotal(order.items.items) }}</span>
+                  </div>
+                </div>
+              </template>
+
+              <div class="order-details">
+                <div class="items-list">
+                  <div v-for="item in order.items.items" :key="item.productId" class="item-row">
+                    <div class="item-info">
+                      <span class="item-name">{{ item.productName }}</span>
+                      <span class="item-quantity">Qty: {{ item.quantity }}</span>
+                    </div>
+                    <span class="item-price">￥{{ (item.price / item.quantity).toFixed(2) }}</span>
+                  </div>
+                </div>
+
+                <div class="order-actions">
+                  <el-button
+                      type="primary"
+                      size="small"
+                      v-if="order.status === 'pending'"
+                      @click="handlePayNow(order.orderId)"
+                  >
+                    Pay Now
+                  </el-button>
+<!--                此处逻辑待讨论，反正我现在不想写-->
+<!--                  <el-button-->
+<!--                      size="small"-->
+<!--                      v-if="order.status === 'pending'"-->
+<!--                      @click="handleCancelOrder(order.orderId)"-->
+<!--                  >-->
+<!--                    Cancel Order</el-button>-->
+<!--                  <el-button type="success" size="small" v-if="order.status === 'shipping'">Track Package</el-button>-->
+<!--                  等待后端给接口-->
+<!--                  <el-button type="info" size="small" v-if="order.status === 'finished'">Leave Review</el-button>-->
+<!--                  等待后端给接口-->
+                </div>
+              </div>
+            </el-collapse-item>
+          </el-collapse>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
 .order-container {
-  padding: 10px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
-  .pagination-container {
-    display: flex;
-    justify-content: center;
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: hotpink;
+    margin-bottom: 20px;
+    text-align: center;
+    font-family: "Droid Serif";
+  }
+
+  .order-tabs {
+    margin-bottom: 30px;
+
+    :deep(.el-tabs__nav-wrap) {
+      &::after {
+        height: 1px;
+        background-color: #e4e7ed;
+      }
+    }
+
+    :deep(.el-tabs__item) {
+      font-weight: 500;
+      padding: 0 20px;
+
+      &:hover {
+        color: pink;
+      }
+    }
+
+    :deep(.el-tabs__active-bar) {
+      height: 3px;
+      background-color: pink;
+    }
   }
 
   .main-container {
     min-height: 500px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+    padding: 20px;
 
-    .holder-container {
+    .empty-state {
       min-height: 500px;
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-  }
-}
+      flex-direction: column;
 
-.order-item {
-  margin-bottom: 20px;
-  border: 1px solid #f5f5f5;
-
-  .head {
-    height: 50px;
-    line-height: 50px;
-    background: rgb(255, 153, 204);
-    padding: 0 20px;
-    overflow: hidden;
-    box-sizing: border-box;
-    border-radius: 10px;
-    color: #fff;
-
-    span {
-      margin-right: 20px;
-
-      &.down-time {
-        margin-right: 0;
-        float: right;
-
-        i {
-          vertical-align: middle;
-          margin-right: 3px;
-        }
-
-        b {
-          vertical-align: middle;
-          font-weight: normal;
-        }
+      .empty-image {
+        width: 200px;
+        height: 200px;
+        margin-bottom: 20px;
       }
-    }
 
-    .del {
-      margin-right: 0;
-      float: right;
-      color: #999;
+      .empty-text {
+        color: #909399;
+        margin-bottom: 20px;
+      }
     }
   }
 
-  .body {
-    display: flex;
-    align-items: stretch;
+  .orders-list {
+    .order-item {
+      margin-bottom: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
 
-    .column {
-      border-left: 1px solid #f5f5f5;
-      text-align: center;
-      padding: 20px;
-
-      >p {
-        padding-top: 10px;
+      &:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
       }
 
-      &:first-child {
-        border-left: none;
+      :deep(.el-collapse-item__header) {
+        background-color: #ffecec;
+        padding: 15px 20px;
+        border-bottom: none;
+        font-size: 16px;
+        height: auto;
+
+        &.is-active {
+          background-color: #FFC0CB;
+        }
       }
 
-      &.goods {
-        flex: 1;
-        padding: 0;
-        align-self: center;
+      :deep(.el-collapse-item__content) {
+        padding-bottom: 0;
+      }
 
-        ul {
-          li {
-            border-bottom: 1px solid #f5f5f5;
-            padding: 10px;
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+
+        .order-meta {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          min-width: 0; /* 防止内容溢出 */
+
+          .order-id {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+        }
+
+        .order-info-right {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          margin-left: 20px;
+          flex-shrink: 0; /* 防止被压缩 */
+
+          .fixed-width-tag {
+            width: 100px; /* 固定宽度 */
+            text-align: center;
+            justify-content: center;
+            border-color: #FFC0CB;
+          }
+
+          .fixed-width-total {
+            width: 100px; /* 固定宽度 */
+            text-align: right;
+            font-weight: 600;
+            color: #333;
+          }
+        }
+      }
+
+      .order-details {
+        padding: 20px;
+        background-color: #fafafa;
+
+        .items-list {
+          margin-bottom: 20px;
+
+          .item-row {
             display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
 
             &:last-child {
               border-bottom: none;
             }
 
-            .image {
-              width: 70px;
-              height: 70px;
-              border: 1px solid #f5f5f5;
-            }
+            .item-info {
+              display: flex;
+              flex-direction: column;
 
-            .info {
-              width: 220px;
-              text-align: left;
-              padding: 0 10px;
-
-              p {
+              .item-name {
+                font-weight: 500;
                 margin-bottom: 5px;
+              }
 
-                &.name {
-                  height: 38px;
-                }
-
-                &.attr {
-                  color: #999;
-                  font-size: 12px;
-
-                  span {
-                    margin-right: 5px;
-                  }
-                }
+              .item-quantity {
+                font-size: 13px;
+                color: #909399;
               }
             }
 
-            .price {
-              width: 100px;
-            }
-
-            .count {
-              width: 80px;
+            .item-price {
+              font-weight: 600;
             }
           }
         }
-      }
 
-      &.state {
-        width: 120px;
-
-        .green {
-          color: $xtxColor;
-        }
-      }
-
-      &.amount {
-        width: 200px;
-
-        .red {
-          color: $priceColor;
-        }
-      }
-
-      &.action {
-        width: 140px;
-
-        a {
-          display: block;
-
-          &:hover {
-            color: $xtxColor;
-          }
+        .order-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+          padding-top: 15px;
+          border-top: 1px dashed #ddd;
         }
       }
     }
   }
+}
 
+@media (max-width: 768px) {
+  .order-container {
+    padding: 10px;
 
+    .order-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+
+      .order-info-right {
+        width: 100%;
+        justify-content: space-between;
+        margin-left: 0;
+        margin-top: 8px;
+
+        .fixed-width-tag,
+        .fixed-width-total {
+          width: auto;
+          min-width: 80px;
+        }
+      }
+    }
+
+    .order-tabs {
+      :deep(.el-tabs__item) {
+        padding: 0 10px !important;
+        font-size: 14px;
+      }
+    }
+
+    .order-details {
+      padding: 15px !important;
+    }
+
+    .order-actions {
+      flex-wrap: wrap;
+
+      .el-button {
+        flex: 1;
+        min-width: 120px;
+      }
+    }
+  }
 }
 </style>

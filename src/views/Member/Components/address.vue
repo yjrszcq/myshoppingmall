@@ -2,26 +2,22 @@
   <div class="address-container">
     <el-card class="address-card">
       <div class="header">
-
         <h3>Shipping address management</h3>
         <el-button type="primary" @click="handleAdd" :icon="Plus">Add a new address</el-button>
-
       </div>
-      
+
       <div class="address-list">
         <el-row :gutter="20">
-          <el-col :span="8" v-for="(address, index) in addressList" :key="index">
+          <el-col :span="8" v-for="address in addressStore.addressList" :key="address.addressId">
             <el-card class="address-item" shadow="hover">
               <div class="info">
-
                 <p><span class="label">Zip code: </span>{{ address.postalCode }}</p>
                 <p><span class="label">Harvest the city：</span>{{ address.city }}</p>
                 <p><span class="label">Full address：</span>{{ address.address }}</p>
               </div>
               <div class="actions">
                 <el-button type="primary" text @click="handleEdit(address)">edit</el-button>
-                <el-button type="danger" text @click="handleDelete(index)">delete</el-button>
-
+                <el-button type="danger" text @click="handleDelete(address.addressId)">delete</el-button>
               </div>
             </el-card>
           </el-col>
@@ -30,10 +26,9 @@
     </el-card>
 
     <el-dialog
-      v-model="dialogVisible"
-
-      :title="isEdit ? 'Edit the address' : 'Add an address'"
-      width="50%"
+        v-model="dialogVisible"
+        :title="isEdit ? 'Edit the address' : 'Add an address'"
+        width="50%"
     >
       <el-form :model="addressForm" ref="addressFormRef" :rules="rules" label-width="100px">
         <el-form-item label="Zip code" prop="postalCode">
@@ -49,41 +44,25 @@
       <template #footer>
         <el-button @click="dialogVisible = false">cancel</el-button>
         <el-button type="primary" @click="submitForm">ok</el-button>
-
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive,onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import {useAddressStore} from "@/stores/addressStore.js";
+import { useAddressStore } from "@/stores/addressStore.js";
 
 const dialogVisible = ref(false)
 const isEdit = ref(false)
-const editIndex = ref(-1)
+const currentAddressId = ref(null)
 
-
-// 地址列表数据
-const addressList = ref([])
-// 下一版优化
-// const defalutAddressList = ref([]);
 const addressStore = useAddressStore();
-const fetchAddressList = async () => {
-  await addressStore.getAddressList();
-  addressList.value = addressStore.addressList;
 
-  if (addressList.value.length > 0) {
-    // 找到默认地址或使用第一个地址
-    const defaultAddr = addressList.value.find(addr => addr.isDefault) || addressList.value[0];
-    // defaultAddress.value = defaultAddr;
-  } else {
-    // defaultAddress.value = {};
-  }
-};
-
+// 直接使用store中的addressList，无需本地副本
+// 表单数据
 const addressForm = reactive({
   postalCode: '',
   city: '',
@@ -91,75 +70,73 @@ const addressForm = reactive({
 })
 
 const rules = {
-
   postalCode: [{ required: true, message: 'Please enter the name of the consignee', trigger: 'blur' }],
   city: [
     { required: true, message: 'Please enter your contact number', trigger: 'blur' },
   ],
   address: [{ required: true, message: 'Please enter your address details', trigger: 'blur' }]
-
 }
+
+// 初始化获取地址列表
+onMounted(() => {
+  addressStore.getAddressList()
+})
 
 // 添加新地址
 const handleAdd = () => {
-  isEdit.value = false;
-  dialogVisible.value = true;
-  Object.keys(addressForm).forEach(key => addressForm[key] = '');
-  fetchAddressList(); // 重新获取列表
-};
+  isEdit.value = false
+  currentAddressId.value = null
+  resetForm()
+  dialogVisible.value = true
+}
 
 // 编辑地址
 const handleEdit = (address) => {
-  isEdit.value = true;
-  dialogVisible.value = true;
-  editIndex.value = addressList.value.indexOf(address);
-  Object.assign(addressForm, address);
-  fetchAddressList(); // 重新获取列表
-};
+  isEdit.value = true
+  currentAddressId.value = address.addressId
+  Object.assign(addressForm, address)
+  dialogVisible.value = true
+}
 
 // 删除地址
-// 删除地址
-const handleDelete = async (index) => {
+const handleDelete = async (addressId) => {
   try {
-    const addressId = addressList.value[index].addressId; // Get the addressId from the address object
-    await addressStore.deleteAddress(addressId);
-    ElMessage.success('The deletion is successful');
-    await fetchAddressList(); // 重新获取列表
+    await addressStore.deleteAddress(addressId)
+    ElMessage.success('The deletion is successful')
   } catch (error) {
-    ElMessage.error('Deletion failed');
-    console.error(error);
+    ElMessage.error('Deletion failed')
+    console.error(error)
   }
-};
+}
 
-// 提交表单（添加或编辑地址）
+// 提交表单
 const submitForm = async () => {
   try {
     if (isEdit.value) {
-      console.log(addressList.value[editIndex.value].addressId,"editaddrid")
-      addressStore.updateAddress(addressList.value[editIndex.value].addressId, addressForm);
-      ElMessage.success('The modification was successful');
+      await addressStore.updateAddress(currentAddressId.value, addressForm)
+      ElMessage.success('The modification was successful')
     } else {
-      addressStore.addAddress(addressForm);
-      ElMessage.success('The addition was successful');
-
+      await addressStore.addAddress(addressForm)
+      ElMessage.success('The addition was successful')
     }
-    dialogVisible.value = false;
-    await fetchAddressList(); // 重新获取列表
+    dialogVisible.value = false
+    resetForm()
   } catch (error) {
-    console.log(error);
-
-    ElMessage.error('The operation failed');
-
+    console.error(error)
+    ElMessage.error('The operation failed')
   }
-};
+}
 
-// 初始化默认地址
-onMounted(() => {
-  fetchAddressList()
-})
+// 重置表单
+const resetForm = () => {
+  Object.keys(addressForm).forEach(key => {
+    addressForm[key] = ''
+  })
+}
 </script>
 
 <style scoped>
+/* 保持原有样式不变 */
 .address-container {
   padding: 20px;
 }

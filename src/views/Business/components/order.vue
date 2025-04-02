@@ -1,217 +1,396 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { ElMessageBox, ElMessage } from 'element-plus';
-import { viewOrders, manageOrders } from '@/apis/business';
-const orders = ref([]);
+import { onMounted, ref, computed } from 'vue'
+import { useBusinessStore } from '@/stores/businessStore'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
+const store = useBusinessStore()
+const selectedStatus = ref('all')
 
+// tab列表，状态与后端匹配
+const tabTypes = [
+  { name: "all", label: "All", color: "#9E9E9E" },
+  { name: "Pending", label: "Pending", color: "#FF8A65" },
+  { name: "Paid", label: "Paid", color: "#64B5F6" },
+  { name: "Shipping", label: "Shipping", color: "#4DB6AC" },
+  { name: "Finished", label: "Finished", color: "#81C784" },
+  { name: "Canceled", label: "Canceled", color: "#E57373" }
+]
 
-//获取数据函数
+// 处理 tab 切换
+const tabClick = (tabName) => {
+  selectedStatus.value = tabName
+}
+
+// 计算订单总价
+const calculateTotal = (items) => {
+  return items.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)
+}
+
+// 获取订单列表
 const getOrders = async () => {
-  const res = await viewOrders()
-  console.log(res,"success");
-  orders.value = res.items
-  console.log(orders,"orders")
+  try {
+    await store.fetchSellerOrders()
+  } catch (error) {
+    ElMessage.error('获取订单失败')
+  }
 }
 
-const handleOrderStatus = async (row) => {
+// 过滤后的订单列表
+const filteredOrders = computed(() => {
+  if (selectedStatus.value === 'all') {
+    return store.sellerOrders
+  }
+  return store.sellerOrders.filter(order => order.status === selectedStatus.value)
+})
 
-  ElMessageBox.confirm(`Do you mark the order ${row.orderId} as completed?`, 'prompt', {
-    confirmButtonText: 'yes',
-    cancelButtonText: 'no',
-
-    type: 'success',
-  }).then(async () => {
-    try {
-      await manageOrders({
-        orderId: row.orderId,
-
-        status: 'done'
-      })
-      ElMessage.success('The order status has been updated');
-      getOrders(); // 刷新订单列表
-    } catch (error) {
-      ElMessage.error('error');
-
+// 发货操作
+const handleShipOrder = async (orderId) => {
+  try {
+    await ElMessageBox.prompt('Please input the trackingNumber', 'SHIP', {
+      confirmButtonText: 'CONFIRM',
+      cancelButtonText: 'CANCEL',
+      inputPattern: /.+/,
+      inputErrorMessage: 'TRACKINGNUMBER CAN NOT BE EMPTY!',
+    }).then(async ({ value }) => {
+      await store.shipOrder(orderId,  value)
+      ElMessage.success('ORDER HAS BEEN SHIPPED!')
+      getOrders()
+    })
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error(error.message || 'SHIPPING FAILED!')
     }
-  });
-};
+  }
+}
 
-const handleAcceptOrder = async (row) => {
+// 订单完成
+// 这里的逻辑留待讨论
+// const handleCompleteOrder = async (orderId) => {
+//   try {
+//     await ElMessageBox.confirm(
+//         '确认订单已完成？',
+//         '确认',
+//         {
+//           confirmButtonText: '确认',
+//           cancelButtonText: '取消',
+//           type: 'success',
+//         }
+//     )
+//     await store.manageOrderAPI(orderId, 'complete')
+//     ElMessage.success('订单状态已更新')
+//     getOrders()
+//   } catch (error) {
+//     if (error !== 'cancel') {
+//       ElMessage.error('操作失败')
+//     }
+//   }
+// }
 
-  ElMessageBox.confirm(`Do you accept orders ${row.orderId}?`, 'prompt', {
-    confirmButtonText: 'yes',
-    cancelButtonText: 'no',
-
-    type: 'success',
-  }).then(async () => {
-    try {
-      await manageOrders({
-        orderId: row.orderId,
-
-        status: 'done'
-      })
-      ElMessage.success('The order has been accepted');
-      getOrders(); // 刷新订单列表
-    } catch (error) {
-      ElMessage.error('error');
-
+// 取消订单
+const handleCancelOrder = async (orderId) => {
+  try {
+    await ElMessageBox.confirm(
+        'DO YOU WANT TO CANCEL THE ORDER?',
+        'YES',
+        {
+          confirmButtonText: 'YES',
+          cancelButtonText: 'NO',
+          type: 'warning',
+        }
+    )
+    await store.cancelOrder(orderId)
+    ElMessage.success('ORDER HAS BEEN CANCELED')
+    getOrders()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('CANCEL ORDER FAILED!')
     }
-  });
-};
-
-const currentPage = ref(1)
-const pageSize = ref(10)
-const total = ref(150)
-
-const handleCurrentChange = (val) => {
-  currentPage.value = val
-  // 这里可以添加获取对应页数据的逻辑
+  }
 }
 
-const handleSizeChange = (val) => {
-  pageSize.value = val
-  // 这里可以添加获取对应条数数据的逻辑
-}
+// 接受订单
+// const handleAcceptOrder = async (orderId) => {
+//   try {
+//     await ElMessageBox.confirm(
+//         '确认接受订单？',
+//         '确认',
+//         {
+//           confirmButtonText: '确认',
+//           cancelButtonText: '取消',
+//           type: 'success',
+//         }
+//     )
+//     await store.manageOrderAPI(orderId, 'accept')
+//     ElMessage.success('订单已接受')
+//     getOrders()
+//   } catch (error) {
+//     if (error !== 'cancel') {
+//       ElMessage.error('接受订单失败')
+//     }
+//   }
+// }
 
-//根据接口获取数据
-onMounted(async () => {
+// 组件加载时获取订单
+onMounted(() => {
   getOrders()
 })
 </script>
 
 <template>
-  <div class="management-container">
-    <div class="header">
+  <div class="order-management">
+    <div class="order-header">
+      <h2 class="order-title">Order Mangement</h2>
 
-      <h2 class="title">Order management</h2>
-      <el-table :data="orders" style="width: 100%" border class="pink-table">
-        <el-table-column prop="orderId" label="orderId" width="300"></el-table-column>
-        <el-table-column prop="productName" label="productName" ></el-table-column>
-        <el-table-column prop="price" label="price" width="120">
-
-
-          <template #default="scope">
-            ¥{{ scope.row.price }}
+      <el-tabs v-model="selectedStatus" @tab-change="tabClick" class="status-tabs">
+        <el-tab-pane
+            v-for="item in tabTypes"
+            :key="item.name"
+            :label="item.label"
+            :name="item.name"
+        >
+          <template #label>
+            <span class="tab-label" :style="{ color: item.color }">
+              {{ item.label }}
+            </span>
           </template>
-        </el-table-column>
-
-        <el-table-column prop="status" label="status" width="120">
-          <template #default="scope">
-            <el-tag :type="'success'">
-              {{ 'success' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" label="createTime" width="180"></el-table-column>
-        <el-table-column label="operate" width="240">
-
-          <template #default="scope">
-            <el-button 
-              size="small" 
-              type="success" 
-              @click="handleOrderStatus(scope.row)">
-
-              Complete the order
-
-            </el-button>
-            <el-button 
-              size="small" 
-              type="info" 
-              @click="handleAcceptOrder(scope.row)">
-
-              Accept orders
-
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+        </el-tab-pane>
+      </el-tabs>
     </div>
-<!--    <div class="pagination-container">-->
-<!--      <el-pagination-->
-<!--        v-model:current-page="currentPage"-->
-<!--        v-model:page-size="pageSize"-->
-<!--        :page-sizes="[10, 20, 30, 50]"-->
-<!--        background-->
-<!--        layout="total, sizes, prev, pager, next, jumper"-->
-<!--        :total="total"-->
-<!--        @size-change="handleSizeChange"-->
-<!--        @current-change="handleCurrentChange"-->
-<!--      />-->
-<!--    </div>-->
+
+    <div class="order-list">
+      <div v-for="order in filteredOrders" :key="order.orderId" class="order-card">
+        <div class="order-summary">
+          <div class="order-meta">
+            <span class="order-number">Order #{{ order.orderId }}</span>
+            <span class="customer-name">{{ order.userName }}</span>
+          </div>
+
+          <div class="order-status">
+            <el-tag
+                :color="tabTypes.find(t => t.name === order.status)?.color"
+                effect="plain"
+                class="status-badge"
+            >
+              {{ tabTypes.find(t => t.name === order.status)?.label }}
+            </el-tag>
+            <span class="order-amount">¥{{ calculateTotal(order.orderItem) }}</span>
+          </div>
+        </div>
+
+        <el-collapse>
+          <el-collapse-item>
+            <template #title>
+              <span class="detail-toggle">Check</span>
+            </template>
+
+            <div class="order-details">
+              <div class="product-list">
+                <div v-for="item in order.orderItem" :key="item.orderItemId" class="product-item">
+                  <div class="product-info">
+                    <span class="product-name">{{ item.productName }}</span>
+                    <span class="product-quantity">×{{ item.quantity }}</span>
+                  </div>
+                  <span class="product-price">¥{{ (item.price * item.quantity).toFixed(2) }}</span>
+                </div>
+              </div>
+
+              <div class="action-buttons">
+
+                <el-button
+                    type="success"
+                    size="small"
+                    plain
+                    v-if="order.status === 'Paid'"
+                    @click.stop="handleShipOrder(order.orderId)"
+                >
+                  Ship
+                </el-button>
+
+
+                <el-button
+                    type="danger"
+                    size="small"
+                    plain
+                    v-if="order.status === 'Pending' || order.status === 'Paid'"
+                    @click.stop="handleCancelOrder(order.orderId)"
+                >
+                  Cancel
+                </el-button>
+              </div>
+            </div>
+          </el-collapse-item>
+        </el-collapse>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.management-container {
-box-sizing: border-box;
+.order-management {
   padding: 20px;
   background-color: #fff5f7;
-  height: 100%;
-  display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  min-height: 100%;
 }
 
-.header {
-  margin-bottom: 20px;
-  flex: 1;
-  .title {
-    color: #e23d7d;
-    margin-bottom: 20px;
-    font-weight: 600;
+.order-header {
+  margin-bottom: 24px;
+  padding: 0 8px;
+}
+
+.order-title {
+  color: #e23d7d;
+  margin-bottom: 16px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.status-tabs {
+  :deep(.el-tabs__item) {
+    padding: 0 16px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  :deep(.el-tabs__active-bar) {
+    background-color: #e23d7d;
+    height: 3px;
   }
 }
 
-.pink-table {
-  :deep(.el-table__header) {
+.tab-label {
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.3s;
+
+  &:hover {
     background-color: #fce4ec;
-    th {
-      background-color: #fce4ec;
-      color: #e23d7d;
-    }
-  }
-  
-  :deep(.el-table__row) {
-    &:hover {
-      background-color: #fff0f4 !important;
-    }
-  }
-  
-  :deep(.el-button) {
-    background-color: #f784a7;
-    border-color: #f784a7;
-    color: white;
-    
-    &:hover {
-      background-color: #e23d7d;
-      border-color: #e23d7d;
-    }
   }
 }
 
-.pagination-container {
-    height: 50px;
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  
-  :deep(.el-pagination.is-background) {
-    .el-pager li:not(.is-disabled) {
-      background-color: #fce4ec;
-      &:hover {
-        color: #e23d7d;
-      }
-      &.is-active {
-        background-color: #e23d7d;
-      }
-    }
-    .btn-prev, .btn-next {
-      background-color: #fce4ec;
-      &:hover {
-        color: #e23d7d;
-      }
-    }
+.order-list {
+  display: grid;
+  gap: 16px;
+
+}
+
+.order-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: all 0.3s;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
+}
+
+.order-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.order-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .order-number {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .customer-name {
+    color: #666;
+    font-size: 14px;
+  }
+}
+
+.order-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .status-badge {
+    border: none;
+    color: white;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 12px;
+  }
+
+  .order-amount {
+    font-weight: 600;
+    color: #e23d7d;
+    min-width: 80px;
+    text-align: right;
+  }
+}
+
+.detail-toggle {
+  color: #e23d7d;
+  font-size: 14px;
+  padding-left: 16px;
+  cursor: pointer;
+}
+
+.order-details {
+  padding: 16px;
+  background-color: #fff9fa;
+}
+
+.product-list {
+  margin-bottom: 16px;
+}
+
+.product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px dashed #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.product-info {
+  flex: 1;
+
+  .product-name {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .product-quantity {
+    color: #888;
+    font-size: 13px;
+    margin-left: 8px;
+  }
+}
+
+.product-price {
+  font-weight: 600;
+  color: #e91e63;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+:deep(.el-button) {
+  border-radius: 16px;
+  padding: 8px 16px;
 }
 </style>

@@ -43,38 +43,38 @@ const handleCancelOrder = async (orderId) => {
 };
 
 // 处理支付按钮点击
-const handlePayNow = (order) => {
-  const cartStore = useCartStore()
-
-  // 获取用户选中的商品
-  const selectedGoods = cartStore.cartList.filter(item => item.selected)
-
-  if (selectedGoods.length === 0) {
-    ElMessage.warning('Please select at least one product to purchase')
-    return
-  }
-
-  // 计算订单信息
-  const totalPrice = selectedGoods.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const postFee = 10 // 假设运费固定
-  const totalPayPrice = totalPrice + postFee
-
-  const orderInfo = {
-    goods: selectedGoods,
-    summary: {
-      goodsCount: selectedGoods.reduce((sum, item) => sum + item.quantity, 0),
-      totalPrice,
-      postFee,
-      totalPayPrice
-    }
-  }
-
-  // 存储订单信息到 localStorage
-  localStorage.setItem('cartInfo', JSON.stringify(orderInfo))
-
-  // 跳转到结算页面
-  router.push('/checkout')
-}
+// const handlePayNow = (order) => {
+//   const cartStore = useCartStore()
+//
+//   // 获取用户选中的商品
+//   const selectedGoods = cartStore.cartList.filter(item => item.selected)
+//
+//   if (selectedGoods.length === 0) {
+//     ElMessage.warning('Please select at least one product to purchase')
+//     return
+//   }
+//
+//   // 计算订单信息
+//   const totalPrice = selectedGoods.reduce((sum, item) => sum + item.price * item.quantity, 0)
+//   const postFee = 10 // 假设运费固定
+//   const totalPayPrice = totalPrice + postFee
+//
+//   const orderInfo = {
+//     goods: selectedGoods,
+//     summary: {
+//       goodsCount: selectedGoods.reduce((sum, item) => sum + item.quantity, 0),
+//       totalPrice,
+//       postFee,
+//       totalPayPrice
+//     }
+//   }
+//
+//   // 存储订单信息到 localStorage
+//   localStorage.setItem('cartInfo', JSON.stringify(orderInfo))
+//
+//   // 跳转到结算页面
+//   router.push('/checkout')
+// }
 
 onMounted(() => getOrderList());
 </script>

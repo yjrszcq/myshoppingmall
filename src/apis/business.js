@@ -37,19 +37,34 @@ export const putawayProducts = (data) => {
 }
 
 //查看订单
-export const viewOrders = (data) => {
+/**
+ * 获取卖家订单列表
+ * @returns {Promise} 返回订单列表
+ */
+export const viewOrders = () => {
     return request({
         url: `/api/seller/orders`,
         method: 'get',
-        data
     })
 }
 
 //管理订单
-export const manageOrders = (orderId) => {
+
+/**
+ * 管理订单（卖家视角）
+ * @param {string} orderId 订单 ID
+ * @param {string} action 操作类型 ('ship' | 'cancel')
+ * @param {string} [trackingNumber] 物流单号（可选，仅在发货时传递）
+ * @returns {Promise} 返回操作结果
+ */
+export const manageOrderAPI = (orderId, action, trackingNumber = '') => {
     return request({
         url: `/api/seller/orders/${orderId}`,
-        method: 'put',
+        method: 'PUT',
+        data: {
+            action,
+            ...(trackingNumber && { trackingNumber }) // 只有发货时才传递 trackingNumber
+        }
     })
 }
 

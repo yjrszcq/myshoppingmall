@@ -146,22 +146,22 @@ onMounted(() => getOrderList());
                   </div>
                 </div>
 
-                <div class="order-actions">
-                  <el-button
-                      type="primary"
-                      size="small"
-                      v-if="order.status === 'pending'"
-                      @click="handlePayNow(order.orderId)"
-                  >
-                    Pay Now
-                  </el-button>
-<!--                此处逻辑待讨论，反正我现在不想写-->
+<!--                <div class="order-actions">-->
 <!--                  <el-button-->
+<!--                      type="primary"-->
 <!--                      size="small"-->
 <!--                      v-if="order.status === 'pending'"-->
-<!--                      @click="handleCancelOrder(order.orderId)"-->
+<!--                      @click="handlePayNow(order.orderId)"-->
 <!--                  >-->
-<!--                    Cancel Order</el-button>-->
+<!--                    Pay Now-->
+<!--                  </el-button>-->
+<!--                此处逻辑待讨论，反正我现在不想写-->
+                  <el-button
+                      size="small"
+                      v-if="order.status === 'pending'"
+                      @click="handleCancelOrder(order.orderId)"
+                  >
+                    Cancel Order</el-button>
 <!--                  <el-button type="success" size="small" v-if="order.status === 'shipping'">Track Package</el-button>-->
 <!--                  等待后端给接口-->
 <!--                  <el-button type="info" size="small" v-if="order.status === 'finished'">Leave Review</el-button>-->

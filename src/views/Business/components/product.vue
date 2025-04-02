@@ -1,235 +1,233 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
-import { getproductsList, deleteProducts, reviseProducts, addProducts } from '../../../apis/business';
+import { getproductsList, deleteProducts, reviseProducts, addProducts, uploadImageAPI } from '@/apis/business.js';
+
 const products = ref([]);
-//根据接口获取数据
-onMounted(async () => {
-  getproducts()
-})
-
-//获取数据函数
-const getproducts = async () => {
-  const res = await getproductsList({
-    page: currentPage.value,
-    pageSize: pageSize.value
-  })
-  products.value = res.products
-  total.value = res.total
-}
-
-const productId = ref(0)
-const handleEdit = (row) => {
-  dialogType.value = 'edit'
-  productForm.value = { ...row }
-  productId.value = row.productId
-  console.log(productId.value,"商品id");
-  
-  dialogVisible.value = true
-}
-
-const handleDelete = (row) => {
-
-  ElMessageBox.confirm('Are you sure you want to delete the item?', 'prompt', {
-    confirmButtonText: 'yes',
-    cancelButtonText: 'no',
-
-    type: 'warning',
-  }).then(() => {
-    console.log(row.productId);
-    
-    deleteProducts(row.productId).then(() => {
-      getproducts()
-
-      ElMessage.success('success');
-
-    })
-    
-  });
-};
-
-const currentPage = ref(1)
-const pageSize = ref(10)
-const total = ref(100)
-
-const handleCurrentChange = (val) => {
-  currentPage.value = val
-  getproducts()
-}
-
-const handleSizeChange = (val) => {
-  pageSize.value = val
-  getproducts()
-}
-
-const dialogVisible = ref(false)
-const dialogType = ref('add') // 'add' 或 'edit'
+const dialogVisible = ref(false);
+const dialogType = ref('add'); // 'add' 或 'edit'
+const productId = ref(0);
 const productForm = ref({
   name: '',
   description: '',
   price: '',
-  stock: ''
-})
+  stock: '',
+  image: '' // 存储图片路径
+});
 
-// 打开新增商品对话框
+const currentPage = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
+
+// 获取商品数据
+const getproducts = async () => {
+  const res = await getproductsList({ page: currentPage.value, pageSize: pageSize.value });
+  products.value = res.products;
+  total.value = res.total;
+};
+
+onMounted(getproducts);
+
+// 编辑商品
+const handleEdit = (row) => {
+  dialogType.value = 'edit';
+  productForm.value = { ...row };
+  productId.value = row.productId;
+  dialogVisible.value = true;
+};
+
+// 删除商品
+const handleDelete = (row) => {
+  ElMessageBox.confirm('Are you sure you want to delete the item?', 'prompt', {
+    confirmButtonText: 'yes',
+    cancelButtonText: 'no',
+    type: 'warning',
+  }).then(async () => {
+    await deleteProducts(row.productId);
+    ElMessage.success('Deleted successfully');
+    await getproducts();
+  });
+};
+
+// 新增商品
 const handleAdd = () => {
-  dialogType.value = 'add'
+  dialogType.value = 'add';
   productForm.value = {
     name: '',
     description: '',
     price: '',
-    stock: ''
+    stock: '',
+    image: '' // 置空图片
+  };
+  dialogVisible.value = true;
+};
+
+// **处理图片上传**
+const handleImageUpload = async (file, productId) => {
+  const formData = new FormData();
+  formData.append('image', file.raw); // 将文件添加到 formData
+  console.log(productId,"productId");
+
+  try {
+    const res = await uploadImageAPI(productId,formData); // 调用上传接口
+    productForm.value.image = res.imagePath; // 服务器返回的图片路径
+    ElMessage.success('Image uploaded successfully');
+  } catch (error) {
+    ElMessage.error('Image upload failed');
   }
-  dialogVisible.value = true
-}
+};
 
 // 提交表单
 const handleSubmit = async () => {
   try {
     if (dialogType.value === 'add') {
-      await addProducts(productForm.value)
-
-      ElMessage.success('新增成功')
+      await addProducts(productForm.value);
+      ElMessage.success('Added successfully');
     } else {
-      await reviseProducts(productForm.value,productId.value)
-      ElMessage.success('修改成功')
-
+      await reviseProducts(productForm.value, productId.value);
+      ElMessage.success('Updated successfully');
     }
-    dialogVisible.value = false
-    getproducts()
+    dialogVisible.value = false;
+    await getproducts();
   } catch (error) {
-
-    ElMessage.error('failed')
-
+    ElMessage.error('Operation failed');
   }
-}
+};
 </script>
+
 
 <template>
   <div class="management-container">
     <div class="header">
       <div class="title-row">
-
         <h2 class="title">Product Management</h2>
         <el-button @click="handleAdd">Add product</el-button>
-
       </div>
-      
+
       <el-table :data="products" style="width: 100%" border class="pink-table">
         <el-table-column prop="productId" label="ID" width="300"></el-table-column>
-
-        <el-table-column prop="name" label="name" width="200"></el-table-column>
-        <el-table-column prop="description" label="description"></el-table-column>
-        <el-table-column prop="price" label="price" width="100"></el-table-column>
-        <el-table-column prop="stock" label="stock" width="100"></el-table-column>
-        <el-table-column label="operation" width="180">
+        <el-table-column prop="name" label="Name" width="200"></el-table-column>
+        <el-table-column prop="description" label="Description"></el-table-column>
+        <el-table-column prop="price" label="Price" width="120" align="right"></el-table-column>
+        <el-table-column prop="stock" label="Stock" width="120" align="center"></el-table-column>
+        <el-table-column label="Operations" width="420" align="center">
           <template #default="scope">
-            <el-button size="small" @click="handleEdit(scope.row)">edit</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(scope.row)">delete</el-button>
-
+            <div class="action-buttons">
+              <el-button size="small" @click="handleEdit(scope.row)">Edit</el-button>
+              <el-button size="small" type="danger" @click="handleDelete(scope.row)">Delete</el-button>
+              <el-upload
+                  class="upload-demo"
+                  action=""
+                  :show-file-list="false"
+                  :http-request="(options) => handleImageUpload(options.file, scope.row.productId)"
+                  accept="image/*"
+              >
+                <el-button size="small">Upload Image</el-button>
+              </el-upload>
+            </div>
+            <el-image
+                v-if="productForm.image"
+                :src="productForm.image"
+                class="product-image"
+            ></el-image>
           </template>
         </el-table-column>
       </el-table>
     </div>
 
-    <!-- 新增/编辑商品对话框 -->
+    <!-- Add/Edit Product Dialog -->
     <el-dialog
-
-      :title="dialogType === 'add' ? 'add product' : 'edit product'"
-
-      v-model="dialogVisible"
-      width="500px"
+        :title="dialogType === 'add' ? 'Add Product' : 'Edit Product'"
+        v-model="dialogVisible"
+        width="500px"
     >
       <el-form :model="productForm" label-width="100px">
-
-        <el-form-item label="name">
+        <el-form-item label="Name">
           <el-input v-model="productForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="description">
-          <el-input v-model="productForm.description" type="textarea"></el-input>
+        <el-form-item label="Description">
+          <el-input v-model="productForm.description" type="textarea" :rows="3"></el-input>
         </el-form-item>
-        <el-form-item label="price">
-          <el-input-number v-model="productForm.price" :min="0"></el-input-number>
-        </el-form-item>
-        <el-form-item label="stock">
-
-          <el-input-number v-model="productForm.stock" :min="0"></el-input-number>
-        </el-form-item>
+        <div class="form-row">
+          <el-form-item label="Price" class="form-col">
+            <el-input-number v-model="productForm.price" :min="0" :precision="2"></el-input-number>
+          </el-form-item>
+          <el-form-item label="Stock" class="form-col">
+            <el-input-number v-model="productForm.stock" :min="0"></el-input-number>
+          </el-form-item>
+        </div>
       </el-form>
       <template #footer>
-        <span class="dialog-footer">
-
-          <el-button @click="dialogVisible = false">cancel</el-button>
-          <el-button type="primary" @click="handleSubmit">ok</el-button>
-
-        </span>
+        <div class="dialog-footer">
+          <el-button @click="dialogVisible = false">Cancel</el-button>
+          <el-button type="primary" @click="handleSubmit">Confirm</el-button>
+        </div>
       </template>
     </el-dialog>
-
-<!--    <div class="pagination-container">-->
-<!--      <el-pagination-->
-<!--        v-model:current-page="currentPage"-->
-<!--        v-model:page-size="pageSize"-->
-<!--        :page-sizes="[10, 20, 30, 50]"-->
-<!--        background-->
-<!--        layout="total, sizes, prev, pager, next, jumper"-->
-<!--        :total="total"-->
-<!--        @size-change="handleSizeChange"-->
-<!--        @current-change="handleCurrentChange"-->
-<!--      />-->
-<!--    </div>-->
   </div>
 </template>
 
 <style scoped lang="scss">
 .management-container {
-  box-sizing: border-box;
-  padding: 20px;
+  padding: 24px;
   background-color: #fff5f7;
   height: 100%;
   display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  flex-direction: column;
 }
 
 .header {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+
   .title {
     color: #e23d7d;
-    margin-bottom: 20px;
+    margin: 0;
     font-weight: 600;
+    font-size: 24px;
   }
 }
 
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
 .pink-table {
+  width: 100%;
+
   :deep(.el-table__header) {
     background-color: #fce4ec;
+
     th {
       background-color: #fce4ec;
       color: #e23d7d;
+      font-weight: 600;
     }
   }
-  
+
   :deep(.el-table__row) {
     &:hover {
       background-color: #fff0f4 !important;
     }
   }
-  
+
   :deep(.el-button) {
     background-color: #f784a7;
     border-color: #f784a7;
     color: white;
-    
+    margin: 4px;
+
     &:hover {
       background-color: #e23d7d;
       border-color: #e23d7d;
     }
-    
+
     &.el-button--danger {
       background-color: #ff4081;
       border-color: #ff4081;
-      
+
       &:hover {
         background-color: #f50057;
         border-color: #f50057;
@@ -238,34 +236,34 @@ const handleSubmit = async () => {
   }
 }
 
-.pagination-container {
-  margin-top: 20px;
+.action-buttons {
   display: flex;
-  justify-content: center;
-  height: 50px;
-  :deep(.el-pagination.is-background) {
-    .el-pager li:not(.is-disabled) {
-      background-color: #fce4ec;
-      &:hover {
-        color: #e23d7d;
-      }
-      &.is-active {
-        background-color: #e23d7d;
-      }
-    }
-    .btn-prev, .btn-next {
-      background-color: #fce4ec;
-      &:hover {
-        color: #e23d7d;
-      }
-    }
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.product-image {
+  width: 100px;
+  height: 100px;
+  margin-top: 8px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+
+  .form-col {
+    flex: 1;
+    margin-bottom: 0;
   }
 }
 
-.title-row {
+.dialog-footer {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  justify-content: flex-end;
+  gap: 12px;
 }
 </style>

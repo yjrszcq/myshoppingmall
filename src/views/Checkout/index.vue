@@ -7,6 +7,8 @@ import { useAddressStore } from '@/stores/addressStore'
 import { addAddressAPI } from '@/apis/vip.js'
 import { submitOrderAPI } from '@/apis/order'
 import { getCartInfoAPI } from '@/apis/cart'
+
+
 const router = useRouter()
 const checkInfo = ref({})  // 订单对象
 const curAddress = ref({})  // 地址对象

@@ -178,7 +178,7 @@ onMounted(() => {
             size="large"
             style="background-color: #ff66b3; color: white"
             @click="checkout"
-            >Place an order for settlement</el-button
+            >Purchase</el-button
           >
         </div>
         <div></div>

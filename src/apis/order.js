@@ -14,3 +14,16 @@ export const submitOrderAPI = (cartId, orderCreateVO) => {
         data: orderCreateVO,           // 请求体数据，确保传递了订单创建信息
     });
 };
+
+/**
+ * 取消订单
+ * @param {string} orderId - 订单ID
+ * @param {string} sessionId - 用户会话ID (需在请求头中传递)
+ * @returns {Promise<void>} - 成功删除返回 204 No-Content，无返回内容
+ */
+export const cancelOrderAPI = (orderId, sessionId) => {
+    return request({
+        url: `/api/orders/${orderId}`, // 请求路径与后端一致
+        method: 'DELETE',             // 请求方法为 DELETE
+    });
+};

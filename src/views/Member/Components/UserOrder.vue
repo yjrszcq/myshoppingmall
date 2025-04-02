@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from "vue";
-import { viewsOrders } from "../../../apis/vip.js";
+import { viewsOrders } from "@/apis/vip.js";
 // tab列表
 const tabTypes = [
 
@@ -27,13 +27,11 @@ const total = ref(0);
 //获取订单列表使用async+await 语法,解决异步问题，将异步变成同步
 const getOrderList = async () => {
   const res = await viewsOrders(params.value);
-
-
+  console.log(res,"res");
   orderList.value = res.orderItem;
   console.log(orderList.value);
   total.value = orderList.length; //后端接口缺少订单总数，暂时用订单列表长度代替
 };
-onMounted(() => getOrderList());
 
 // 点击tab切换分类调取订单列表
 const tabClick = (type) => {
@@ -63,6 +61,8 @@ const formatPayState = (payState) => {
   };
   return stateMap[payState];
 };
+
+onMounted(() => getOrderList());
 </script>
 
 <template>

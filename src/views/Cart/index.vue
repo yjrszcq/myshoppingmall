@@ -66,8 +66,10 @@ const checkout = () => {
 };
 
 const onChange = (item) => {
-  const { itemId, quantity } = item;
-  updateQuantity(itemId, quantity);
+  const { cartItemId, quantity } = item;
+  console.log(item,"item")
+  console.log(cartItemId,"itemid");
+  updateQuantity(cartItemId, quantity);//注意
 };
 
 onMounted(() => {

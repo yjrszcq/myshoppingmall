@@ -33,16 +33,14 @@ export const deleteCartItemAPI = (itemId) => {
 }
 
 //修改购物车商品数量
-export const updateCartItemQuantityAPI = ({ itemId,quantity }) => {
+export const updateCartItemQuantityAPI = ({ itemId, quantity }) => {
   return request({
-    url: '/api/cart/items/{itemId}',
+    url: `/api/cart/items/${itemId}`, // 确保 itemId 正确替换
     method: 'PUT',
-    data: {
-      quantity,
-      itemId
-    }
-  })
-}
+    data: quantity !== undefined ? { quantity } : {}, // 只有当 quantity 存在时才传递
+  });
+};
+
 
 /**
  * 获取购物车信息

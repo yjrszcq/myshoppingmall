@@ -170,18 +170,10 @@ const handleSuccessfulPayment = async (cartStore) => {
     }
     
     // 4. 清理购物车
-    if (cartStore.isLogin) {
-      // 已登录用户：调用API批量删除
       const deletePromises = selectedGoods.map(item =>
-          cartStore.delCart(item.productId)
+          cartStore.delCart(item.cartItemId)
       )
       await Promise.all(deletePromises)
-    } else {
-      // 未登录用户：本地移除选中的商品
-      selectedGoods.forEach(item => {
-        cartStore.delCart(item.productId)
-      })
-    }
     
     // 5. 清除本地存储的购物车信息
     localStorage.removeItem('cartInfo')

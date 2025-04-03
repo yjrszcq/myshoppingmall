@@ -66,10 +66,10 @@ const checkout = () => {
 };
 
 const onChange = (item) => {
-  const { cartItemId, quantity } = item;
+  const { itemId, quantity } = item;
   console.log(item,"item")
-  console.log(cartItemId,"itemid");
-  updateQuantity(cartItemId, quantity);//注意
+  console.log(itemId,"itemid");
+  updateQuantity(itemId, quantity);//注意
 };
 
 onMounted(() => {
@@ -141,7 +141,7 @@ onMounted(() => {
                     title="Do you confirm the deletion?"
                     confirm-button-text="yes"
                     cancel-button-text="no"
-                    @confirm="delCart(i.cartItemId)"
+                    @confirm="delCart(i.itemId)"
                   >
                     <template #reference>
                       <a href="javascript:;">delete</a>

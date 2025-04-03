@@ -38,9 +38,9 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   // 删除购物车商品
-  const delCart = async (productId) => {
+  const delCart = async (itemId) => {
     try {
-      await deleteCartItemAPI(productId);
+      await deleteCartItemAPI(itemId);
       await getCart();
       ElMessage.success('Delete successfully.');
     } catch (error) {

@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useCartStore } from '@/stores/cartStore.js'
-import { submitOrderAPI } from '@/apis/order'
+import { submitPayment, getPaymentStatus } from '@/apis/checkout.js'
 import { manageOrderAPI } from '@/apis/orderManage'
 import { get } from '@vueuse/core'
 
@@ -116,22 +116,55 @@ const confirmPay = async () => {
 
     try {
       await formRef.value.validate()
-      await handleSuccessfulPayment(cartStore)
-      ElMessage.success('支付成功')
-      router.push('/member/order')
+      await processPayment(cartStore)
     } catch (error) {
       console.error('支付失败:', error)
       ElMessage.error('请检查银行卡信息是否正确')
     }
   } else {
     try {
-      await handleSuccessfulPayment(cartStore)
-      ElMessage.success('支付成功')
-      router.push('/member/order')
+      await processPayment(cartStore)
     } catch (error) {
       console.error('支付失败:', error)
       ElMessage.error('支付失败，请重试')
     }
+  }
+}
+
+const processPayment = async (cartStore) => {
+  try {
+    const orderId = get(cartInfo.value, 'orderId')
+    if (!orderId) {
+      console.error('订单ID不存在，无法更新订单状态')
+      ElMessage.error('订单信息不完整，请重新提交订单')
+      router.push('/cart')
+      return
+    }
+
+    // 1. 提交支付请求
+    await submitPayment(orderId)
+    ElMessage.success('支付请求已提交，正在查询支付状态...')
+
+    // 2. 轮询查询支付状态
+    const checkStatus = async () => {
+      try {
+        const response = await getPaymentStatus(orderId)
+        if (response.status === 'success') {
+          ElMessage.success('支付成功')
+          await handleSuccessfulPayment(cartStore)
+          router.push('/member/order')
+        } else {
+          setTimeout(checkStatus, 3000) // 3秒后再次检查
+        }
+      } catch (error) {
+        console.error('查询支付状态失败:', error)
+        ElMessage.error('支付状态查询失败，请重试')
+      }
+    }
+    checkStatus()
+  } catch (error) {
+    console.error('支付失败:', error)
+    ElMessage.error('支付失败，请重试')
   }
 }
 

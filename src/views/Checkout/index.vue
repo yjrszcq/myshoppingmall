@@ -106,7 +106,7 @@ const submitOrder = async () => {
     
     // 提交订单到后端
     const response = await submitOrderAPI(cartId)
-    console.log('订单创建成功，订单ID:', response.orderIds[0])
+    console.log('checkinfo:', checkInfo)
     
     // 保存购物车信息到localStorage
     const cartInfo = {

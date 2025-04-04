@@ -28,9 +28,26 @@ export const useCartStore = defineStore('cart', () => {
   const addCart = async (goods) => {
     try {
       const { productId, quantity } = goods;
-      await addItemToCartAPI({ productId, quantity });
+
+      // 检查购物车中是否已存在该商品
+      const existingItem = cartList.value.find(item => item.productId === productId);
+      console.log("existingItem",existingItem)
+
+      if (existingItem) {
+        // 如果存在，更新数量
+        console.log("enter if")
+        const newQuantity = existingItem.quantity + quantity;
+        console.log(existingItem.itemId,newQuantity,"usage")
+        await updateCartItemQuantityAPI({ itemId: existingItem.itemId, quantity: newQuantity });
+        ElMessage.success('Quantity updated successfully.');
+      } else {
+        // 如果不存在，添加新商品
+        console.log(existingItem.itemId,newQuantity,"usage")
+        await addItemToCartAPI({ productId, quantity });
+        ElMessage.success('Added successfully.');
+      }
+
       await getCart();
-      ElMessage.success('Added successfully.');
     } catch (error) {
       console.error("Add to cart failed:", error);
       ElMessage.error('Failed to add item.');
@@ -52,6 +69,7 @@ export const useCartStore = defineStore('cart', () => {
   // 更新商品数量
   const updateQuantity = async (itemId, quantity) => {
     try {
+      console.log("useupdate",itemId)
       await updateCartItemQuantityAPI({ itemId, quantity });
       await getCart();
     } catch (error) {

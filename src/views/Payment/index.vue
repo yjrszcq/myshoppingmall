@@ -188,23 +188,9 @@ const handleSuccessfulPayment = async (cartStore) => {
       return
     }
 
-    // 3. 管理订单（发货）
-    try {
-      const manageResponse = await manageOrderAPI(orderId, {
-        action: 'ship',
-        trackingNumber: `SF${Date.now()}` // 生成一个示例物流单号
-      })
-      console.log('订单状态更新成功:', manageResponse.status)
-      ElMessage.success('订单状态更新成功')
-    } catch (manageError) {
-      console.error('订单状态更新失败:', manageError)
-      ElMessage.error('订单状态更新失败，请重试')
-      return
-    }
-    
-    // 4. 清理购物车
+    //删除购物车内相应的商品
       const deletePromises = selectedGoods.map(item =>
-          cartStore.delCart(item.cartItemId)
+          cartStore.delCart(item.itemId)
       )
       await Promise.all(deletePromises)
     

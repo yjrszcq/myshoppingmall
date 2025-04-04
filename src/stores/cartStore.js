@@ -31,7 +31,6 @@ export const useCartStore = defineStore('cart', () => {
 
       // 检查购物车中是否已存在该商品
       const existingItem = cartList.value.find(item => item.productId === productId);
-      console.log("existingItem",existingItem)
 
       if (existingItem) {
         // 如果存在，更新数量
@@ -42,7 +41,7 @@ export const useCartStore = defineStore('cart', () => {
         ElMessage.success('Quantity updated successfully.');
       } else {
         // 如果不存在，添加新商品
-        console.log(existingItem.itemId,newQuantity,"usage")
+        console.log("else")
         await addItemToCartAPI({ productId, quantity });
         ElMessage.success('Added successfully.');
       }

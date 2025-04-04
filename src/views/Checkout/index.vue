@@ -21,9 +21,9 @@ const selectedAddress = ref(null)
 const deliveryTime = ref('anytime') // 默认选择不限送货时间
 const deliveryOptions = [
 
-{ "id": "anytime", "text": "No delivery time limit: Monday to Sunday" },
-{ "id": "workday", "text": "Delivery on weekdays: Monday to Friday" },
-{ "id": "weekend", "text": "Delivery on weekends and holidays: Saturday to Sunday" }
+{ "id": "anytime", "text": "No limit: Monday to Sunday" },
+{ "id": "workday", "text": "Weekdays" },
+{ "id": "weekend", "text": "Weekends and Holidays" }
 
 ]
 
@@ -35,43 +35,31 @@ const serviceFee = computed(() => {
 // 计算应付总额
 const totalPayPrice = computed(() => {
   if (!checkInfo.value.summary) return 0
+  checkInfo.value.summary.totalPayPrice = checkInfo.value.summary.totalPrice + checkInfo.value.summary.postFee + serviceFee.value;
   return checkInfo.value.summary.totalPrice + checkInfo.value.summary.postFee + serviceFee.value
 })
 
 // 默认地址
 const defaultAddress = ref({})
 
-//从cart中直接获取
-const getCartInfo = () => {
-  const cartStore = useCartStore();
-
-  // 1. 筛选出被选中的商品（item.selected === true）
-  const selectedGoods = cartStore.cartList.filter(item => item.selected);
-
-  // 2. 如果没有选中商品，清空 checkInfo 并提示
-  if (selectedGoods.length === 0) {
-    checkInfo.value = null; // 或者设为空对象 {}
-
-    ElMessage.warning('Please select the product you want to check');
-
-    return;
-  }
-
-  // 3. 计算选中商品的总价、运费和应付总额
-  const totalPrice = selectedGoods.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const postFee = 10; // 运费
-  const totalPayPrice = totalPrice + postFee;
-
-  // 4. 更新 checkInfo.value（直接赋值）
-  checkInfo.value = {
-    goods: selectedGoods, // 仅包含选中的商品
-    summary: {
-      goodsCount: selectedGoods.reduce((sum, item) => sum + item.quantity, 0), // 选中商品总数量
-      totalPrice,   // 选中商品总价
-      postFee,      // 运费
-      totalPayPrice // 应付总额（总价 + 运费）
+//从local中直接获取
+const loadCartInfoFromLocalStorage = () => {
+  try {
+    const cartInfoStr = localStorage.getItem('cartInfo');
+    if (!cartInfoStr) {
+      ElMessage.warning('No selected products found, please return to the cart page');
+      router.push('/cart');
+      return;
     }
-  };
+
+    const cartInfo = JSON.parse(cartInfoStr);
+    checkInfo.value = cartInfo; // 直接使用 localStorage 中的数据
+    console.log(checkInfo.value,"checkout");
+  } catch (error) {
+    console.error('Failed to parse cart data:', error);
+    ElMessage.error('Failed to load order information');
+    router.push('/cart');
+  }
 };
 
 
@@ -106,6 +94,8 @@ const submitOrder = async () => {
     
     // 提交订单到后端
     const response = await submitOrderAPI(cartId)
+
+
     console.log('checkinfo:', checkInfo)
     
     // 保存购物车信息到localStorage
@@ -116,6 +106,7 @@ const submitOrder = async () => {
       summary: checkInfo.value.summary,
       address: curAddress.value
     }
+    console.log(cartInfo,"cartInfo")
     localStorage.setItem('cartInfo', JSON.stringify(cartInfo))
     
     if (payMethod.value === 'online') {
@@ -239,7 +230,7 @@ const handleAddAddress = async () => {
 
 // 初始化默认地址
 onMounted(() => {
-  getCartInfo()
+  loadCartInfoFromLocalStorage();
   fetchAddressList()
 })
 
@@ -283,11 +274,11 @@ onMounted(() => {
             <thead>
               <tr>
 
-              <th width="400">Product information</th>
-              <th width="220">unit price</th>
-              <th width="180">quantity</th>
-              <th width="180">total</th>
-              <th width="140">operation</th>
+              <th width="440">Product name</th>
+              <th width="270">unit price</th>
+              <th width="205">quantity</th>
+              <th width="205">total</th>
+<!--              <th width="140">operation</th>-->
 
               </tr>
             </thead>
@@ -295,7 +286,7 @@ onMounted(() => {
               <tr v-for="i in checkInfo.goods" :key="i.id">
                 <td>
                   <a href="javascript:;" class="info">
-                    <img :src="i.picture" alt="">
+<!--                    <img :src="i.picture" alt="">-->
                     <div class="right">
                       <p>{{ i.name }}</p>
                       <p>{{ i.attrsText }}</p>
@@ -305,7 +296,7 @@ onMounted(() => {
                 <td>&yen;{{ i.price }}</td>
                 <td>{{ i.quantity }}</td>
                 <td>&yen;{{ (i.price * i.quantity).toFixed(2) }}</td>
-                <td>&yen;{{ (i.price * i.quantity).toFixed(2) }}</td>
+<!--                <td>&yen;{{ (i.price * i.quantity).toFixed(2) }}</td>-->
               </tr>
             </tbody>
           </table>
@@ -334,7 +325,7 @@ onMounted(() => {
         <div class="box-body">
           <a class="my-btn" :class="{ active: payMethod === 'online' }" href="javascript:;" @click="changePayMethod('online')">Online Payment</a>
           <a class="my-btn" :class="{ active: payMethod === 'cod' }" href="javascript:;" @click="changePayMethod('cod')">Cash on Delivery</a>
-          <span style="color:#999">Cash on Delivery requires a 5 yuan handling fee</span>
+<!--          <span style="color:#999">Cash on Delivery requires a 5 yuan handling fee</span>-->
         </div>
 
         <!-- 金额明细 -->
@@ -342,25 +333,25 @@ onMounted(() => {
         <div class="box-body">
           <div class="total">
             <dl>
-              <dt>Items Number:</dt>
-              <dd>{{ checkInfo.summary?.goodsCount }}件</dd>
+              <dt>Number:</dt>
+              <dd>{{ checkInfo.summary?.goodsCount }}</dd>
             </dl>
             <dl>
-              <dt>Item total price：</dt>
+              <dt>Item Price:</dt>
               <dd>¥{{ checkInfo.summary?.totalPrice.toFixed(2) }}</dd>
             </dl>
+<!--            <dl>-->
+<!--              <dt>Fare<i></i>:</dt>-->
+<!--              <dd>¥{{ checkInfo.summary?.postFee.toFixed(2) }}</dd>-->
+<!--            </dl>-->
+<!--            <dl>-->
+<!--              <dt>Hand<i></i> Renewal:</dt>-->
+<!--              <dd>¥{{ serviceFee.toFixed(2) }}</dd>-->
+<!--            </dl>-->
             <dl>
-              <dt>Fare<i></i>:</dt>
-              <dd>¥{{ checkInfo.summary?.postFee.toFixed(2) }}</dd>
-            </dl>
-            <dl>
-              <dt>Hand<i></i> Renewal:</dt>
-              <dd>¥{{ serviceFee.toFixed(2) }}</dd>
-            </dl>
-            <dl>
-              <dt>Total amount payable:</dt>
+              <dt>Total:</dt>
 
-              <dd class="price">¥{{ totalPayPrice.toFixed(2) }}</dd>
+              <dd class="price">¥{{ checkInfo.summary?.totalPrice.toFixed(2) }}</dd>
             </dl>
           </div>
         </div>
@@ -368,7 +359,7 @@ onMounted(() => {
         <!-- 提交订单 -->
         <div class="submit">
 
-          <el-button size="large" style="background-color: #ff66b3;color: white" @click="submitOrder">Submit your order</el-button>
+          <el-button size="large" style="background-color: #ff66b3;color: white" @click="submitOrder">Submit</el-button>
 
         </div>
       </div>

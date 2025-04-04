@@ -33,8 +33,9 @@ const checkout = () => {
   }
 
   // 计算商品总价和应付总额
+  console.log(selectedGoods,"selected");
   const totalPrice = selectedGoods.reduce(
-    (sum, item) => sum + item.price * item.count,
+    (sum, item) => sum + item.price * item.quantity,
     0
   );
   const postFee = 10; // 运费
@@ -49,13 +50,13 @@ const checkout = () => {
         name: item.name,
         picture: item.picture,
         price: item.price,
-        count: item.count,
+        quantity: item.quantity,
         attrsText: item.attrsText,
       })),
       summary: {
-        goodsCount: selectedGoods.reduce((sum, item) => sum + item.count, 0),
+        goodsCount: selectedGoods.reduce((sum, item) => sum + item.quantity, 0),
         totalPrice: totalPrice,
-        postFee: postFee,
+        // postFee: postFee,
         totalPayPrice: totalPayPrice,
       },
     })
@@ -84,18 +85,18 @@ onMounted(() => {
         <table>
           <thead>
             <tr>
-              <th width="120">
+              <th style="width: 120px">
                 <el-checkbox
                   :model-value="cartStore.isAll"
                   @change="allCheck"
                 />
               </th>
 
-              <th width="400">Product information</th>
-              <th width="220">unit price</th>
-              <th width="180">quantity</th>
-              <th width="180">total</th>
-              <th width="140">operation</th>
+              <th style="width: 400px">Product name</th>
+              <th style="width: 220px">unit price</th>
+              <th style="width: 180px">quantity</th>
+              <th style="width: 180px">total</th>
+              <th style="width: 140px">operation</th>
             </tr>
           </thead>
           <!-- 商品列表 -->
@@ -144,7 +145,7 @@ onMounted(() => {
                     @confirm="delCart(i.itemId)"
                   >
                     <template #reference>
-                      <a href="javascript:;">delete</a>
+                      <a >delete</a>
                     </template>
                   </el-popconfirm>
                 </p>

@@ -47,38 +47,21 @@ const handleFinishOrder = async (orderId) => {
 };
 
 // 处理支付按钮点击
-// const handlePayNow = (order) => {
-//   const cartStore = useCartStore()
-//
-//   // 获取用户选中的商品
-//   const selectedGoods = cartStore.cartList.filter(item => item.selected)
-//
-//   if (selectedGoods.length === 0) {
-//     ElMessage.warning('Please select at least one product to purchase')
-//     return
-//   }
-//
-//   // 计算订单信息
-//   const totalPrice = selectedGoods.reduce((sum, item) => sum + item.price * item.quantity, 0)
-//   const postFee = 10 // 假设运费固定
-//   const totalPayPrice = totalPrice + postFee
-//
-//   const orderInfo = {
-//     goods: selectedGoods,
-//     summary: {
-//       goodsCount: selectedGoods.reduce((sum, item) => sum + item.quantity, 0),
-//       totalPrice,
-//       postFee,
-//       totalPayPrice
-//     }
-//   }
-//
-//   // 存储订单信息到 localStorage
-//   localStorage.setItem('cartInfo', JSON.stringify(orderInfo))
-//
-//   // 跳转到结算页面
-//   router.push('/checkout')
-// }
+const handlePayNow = (order) => {
+  const cart = useCartStore();
+  console.log(cart);
+
+  // 存储订单信息到 localStorage
+  const cartInfo = {
+    cartId: cart.cartId,
+    orderId: order.orderId, // 保存订单ID
+    goods: order.items,
+  }
+  localStorage.setItem('cartInfo', JSON.stringify(cartInfo));
+
+  // 跳转到结算页面
+  router.push('/payment')
+}
 
 onMounted(() => getOrderList());
 </script>
@@ -146,19 +129,19 @@ onMounted(() => getOrderList());
                       <span class="item-name">{{ item.productName }}</span>
                       <span class="item-quantity">Qty: {{ item.quantity }}</span>
                     </div>
-                    <span class="item-price">￥{{ (item.price / item.quantity).toFixed(2) }}</span>
+                    <span class="item-price">${{ (item.price / item.quantity).toFixed(2) }}</span>
                   </div>
                 </div>
 
                 <div class="order-actions">
-<!--                  <el-button-->
-<!--                      type="primary"-->
-<!--                      size="small"-->
-<!--                      v-if="order.status === 'pending'"-->
-<!--                      @click="handlePayNow(order.orderId)"-->
-<!--                  >-->
-<!--                    Pay Now-->
-<!--                  </el-button>-->
+                  <el-button
+                      type="primary"
+                      size="small"
+                      v-if="order.status === 'pending'"
+                      @click="handlePayNow(order)"
+                  >
+                    Pay Now
+                  </el-button>
 <!--                此处逻辑待讨论，反正我现在不想写-->
                   <el-button
                       size="small"

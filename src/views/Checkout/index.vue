@@ -2,7 +2,6 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { useCartStore } from '@/stores/cartStore.js'
 import { useAddressStore } from '@/stores/addressStore'
 import { addAddressAPI } from '@/apis/vip.js'
 import { submitOrderAPI } from '@/apis/order'

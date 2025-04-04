@@ -4,7 +4,6 @@ import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useCartStore } from '@/stores/cartStore.js'
 import { submitPayment, getPaymentStatus } from '@/apis/checkout.js'
-import { manageOrderAPI } from '@/apis/orderManage'
 import { get } from '@vueuse/core'
 
 const router = useRouter()

@@ -5,17 +5,17 @@ import { addItemToCartAPI, getCartContentsAPI, deleteCartItemAPI, updateCartItem
 import { ElMessage } from 'element-plus'
 
 export const useCartStore = defineStore('cart', () => {
-  const userStore = useUserstore()
-  const isLogin = computed(() => userStore.userInfo?.token)
 
   // 初始化 cartList 确保默认值为 []
-  const cartList = ref([])
+  const cartList = ref([]);
+  const cartId = ref();
 
   // 获取购物车数据
   const getCart = async () => {
     try {
       const res = await getCartContentsAPI();
       cartList.value = Array.isArray(res.items) ? res.items : [];
+      cartId.value = res.cartId;
       console.log(res, "cartitem");
       console.log(cartList,"cartlistinstore");
     } catch (error) {
@@ -91,6 +91,7 @@ export const useCartStore = defineStore('cart', () => {
 
   return {
     cartList,
+    cartId,
     addCart,
     isAll,
     allCheck,

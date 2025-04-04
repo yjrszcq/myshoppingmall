@@ -32,6 +32,8 @@ export const useBusinessStore = defineStore('business', {
                 this.isLoading = true;
                 const res = await viewOrders();
                 this.sellerOrders = res || [];
+                console.log(res,"res")
+                console.log(this.sellerOrders,"res2")
                 return this.sellerOrders;
             } catch (error) {
                 this.error = error.message || '获取订单列表失败';

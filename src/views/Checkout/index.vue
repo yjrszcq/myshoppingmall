@@ -97,6 +97,7 @@ const submitOrder = async () => {
     // 获取购物车信息
     const cartResponse = await getCartInfoAPI()
     const cartId = cartResponse.cartId
+    console.log(cartResponse,"cart")
     
     if (!cartId) {
       ElMessage.error('获取购物车信息失败')

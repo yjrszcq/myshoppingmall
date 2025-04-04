@@ -9,11 +9,11 @@ const selectedStatus = ref('all')
 // tab列表，状态与后端匹配
 const tabTypes = [
   { name: "all", label: "All", color: "#9E9E9E" },
-  { name: "Pending", label: "Pending", color: "#FF8A65" },
-  { name: "Paid", label: "Paid", color: "#64B5F6" },
-  { name: "Shipping", label: "Shipping", color: "#4DB6AC" },
-  { name: "Finished", label: "Finished", color: "#81C784" },
-  { name: "Canceled", label: "Canceled", color: "#E57373" }
+  { name: "pending", label: "Pending", color: "#FF8A65" },
+  { name: "paid", label: "Paid", color: "#64B5F6" },
+  { name: "shipping", label: "Shipping", color: "#4DB6AC" },
+  { name: "finished", label: "Finished", color: "#81C784" },
+  { name: "canceled", label: "Canceled", color: "#E57373" }
 ]
 
 // 处理 tab 切换
@@ -21,10 +21,16 @@ const tabClick = (tabName) => {
   selectedStatus.value = tabName
 }
 
-// 计算订单总价
-const calculateTotal = (items) => {
-  return items.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)
-}
+const calculateTotal = (order) => {
+  console.log(order, "order");
+  if (!Array.isArray(order) || order.length === 0) return "0.00";
+  return order
+      .reduce((total, item) => total + (item.price * item.quantity), 0)
+      .toFixed(2);
+};
+
+
+
 
 // 获取订单列表
 const getOrders = async () => {
@@ -37,11 +43,17 @@ const getOrders = async () => {
 
 // 过滤后的订单列表
 const filteredOrders = computed(() => {
-  if (selectedStatus.value === 'all') {
-    return store.sellerOrders
+  let orders = store.sellerOrders.orders || []; // 兼容可能为空的情况
+  if (selectedStatus.value !== 'all') {
+    orders = orders.filter(order => order.status === selectedStatus.value);
   }
-  return store.sellerOrders.filter(order => order.status === selectedStatus.value)
-})
+  // 规范化 items 结构，确保是数组
+  return orders.map(order => ({
+    ...order,
+    items: order.items.items || [] // 确保 items 是数组
+  }));
+});
+
 
 // 发货操作
 const handleShipOrder = async (orderId) => {
@@ -173,7 +185,7 @@ onMounted(() => {
             >
               {{ tabTypes.find(t => t.name === order.status)?.label }}
             </el-tag>
-            <span class="order-amount">¥{{ calculateTotal(order.orderItem) }}</span>
+            <span class="order-amount">¥{{ calculateTotal(order.items) }}</span>
           </div>
         </div>
 
@@ -185,7 +197,7 @@ onMounted(() => {
 
             <div class="order-details">
               <div class="product-list">
-                <div v-for="item in order.orderItem" :key="item.orderItemId" class="product-item">
+                <div v-for="item in order.items" :key="item.orderItemId" class="product-item">
                   <div class="product-info">
                     <span class="product-name">{{ item.productName }}</span>
                     <span class="product-quantity">×{{ item.quantity }}</span>

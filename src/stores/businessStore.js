@@ -31,9 +31,9 @@ export const useBusinessStore = defineStore('business', {
             try {
                 this.isLoading = true;
                 const res = await viewOrders();
-                this.sellerOrders = res || [];
-                console.log(res,"res")
-                console.log(this.sellerOrders,"res2")
+                // Access the orders property of the response
+                this.sellerOrders = Array.isArray(res?.orders) ? res.orders : [];
+                console.log(this.sellerOrders,"res")
                 return this.sellerOrders;
             } catch (error) {
                 this.error = error.message || '获取订单列表失败';
@@ -54,8 +54,8 @@ export const useBusinessStore = defineStore('business', {
                 this.isLoading = true;
                 await manageOrderAPI(orderId, 'ship', trackingNumber);
 
-                // 更新本地订单状态
-                const order = this.sellerOrders.find(o => o.id === orderId);
+                // Update local order status
+                const order = this.sellerOrders.find(o => o.orderId === orderId);  // Note: using orderId
                 if (order) {
                     order.status = 'shipped';
                     order.trackingNumber = trackingNumber;
@@ -63,7 +63,7 @@ export const useBusinessStore = defineStore('business', {
 
                 return true;
             } catch (error) {
-                ElMessage.error(this.error);
+                ElMessage.error(error.message || '发货失败');
                 throw error;
             } finally {
                 this.isLoading = false;
@@ -120,6 +120,7 @@ export const useBusinessStore = defineStore('business', {
          * 根据状态筛选订单
          */
         filteredOrders: (state) => {
+            if (!Array.isArray(state.sellerOrders)) return [];
             if (state.selectedStatus === 'all') {
                 return state.sellerOrders;
             }

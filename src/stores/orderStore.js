@@ -1,6 +1,6 @@
 // stores/orderStore.js
 import { defineStore } from 'pinia';
-import { submitOrderAPI, cancelOrderAPI } from '@/apis/order.js';
+import { submitOrderAPI, cancelOrderAPI, finsihOrderAPI } from '@/apis/order.js';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useCartStore } from './cartStore';
 import { useAddressStore } from './addressStore';
@@ -76,12 +76,45 @@ export const useOrderStore = defineStore('order', {
                 if (order) {
                     order.status = 'canceled';
                 }
-
                 ElMessage.success('Order cancelled successfully');
                 return true;
             } catch (error) {
                 if (error !== 'cancel') {
                     this.error = error.message || 'Failed to cancel order';
+                    ElMessage.error(this.error);
+                    throw error;
+                }
+                return false;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        async finishOrder(orderId) {
+            try {
+                await ElMessageBox.confirm(
+                    'Are you sure you want to finish this order?',
+                    'Confirm receipt',
+                    {
+                        confirmButtonText: 'Confirm',
+                        cancelButtonText: 'Cancel',
+                        type: 'warning',
+                    }
+                );
+
+                this.isLoading = true;
+                await finsihOrderAPI(orderId);
+
+                const order = this.orders.find(o => o.orderId === orderId);
+                if (order) {
+                    order.status = 'finished';
+                }
+
+                ElMessage.success('Order finished successfully');
+                return true;
+            } catch (error) {
+                if (error !== 'finished') {
+                    this.error = error.message || 'Failed to finish order';
                     ElMessage.error(this.error);
                     throw error;
                 }

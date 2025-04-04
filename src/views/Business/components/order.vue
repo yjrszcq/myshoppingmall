@@ -43,7 +43,8 @@ const getOrders = async () => {
 
 // 过滤后的订单列表
 const filteredOrders = computed(() => {
-  let orders = store.sellerOrders.orders || []; // 兼容可能为空的情况
+  console.log(store.sellerOrders,"index")
+  let orders = store.sellerOrders || []; // 兼容可能为空的情况
   if (selectedStatus.value !== 'all') {
     orders = orders.filter(order => order.status === selectedStatus.value);
   }
@@ -212,7 +213,7 @@ onMounted(() => {
                     type="success"
                     size="small"
                     plain
-                    v-if="order.status === 'Paid'"
+                    v-if="order.status === 'pending'"
                     @click.stop="handleShipOrder(order.orderId)"
                 >
                   Ship
@@ -223,7 +224,7 @@ onMounted(() => {
                     type="danger"
                     size="small"
                     plain
-                    v-if="order.status === 'Pending' || order.status === 'Paid'"
+                    v-if="order.status === 'pending' || order.status === 'paid'"
                     @click.stop="handleCancelOrder(order.orderId)"
                 >
                   Cancel

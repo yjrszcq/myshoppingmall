@@ -42,6 +42,10 @@ const handleCancelOrder = async (orderId) => {
   await orderStore.cancelOrder(orderId);
 };
 
+const handleFinishOrder = async (orderId) => {
+  await orderStore.finishOrder(orderId);
+};
+
 // 处理支付按钮点击
 // const handlePayNow = (order) => {
 //   const cartStore = useCartStore()
@@ -166,6 +170,12 @@ onMounted(() => getOrderList());
 <!--                  等待后端给接口-->
 <!--                  <el-button type="info" size="small" v-if="order.status === 'finished'">Leave Review</el-button>-->
 <!--                  等待后端给接口-->
+                  <el-button
+                      size="small"
+                      v-if="order.status === 'shipping'"
+                      @click="handleFinishOrder(order.orderId)"
+                  >
+                    Finish Order</el-button>
                 </div>
               </div>
             </el-collapse-item>

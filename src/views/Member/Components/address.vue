@@ -17,7 +17,8 @@
               </div>
               <div class="actions">
                 <el-button type="primary" text @click="handleEdit(address)">edit</el-button>
-                <el-button type="danger" text @click="handleDelete(address.addressId)">delete</el-button>
+<!--                <el-button type="danger" text @click="handleDelete(address.addressId)">delete</el-button>-->
+<!--                过不了一致性检查，后续待讨论-->
               </div>
             </el-card>
           </el-col>

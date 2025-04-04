@@ -18,12 +18,22 @@ export const submitOrderAPI = (cartId, orderCreateVO) => {
 /**
  * 取消订单
  * @param {string} orderId - 订单ID
- * @param {string} sessionId - 用户会话ID (需在请求头中传递)
  * @returns {Promise<void>} - 成功删除返回 204 No-Content，无返回内容
  */
-export const cancelOrderAPI = (orderId, sessionId) => {
+export const cancelOrderAPI = (orderId) => {
     return request({
         url: `/api/orders/${orderId}`, // 请求路径与后端一致
         method: 'DELETE',             // 请求方法为 DELETE
+    });
+};
+/**
+ * 取消订单
+ * @param {string} orderId - 订单ID
+ * @returns {Promise<void>} - 成功删除返回 204 No-Content，无返回内容
+ */
+export const finsihOrderAPI = (orderId) => {
+    return request({
+        url: `/api/orders/${orderId}/confirm`, // 请求路径与后端一致
+        method: 'PUT',             // 请求方法为 DELETE
     });
 };

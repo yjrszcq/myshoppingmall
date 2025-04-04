@@ -1,9 +1,8 @@
 <script setup>
 import { onMounted, computed } from "vue";
 import { useOrderStore } from "@/stores/orderStore";
-import { InfoFilled, ShoppingCart } from '@element-plus/icons-vue';
+import {  ShoppingCart } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
-import { ElMessage } from 'element-plus'
 import {useCartStore} from "@/stores/cartStore.js";
 
 const router = useRouter();
@@ -29,8 +28,15 @@ const filteredOrders = computed(() => orderStore.filteredOrders);
 
 // 计算订单总价
 const calculateTotal = (items) => {
-  return items.reduce((total, item) => total + (item.price * 1), 0).toFixed(2);
+  const arr = Array.from(items || []);
+  return arr.reduce((total, item) => {
+    const price = Number(item?.price || 0);
+    const quantity = Number(item?.quantity || 1);
+    const subtotal = price * quantity;
+    return total + subtotal;
+  }, 0).toFixed(2);
 };
+
 
 // 处理 tab 切换
 const tabClick = (tabName) => {
@@ -46,22 +52,31 @@ const handleFinishOrder = async (orderId) => {
   await orderStore.finishOrder(orderId);
 };
 
-// 处理支付按钮点击
+//处理立即支付的部分
 const handlePayNow = (order) => {
   const cart = useCartStore();
-  console.log(cart);
+  const items = Array.from(order?.items?.items || []);
+  let total = 0;
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const price = Number(item?.price);
+    const quantity = Number(item?.quantity);
+    const subtotal = price * quantity;
+    total += subtotal;
+  }
 
-  // 存储订单信息到 localStorage
   const cartInfo = {
     cartId: cart.cartId,
-    orderId: order.orderId, // 保存订单ID
-    goods: order.items,
-  }
-  localStorage.setItem('cartInfo', JSON.stringify(cartInfo));
+    orderId: order.orderId,
+    goods: items,
+    totalAmount: total,
+  };
 
-  // 跳转到结算页面
-  router.push('/payment')
-}
+  localStorage.setItem('cartInfo', JSON.stringify(cartInfo));
+  router.push('/payment');
+};
+
+
 
 onMounted(() => getOrderList());
 </script>
@@ -85,9 +100,8 @@ onMounted(() => getOrderList());
     </el-tabs>
 
     <div class="main-container">
-      <el-skeleton :rows="5" animated v-if="isLoading"/>
 
-      <div class="empty-state" v-else-if="filteredOrders.length === 0">
+      <div class="empty-state" v-if="filteredOrders.length === 0">
         <el-empty description="No orders found">
           <template #image>
             <el-icon :size="100" color="#ccc">

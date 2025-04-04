@@ -319,11 +319,12 @@ onMounted(() => {
         </div>
 
         <!-- 支付方式 -->
+<!--        货到付款的逻辑还得想一下，下回再说！-->
 
         <h3 class="box-title">Payment Methods</h3>
         <div class="box-body">
           <a class="my-btn" :class="{ active: payMethod === 'online' }" href="javascript:;" @click="changePayMethod('online')">Online Payment</a>
-          <a class="my-btn" :class="{ active: payMethod === 'cod' }" href="javascript:;" @click="changePayMethod('cod')">Cash on Delivery</a>
+<!--          <a class="my-btn" :class="{ active: payMethod === 'cod' }" href="javascript:;" @click="changePayMethod('cod')">Cash on Delivery</a>-->
 <!--          <span style="color:#999">Cash on Delivery requires a 5 yuan handling fee</span>-->
         </div>
 

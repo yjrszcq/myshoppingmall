@@ -30,6 +30,9 @@ onMounted(() => {
   cartInfo.value = storedCartInfo
   if (storedCartInfo.summary) {
     totalAmount.value = storedCartInfo.summary.totalPayPrice
+  }else{
+    totalAmount.value = storedCartInfo.totalAmount
+    console.log(totalAmount.value,"totalAmount")
   }
   
   // 检查购物车信息是否完整
@@ -44,19 +47,19 @@ onMounted(() => {
 const payMethods = [
   { 
     id: 'alipay', 
-    name: '支付宝支付', 
+    name: 'Alipay',
     icon: '/src/assets/images/alipay.svg',
     qrcode: '/src/assets/images/alipay_qrcode.jpg'
   },
   { 
     id: 'wechat', 
-    name: '微信支付', 
+    name: 'Wechat',
     icon: '/src/assets/images/wechat.svg',
     qrcode: '/src/assets/images/wechat_qrcode.jpg'
   },
   { 
     id: 'card', 
-    name: '银行卡支付', 
+    name: 'card',
     icon: '/src/assets/images/card.svg'
   }
 ]
@@ -142,14 +145,14 @@ const processPayment = async (cartStore) => {
 
     // 1. 提交支付请求
     await submitPayment(orderId)
-    ElMessage.success('支付请求已提交，正在查询支付状态...')
+    ElMessage.success('load...')
 
     // 2. 轮询查询支付状态
     const checkStatus = async () => {
       try {
         const response = await getPaymentStatus(orderId)
         if (response.status === 'success') {
-          ElMessage.success('支付成功')
+          ElMessage.success('Success')
           await handleSuccessfulPayment(cartStore)
           router.push('/member/order')
         } else {

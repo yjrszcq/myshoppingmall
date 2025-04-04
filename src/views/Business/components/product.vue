@@ -267,10 +267,11 @@ const handleSubmit = async () => {
 
 .form-row {
   display: flex;
-  gap: 16px;
+  gap: 5px;
 
   .form-col {
-    flex: 1;
+    width: 50%;
+    flex: 0;
     margin-bottom: 0;
   }
 }

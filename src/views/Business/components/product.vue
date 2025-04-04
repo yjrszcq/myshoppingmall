@@ -64,18 +64,33 @@ const handleAdd = () => {
 
 // **处理图片上传**
 const handleImageUpload = async (file, productId) => {
+  if (!file) {
+    console.error("Error: No file provided!");
+    ElMessage.error("No file selected");
+    return;
+  }
+  console.log("Uploading file:", file);
+  console.log("Product ID:", productId);
+
   const formData = new FormData();
-  formData.append('image', file.raw); // 将文件添加到 formData
-  console.log(productId,"productId");
+  formData.append('image', file); // `file.raw` 可能是多余的，直接用 `file`
 
   try {
-    const res = await uploadImageAPI(productId,formData); // 调用上传接口
-    productForm.value.image = res.imagePath; // 服务器返回的图片路径
-    ElMessage.success('Image uploaded successfully');
+    const res = await uploadImageAPI(productId, formData);
+    console.log("Upload response:", res);
+
+    if (res.imagePath) {
+      productForm.value.image = res.imagePath; // 假设后端返回 `imagePath`
+      ElMessage.success('Image uploaded successfully');
+    } else {
+      throw new Error("No imagePath in response");
+    }
   } catch (error) {
+    console.error("Upload failed:", error);
     ElMessage.error('Image upload failed');
   }
 };
+
 
 // 提交表单
 const handleSubmit = async () => {
@@ -123,8 +138,7 @@ const handleSubmit = async () => {
                   accept="image/*"
               >
                 <el-button size="small">Upload Image</el-button>
-              </el-upload>
-            </div>
+              </el-upload>            </div>
             <el-image
                 v-if="productForm.image"
                 :src="productForm.image"

@@ -76,23 +76,20 @@ export const addProducts = (data) => {
         data
     })
 }
-
 /**
  * 上传图片
  * @param {string} productId - 商品 ID
- * @param {File} imageFile - 需要上传的图片文件
+ * @param {FormData} formData - 包含图片的 FormData 对象
  * @returns {Promise<Object>} - 返回包含图片路径的对象
  */
-export const uploadImageAPI = (productId, imageFile) => {
+export const uploadImageAPI = (productId, formData) => {
     console.log("Uploading Image - Product ID:", productId); // Debug 日志
     if (!productId) {
         console.error("Error: productId is missing in uploadImageAPI!");
         return Promise.reject("Product ID is missing");
     }
-    const formData = new FormData();
-    formData.append('image', imageFile);
     return request({
-        url: `/image/${productId}`,
+        url: `/api/image/${productId}`,  // 确保这个 URL 路径正确
         method: 'POST',
         data: formData,
     });

@@ -213,7 +213,7 @@ onMounted(() => {
                     type="success"
                     size="small"
                     plain
-                    v-if="order.status === 'pending'"
+                    v-if="order.status === 'paid'"
                     @click.stop="handleShipOrder(order.orderId)"
                 >
                   Ship

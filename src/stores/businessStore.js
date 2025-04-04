@@ -52,7 +52,7 @@ export const useBusinessStore = defineStore('business', {
         async shipOrder(orderId, trackingNumber) {
             try {
                 this.isLoading = true;
-                await manageOrderAPI(orderId, 'ship', trackingNumber);
+                await manageOrderAPI(orderId, 'shipping', trackingNumber);
 
                 // Update local order status
                 const order = this.sellerOrders.find(o => o.orderId === orderId);  // Note: using orderId
@@ -78,7 +78,7 @@ export const useBusinessStore = defineStore('business', {
             try {
 
                 this.isLoading = true;
-                await manageOrderAPI(orderId, 'cancel');
+                await manageOrderAPI(orderId, 'canceled');
 
                 // 更新本地订单状态
                 const order = this.sellerOrders.find(o => o.id === orderId);

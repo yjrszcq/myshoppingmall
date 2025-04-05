@@ -161,9 +161,9 @@ const doregister = () => {
               <el-form-item prop="username" label="account">
                 <el-input v-model="loginForm.username"/>
               </el-form-item>
-              <el-form-item prop="password" label="password">
+              <el-form-item prop="password" label="password" >
 
-                <el-input v-model="loginForm.password"/>
+                <el-input v-model="loginForm.password" type="password"/>
               </el-form-item>
               <!--              后端没有提供相应的接口，可以考虑在后面的版本添加上去-->
               <!--              <el-form-item label-width="22px">-->

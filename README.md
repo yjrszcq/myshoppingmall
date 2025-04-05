@@ -16,16 +16,17 @@ node v20.15.0  ***请不要低于19，否则可能会引发未知错误***
 * 3.bugfix：假如你开发完了某个功能，但是觉得需要修改一些问题，扔到bugfix里面，修好了再融进master
 * 4.dev是版本号，第一个版本做完了，dev2 dev3分支我会建立的，大概做得没问题了我会往里面融做好了的版本的，你不用管就是了
 
-## ToDoList
+## VERSION 1
 * Home主页展示 （✔️）
 * 用户login （✔️）
-* 购物车 (Estrella0101)
-* 个人中心 （adzukiZhu）
+* 购物车 (✔️Estrella0101)
+* 个人中心 （✔️adzukiZhu）
 * 搜索页面 （✔️）
 * 商品详情 （✔️）
 * 商户login （✔️）
-* 商户的商品/订单管理（Flliww）
-* 支付页面(KeloShen)
+* 商户的商品/订单管理（✔️Flliww）
+* 支付页面(✔️KeloShen)
+
 
 
 ## Recommended IDE Setup

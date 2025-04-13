@@ -5,6 +5,11 @@ import {useUserstore} from "@/stores/user.js";
 const Userstore = useUserstore();
 const router = useRouter();
 
+Userstore.userInfo = {
+  sessionId: 'mock-session-id-123456',
+  userAccount: 'mock_user',
+  userId: 'mock-user-id-abc'
+}
 
 const goToBusiness = () => {
   Userstore.clearUserInfo()
@@ -19,6 +24,11 @@ const goToUser = () => {
 const confirm = () =>{
   Userstore.clearUserInfo()
   router.push({ path: '/login'});
+}
+
+// 跳转促销页面
+const goToPromotion = () =>{
+  router.push({ path: '/promotion'});
 }
 </script>
 
@@ -44,7 +54,7 @@ const confirm = () =>{
         <template v-else>
           <li><a href="javascript:;" @click="$router.push('/login')">log in</a></li>
           <li><a href="javascript:;" @click="$router.push('/login')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
-<!--          <li><a href="javascript:;">Help Center</a></li>-->
+          <li><a href="javascript:;">Help Center</a></li>
           <li><a href="https://space.bilibili.com/1265680561">About us</a></li>
           <li><a href="javascript:;" @click="goToBusiness">Merchant Edition</a></li>
 

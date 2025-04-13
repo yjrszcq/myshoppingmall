@@ -20,6 +20,7 @@ import UserInfo from "@/views/Member/Components/UserInfo.vue";
 import Payment from "@/views/Payment/index.vue"
 import BankInfo from "@/views/BankInfo/index.vue"
 import Address from "@/views/Member/Components/address.vue"
+import Promotion from "@/views/Promotion/promotionList.vue"
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     // path和component对应关系的位置
@@ -55,6 +56,10 @@ const router = createRouter({
                 {
                     path:'bank-info',
                     component: BankInfo,
+                },
+                {
+                    path:'promotion',
+                    component: Promotion,
                 },
                 //会员中心
                 {

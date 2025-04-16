@@ -5,7 +5,10 @@ import { getProductById } from "@/apis/detail.js"; // 用你的接口方法
 import ImageView from "@/components/imageView/index.vue";
 import { useCartStore } from "@/stores/cartStore";
 //import { picture } from '@element-plus/icons-vue/dist/types'
+import { usePromotionInfoStore } from '@/stores/promotionInfoStore';
+import { getPromotionByProductId } from '@/apis/promotionInfo.js';
 
+const promotionInfoStore = usePromotionInfoStore();
 const cartStore = useCartStore();
 
 
@@ -48,9 +51,21 @@ const getGoods = async () => {
   }
 };
 
+const getPromotionInfo = async () => {
+  try {
+    const res = await getPromotionByProductId($route.params.id);
+    return res.data;
+  } catch (error) {
+    console.error('Failed to fetch promotion info:', error);
+  }
+};
+
 // 页面加载时发请求
 onMounted(() => {
   getGoods();
+  getPromotionInfo().then(promotionInfo => {
+    goods.value.promotionInfo = promotionInfo;
+  });
 });
 </script>
 
@@ -142,6 +157,21 @@ onMounted(() => {
                
                 class="number"
               />
+              
+              <!-- 促销信息写在这里 -->
+              <div v-if="promotionInfo" class="promotion-info">
+                <div class="discount-rate">
+                  <span>🔥 discount-rate:</span>
+                  <span>{{ promotionInfo.discountRate }}%</span>
+                </div>
+                <div class="valid-until">
+                  <span>🔥 validUntil:</span>
+                  <span>{{ formatDate(promotionInfo.validUntil) }}</span>
+                </div>
+              </div>
+              <div v-else class="no-promotion">
+                😭 There are no discounts at this time 😭
+              </div>
               <!-- 按钮组件 -->
               <div>
                 <el-button size="large" class="btn" @click="addCart">
@@ -424,5 +454,50 @@ onMounted(() => {
 
 .bread-container {
   padding: 25px 0;
+}
+
+.promotion-detail {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.promotion-info {
+  margin-right: 20px;
+  border: 2px solid #ff69b4; 
+  padding: 10px; 
+  border-radius: 5px; 
+  background-color: #fff; 
+}
+
+.discount-rate, .valid-until {
+  font-size: 14px;
+  color: #333;
+}
+
+.no-promotion {
+  color: #999; 
+  font-size: 14px; 
+  text-align: center; 
+  border: 2px solid #ff69b4; 
+  padding: 3px; 
+  border-radius: 5px; 
+  margin-top: 20px;
+  width: 60%;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 14px;
+  background-color: #ff8bac;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #f46c9d;
 }
 </style>

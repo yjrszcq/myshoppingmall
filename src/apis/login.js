@@ -20,4 +20,13 @@ export const loginapi = ({username,password}) => {
         }
     })
 }
-
+//登出用户接口
+export const logoutapi = () => {
+    return request({
+        url: '/api/auth/logout',
+        method: 'POST',
+        headers: {
+            'session-id': localStorage.getItem('session-id'), // 从存储中获取 session-id
+        }
+    })
+}

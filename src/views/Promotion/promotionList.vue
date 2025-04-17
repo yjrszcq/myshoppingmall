@@ -1,18 +1,25 @@
 <script setup>
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { usePromotionStore } from '@/stores/promotionStore'
 import dayjs from 'dayjs'
 
 const store = usePromotionStore()
+const router = useRouter()
 
 const formatDate = (date) => {
   return dayjs(date).format('YYYY-MM-DD HH:mm')
+}
+
+const handleRowClick = (row) => {
+  router.push(`/detail/${row.productId}`)
 }
 
 onMounted(() => {
   store.fetchPromotions()
 })
 </script>
+
 
 <template>
   <div class="promotion-section">
@@ -24,6 +31,7 @@ onMounted(() => {
       class="promotion-table"
       header-cell-class-name="table-header"
       cell-class-name="table-cell"
+      @row-click="handleRowClick"
     >
       <el-table-column prop="name" label="Product Name" align="center" />
       

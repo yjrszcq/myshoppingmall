@@ -3,6 +3,8 @@
 
 ## 运行环境:
 
+***请复制在根目录下的Config文件夹下的application_sample，将其重命名为application.yaml，此后进行baseurl的修改请在application.yaml中进行***
+
 vue3
 
 node v20.15.0  ***请不要低于19，否则可能会引发未知错误***

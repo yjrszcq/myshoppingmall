@@ -1,0 +1,3 @@
+http:
+  baseURL: "http://localhost:8081"  # 默认开发环境地址
+  timeout: 5000

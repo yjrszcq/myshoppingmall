@@ -29,5 +29,4 @@ coverage
 
 *.tsbuildinfo
 
-config/application*.yaml
-!config/application.yaml.example
+/Config/application.yaml

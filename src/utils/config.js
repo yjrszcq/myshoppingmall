@@ -1,11 +1,15 @@
-// src/utils/config.js
-import yaml from 'js-yaml';
-import fs from 'fs';
-import path from 'path';
+import { load } from 'js-yaml';
 
-// 读取 YAML 配置文件
-const config = yaml.load(
-    fs.readFileSync(path.resolve(__dirname, '../../config/application.yaml'), 'utf8')
-);
+// 同步加载所有 YAML 配置文件
+const yamlFiles = import.meta.glob('/Config/application.yaml', {
+    as: 'raw',
+    eager: true
+});
 
-export default config;
+// 根据环境选择配置文件
+function getConfig() {
+    const configFile = '/Config/application.yaml'
+    return load(yamlFiles[configFile]);
+}
+
+export const config = getConfig();

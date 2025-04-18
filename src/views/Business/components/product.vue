@@ -130,16 +130,21 @@ const handleSubmit = async () => {
 }
 
 // 促销操作
-const showPromotionDialog = (id) => {
-  selectedProductId.value = id
+const showBatchPromotionDialog = () => {
+  if (selectedProducts.value.length === 0) {
+    ElMessage.warning("No products selected")
+    return
+  }
+
   promotionForm.value = {
-    productIds: [id],
+    productIds: [...selectedProducts.value],
     discountRate: 10,
     startDate: '',
     endDate: ''
   }
   promotionDialogVisible.value = true
 }
+
 
 const handleCreatePromotion = async () => {
   try {
@@ -162,7 +167,7 @@ const handleCreatePromotion = async () => {
 
     loading.value = true
     await createPromotion({
-      productIds: [selectedProductId.value],
+      productIds: promotionForm.value.productIds,
       discountRate: promotionForm.value.discountRate,
       startDate: new Date(promotionForm.value.startDate).toISOString(),
       endDate: new Date(promotionForm.value.endDate).toISOString()
@@ -177,6 +182,13 @@ const handleCreatePromotion = async () => {
     loading.value = false
   }
 }
+
+const selectedProducts = ref([])
+const handleSelectionChange = (rows) => {
+  selectedProducts.value = rows.map(item => item.productId)
+}
+
+
 </script>
 
 <template>
@@ -184,15 +196,30 @@ const handleCreatePromotion = async () => {
     <div class="header">
       <div class="title-row">
         <h2 class="title">Product Management</h2>
-        <el-button @click="handleAdd">Add product</el-button>
+        <div class="button-group">
+          <el-button
+              class="pink-button"
+              @click="handleAdd"
+          >
+            Add product
+          </el-button>
+          <el-button
+              class="pink-button warning"
+              :disabled="selectedProducts.length === 0"
+              @click="showBatchPromotionDialog"
+          >
+            Create Promotion
+          </el-button>
+        </div>
       </div>
 
       <ProductTable
           :products="products"
           @edit="handleEdit"
           @delete="handleDelete"
-          @promotion="showPromotionDialog"
+          @promotion="showBatchPromotionDialog"
           @upload="handleImageUpload"
+          @select-multiple="handleSelectionChange"
       />
     </div>
 
@@ -239,5 +266,41 @@ const handleCreatePromotion = async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+
+  .button-group {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+.pink-button {
+  background-color: #ff85a2;
+  border-color: #ff85a2;
+  color: white;
+
+  &:hover {
+    background-color: #ff6b8b;
+    border-color: #ff6b8b;
+  }
+
+  &:active {
+    background-color: #e23d7d;
+    border-color: #e23d7d;
+  }
+
+  &.warning {
+    background-color: #ff6b8b;
+    border-color: #ff6b8b;
+
+    &:hover {
+      background-color: #e23d7d;
+      border-color: #e23d7d;
+    }
+
+    &:disabled {
+      background-color: #ffc0cb;
+      border-color: #ffc0cb;
+    }
+  }
 }
 </style>

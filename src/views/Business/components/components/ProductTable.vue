@@ -1,5 +1,10 @@
 <template>
-  <el-table :data="products" style="width: 100%" border class="pink-table">
+  <el-table :data="products"
+            style="width: 100%"
+            border class="pink-table"
+            @selection-change="handleSelectionChange"
+  >
+    <el-table-column type="selection" width="55" />
     <el-table-column prop="productId" label="ID" width="300"></el-table-column>
     <el-table-column prop="name" label="Name" width="200"></el-table-column>
     <el-table-column prop="description" label="Description"></el-table-column>
@@ -10,7 +15,6 @@
         <div class="action-buttons">
           <el-button size="small" @click="emit('edit', scope.row)">Edit</el-button>
           <el-button size="small" type="danger" @click="emit('delete', scope.row)">Delete</el-button>
-          <el-button size="small" type="warning" @click="emit('promotion', scope.row.productId)">Discount</el-button>
           <el-upload
               class="upload-demo"
               action=""
@@ -39,7 +43,10 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['edit', 'delete', 'promotion', 'upload'])
+const emit = defineEmits(['edit', 'delete', 'promotion', 'upload', 'select-multiple'])
+const handleSelectionChange = (val) => {
+  emit('select-multiple', val)
+}
 </script>
 
 <style scoped lang="scss">

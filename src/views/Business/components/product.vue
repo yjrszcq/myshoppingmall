@@ -12,6 +12,7 @@ import {
 import ProductTable from '../components/components/ProductTable.vue'
 import ProductFormDialog from '../components/components/ProductFormDialog.vue'
 import PromotionDialog from '../components/components/PromotionDialog.vue'
+import dayjs from 'dayjs'
 
 // 商品数据相关
 const products = ref([])
@@ -166,11 +167,12 @@ const handleCreatePromotion = async () => {
     }
 
     loading.value = true
+
     await createPromotion({
       productIds: promotionForm.value.productIds,
       discountRate: promotionForm.value.discountRate,
-      startDate: new Date(promotionForm.value.startDate).toISOString(),
-      endDate: new Date(promotionForm.value.endDate).toISOString()
+      startDate: dayjs(promotionForm.value.startDate).format('YYYY-MM-DD HH:mm'),
+      endDate: dayjs(promotionForm.value.endDate).format('YYYY-MM-DD HH:mm')
     })
 
     ElMessage.success('Promotion created successfully!')

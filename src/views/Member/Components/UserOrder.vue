@@ -4,6 +4,7 @@ import { useOrderStore } from "@/stores/orderStore";
 import {  ShoppingCart } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import {useCartStore} from "@/stores/cartStore.js";
+import Comment from "@/views/Business/components/comment.vue";
 
 const router = useRouter();
 const orderStore = useOrderStore();
@@ -76,7 +77,9 @@ const handlePayNow = (order) => {
   router.push('/payment');
 };
 
-
+const handleCommentSuccess = () => {
+  ElMessage.success('评论已提交')
+}
 
 onMounted(() => getOrderList());
 </script>
@@ -141,19 +144,16 @@ onMounted(() => getOrderList());
                   <div v-for="item in order.items.items" :key="item.productId" class="item-row">
                     <div class="item-info">
                       <span class="item-name">{{ item.productName }}</span>
-                      <span class="item-quantity">
-                        Qty: {{ item.quantity }}
-                        <el-button type="info"
-                                   size="small"
-                                   v-if="order.status === 'finished'"
-                                   @click="HandleComment"
-                                   style="align-content: end"
-                                            >
-                      Leave Review</el-button>
-                      </span>
-
+                      <span class="item-quantity">Qty: {{ item.quantity }}</span>
                     </div>
-                    <span class="item-price">${{ (item.price / item.quantity).toFixed(2) }}</span>
+                    <div class="item-right">
+                      <span class="item-price">${{ (item.price / item.quantity).toFixed(2) }}</span>
+                      <comment
+                          :product-id="item.productId"
+                          :order-id="order.orderId"
+                          @submit-success="handleCommentSuccess"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -343,6 +343,7 @@ onMounted(() => getOrderList());
           .item-row {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid #eee;
 
@@ -365,11 +366,19 @@ onMounted(() => getOrderList());
               }
             }
 
-            .item-price {
-              font-weight: 600;
+            .item-right {
+              display: flex;
+              flex-direction: column;
+              align-items: flex-end;
+              gap: 5px;
+
+              .item-price {
+                font-weight: 600;
+              }
             }
           }
         }
+
 
         .order-actions {
           display: flex;

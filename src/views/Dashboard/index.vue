@@ -1,6 +1,6 @@
 <script setup>
 import Line from "./components/line.vue";
-import pic from "./components/pie.vue";
+import pie from "./components/pie.vue";
 import Column from "./components/column.vue";
 import { ref, onMounted, computed } from "vue";
 import * as echarts from "echarts";
@@ -14,7 +14,6 @@ const size = ref("large");
 
 const handleSearch = () => {
   // console.log(getCurrentMonth(value1.value));
- //你们这控制台都不能打印估计你到时候要去调一下
   
   getDataList(getCurrentMonth(value1.value));
 };
@@ -67,8 +66,18 @@ const getDataList = async (CurrentMonth  = getCurrentMonth()) => {
   try {
     const res = await getData(CurrentMonth);
   
-  
-    dataList.value = res;
+    const summaryData = {
+      totalSales: res.summary.totalSales,
+      totalOrders: res.summary.totalOrders,
+      avgRating: res.summary.avgRating,
+      topProductName: res.summary.topProduct.name,
+    };
+
+    // 将提取的数据构造成表格需要的格式
+    const summaryTableData = [summaryData];
+    dataList.value = { ...res, summaryTableData };
+
+   // dataList.value = res;
     // console.log(dataList.value);
     console.log("==========>", res);
   } catch {
@@ -85,7 +94,7 @@ const ChartData = computed(() => {
       xData: [],
       yData: [],
     },
-    pic: [],
+    pie: [],
     column: {
       xData: [],
       yData: [],
@@ -96,7 +105,7 @@ const ChartData = computed(() => {
     arr.line.xData.push(item.name);
     arr.line.yData.push(item.totalRevenue);
 
-    arr.pic.push({
+    arr.pie.push({
       value: item.salesCount,
       name: item.name,
     });
@@ -129,7 +138,7 @@ const ChartData = computed(() => {
         <Line :data="ChartData.line" />
       </el-card>
       <el-card class="chart-card">
-        <pic :data="ChartData.pic" />
+        <pie :data="ChartData.pie" />
       </el-card>
       <el-card class="chart-card">
         <Column :data="ChartData.column" />
@@ -137,16 +146,27 @@ const ChartData = computed(() => {
       </el-card>
     </div>
 
+    <el-card class="table-section1">
+      <div class="table-title">SUMMARY</div>
+      <el-table :data="dataList?.summaryTableData" style="width: 100%">
+        <el-table-column prop="totalSales" label="totalSales" align="center"/>
+        <el-table-column prop="totalOrders" label="totalOrders" align="center"/>
+        <el-table-column prop="avgRating" label="avgRating" align="center"/>
+        <el-table-column prop="topProductName" label="topProduct" align="center" />
+       
+      </el-table>
+    </el-card>
+
     <el-card class="table-section">
+      <div class="table-title">DETAILS</div>
       <el-table :data="dataList?.details" style="width: 100%">
-        <el-table-column prop="productId" label="productId" />
-        <el-table-column prop="name" label="name" />
-        <el-table-column prop="salesCount" label="salesCount" />
-        <el-table-column prop="totalRevenue" label="totalRevenue" />
-        <el-table-column prop="avgRating" label="avgRating" />
+        <el-table-column prop="productId" label="productId" align="center"/>
+        <el-table-column prop="name" label="name" align="center"/>
+        <el-table-column prop="salesCount" label="salesCount"align="center" />
+        <el-table-column prop="totalRevenue" label="totalRevenue" align="center"/>
         <el-table-column
           prop="promotionEffect.promotionId"
-          label="promotionEffect"
+          label="promotionEffect" align="center"
         />
       </el-table>
     </el-card>
@@ -175,7 +195,19 @@ const ChartData = computed(() => {
 }
 
 .chart-card {
-  min-height: 450px;
+  min-height: 400px;
+}
+
+.table-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000000;
+  margin-bottom: 10px; 
+  padding: 10px 0px;
+}
+
+.table-section1 {
+  margin-top: 20px;
 }
 
 .table-section {

@@ -2,12 +2,13 @@
 import axios from 'axios'
 import {ElMessage} from "element-plus";
 import {useUserstore} from "@/stores/user.js";
+import {config} from "@/utils/config.js"
 
 const httpInstance = axios.create({
-    // baseURL: 'http://localhost:8080', //仅供测试使用，待后端小组补充后请修改！
-    baseURL: 'https://m1.apifoxmock.com/m1/6033373-5723167-default',
-    timeout: 5000,
-})
+
+    baseURL: config.http.baseURL, // 使用配置中的 baseURL
+    timeout: config.http.timeout  // 使用配置中的 timeout
+});
 
 // axios请求拦截器
 httpInstance.interceptors.request.use(config => {

@@ -6,6 +6,8 @@ import ImageView from "@/components/imageView/index.vue";
 import { useCartStore } from "@/stores/cartStore";
 //import { picture } from '@element-plus/icons-vue/dist/types'
 import Evaluate from "@/views/Detail/evaluate.vue";
+import { useCollectionStore } from "@/stores/collectionStore"
+import { Star, StarFilled } from '@element-plus/icons-vue'
 
 const cartStore = useCartStore();
 
@@ -38,16 +40,20 @@ const addCart = () => {
     selected: true,
   });
 };
-// 获取商品详情数据
+
+
+const collectionStore = useCollectionStore()
+// 获取商品详情
 const getGoods = async () => {
   try {
-    const res = await getProductById(route.params.id); // 这里调用封装的方法
-    goods.value = res;
-    console.log(goods.value);
+    const res = await getProductById(route.params.id)
+    goods.value = res
+    // 初始化时可以预加载收藏列表（可选）
+    await collectionStore.fetchCollections()
   } catch (error) {
-    console.error("Fetch store details failed", error);
+    console.error("获取商品详情失败", error)
   }
-};
+}
 
 // 页面加载时发请求
 onMounted(() => {
@@ -62,18 +68,7 @@ onMounted(() => {
         <el-breadcrumb separator=">">
           <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
 
-          <!--
-            错误原因：goods一开始{}  {}.categories -> undefined  -> undefined[1]
-            1. 可选链的语法?.
-            2. v-if手动控制渲染时机 保证只有数据存在才渲染
-           -->
-          <!--          后端没给接口，可以作为后续补充-->
-          <!--          <el-breadcrumb-item :to="{ path: `/category/${goods.categories[1].id}` }">{{ goods.categories[1].name }}-->
-          <!--          </el-breadcrumb-item>-->
-          <!--          <el-breadcrumb-item :to="{ path: `/category/sub/${goods.categories[0].id}` }">{{-->
-          <!--              goods.categories[0].name-->
-          <!--            }}-->
-          <!--          </el-breadcrumb-item>-->
+
           <el-breadcrumb-item>{{ goods.name }}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
@@ -84,33 +79,20 @@ onMounted(() => {
             <div class="media">
               <!-- 图片预览区 -->
               <ImageView />
-              <!-- 统计数量 -->
-              <!--              <ul class="goods-sales">-->
-              <!--                <li>-->
-              <!--                  <p>销量人气</p>-->
-              <!--                  <p> {{ goods.salesCount }}+ </p>-->
-              <!--                  <p><i class="iconfont icon-task-filling"></i>销量人气</p>-->
-              <!--                </li>-->
-              <!--                <li>-->
-              <!--                  <p>商品评价</p>-->
-              <!--                  <p>{{ goods.commentCount }}+</p>-->
-              <!--                  <p><i class="iconfont icon-comment-filling"></i>查看评价</p>-->
-              <!--                </li>-->
-              <!--                <li>-->
-              <!--                  <p>收藏人气</p>-->
-              <!--                  <p>{{ goods.collectCount }}+</p>-->
-              <!--                  <p><i class="iconfont icon-favorite-filling"></i>收藏商品</p>-->
-              <!--                </li>-->
-              <!--                <li>-->
-              <!--                  <p>品牌信息</p>-->
-              <!--                  <p>{{ goods.brand.name }}</p>-->
-              <!--                  <p><i class="iconfont icon-dynamic-filling"></i>品牌主页</p>-->
-              <!--                </li>-->
-              <!--              </ul>-->
             </div>
             <div class="spec">
               <!-- 商品信息区 -->
-              <p class="g-name">{{ goods.name }}</p>
+              <div class="g-name-container">
+                <p class="g-name">{{ goods.name }}</p>
+                <el-button
+                    :icon="collectionStore.isCollected(goods.productId) ? StarFilled : Star"
+                    circle
+                    @click="collectionStore.toggleCollection(goods.productId)"
+                    :loading="collectionStore.loading"
+                    :type="collectionStore.isCollected(goods.productId) ? 'warning' : ''"
+                    class="collect-btn"
+                />
+              </div>
               <p class="g-desc">{{ goods.desc }}</p>
               <p class="g-price">
                 <span>{{ goods.price }}</span>
@@ -151,33 +133,6 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <!--          后端没给接口，可作为后续版本添加-->
-
-          <!--          <div class="goods-footer">-->
-          <!--&lt;!&ndash;            <div class="goods-article">&ndash;&gt;-->
-          <!--&lt;!&ndash;              &lt;!&ndash; 商品详情 &ndash;&gt;&ndash;&gt;-->
-          <!--&lt;!&ndash;              <div class="goods-tabs">&ndash;&gt;-->
-          <!--&lt;!&ndash;                <nav>&ndash;&gt;-->
-          <!--&lt;!&ndash;                  <a>商品详情</a>&ndash;&gt;-->
-          <!--&lt;!&ndash;                </nav>&ndash;&gt;-->
-          <!--&lt;!&ndash;                <div class="goods-detail">&ndash;&gt;-->
-          <!--&lt;!&ndash;                  &lt;!&ndash; 属性 &ndash;&gt;&ndash;&gt;-->
-          <!--&lt;!&ndash;                  <ul class="attrs">&ndash;&gt;-->
-          <!--&lt;!&ndash;                    <li v-for="item in goods.details.properties" :key="item.value">&ndash;&gt;-->
-          <!--&lt;!&ndash;                      <span class="dt">{{ item.name }}</span>&ndash;&gt;-->
-          <!--&lt;!&ndash;                      <span class="dd">{{ item.value }}</span>&ndash;&gt;-->
-          <!--&lt;!&ndash;                    </li>&ndash;&gt;-->
-          <!--&lt;!&ndash;                  </ul>&ndash;&gt;-->
-          <!--&lt;!&ndash;                  &lt;!&ndash; 图片 &ndash;&gt;&ndash;&gt;-->
-          <!--&lt;!&ndash;                  <img v-for="img in goods.details.pictures" :src="img" :key="img" alt="">&ndash;&gt;-->
-          <!--&lt;!&ndash;                </div>&ndash;&gt;-->
-          <!--&lt;!&ndash;              </div>&ndash;&gt;-->
-          <!--&lt;!&ndash;            </div>&ndash;&gt;-->
-          <!--            &lt;!&ndash; 24热榜+专题推荐 &ndash;&gt;-->
-          <!--            <div class="goods-aside">-->
-
-          <!--            </div>-->
-          <!--          </div>-->
         </div>
       </div>
 
@@ -221,7 +176,26 @@ onMounted(() => {
       min-height: 1000px;
     }
   }
+  .g-name-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 
+    .collect-btn {
+      font-size: 20px;
+      padding: 8px;
+      background-color: #FFE4E1; // 玫瑰石英粉
+      border-color: #FFC0CB;
+      color: #DB7093; // 旧玫瑰色图标
+
+      &:hover {
+        transform: scale(1.1);
+        transition: transform 0.2s;
+        background-color: #DB7093;
+        color: white;
+      }
+    }
+  }
   .goods-tabs {
     min-height: 600px;
     background: #fff;

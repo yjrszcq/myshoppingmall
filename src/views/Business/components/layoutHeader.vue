@@ -54,9 +54,12 @@
 </template>
 
 <script setup>
-import { Location, Setting, PieChart } from "@element-plus/icons-vue";
-import { useRouter } from "vue-router";
-import { useUserstore } from "@/stores/user.js";
+
+import { Location,  Setting } from '@element-plus/icons-vue';
+import { useRouter } from 'vue-router';
+import { useUserstore} from '@/stores/user.js'
+import { logoutapi } from '@/apis/login.js';
+
 
 const router = useRouter();
 const Userstore = useUserstore();
@@ -65,10 +68,13 @@ const handleMenuSelect = (index) => {
 };
 
 // 退出登录
-const confirm = () => {
-  Userstore.clearUserInfo();
-  router.push({ path: "/loginbusiness" });
-};
+
+const confirm = async () =>{
+  await logoutapi()
+  Userstore.clearUserInfo()
+  router.push({ path: '/loginbusiness'});
+}
+
 </script>
 
 <style scoped>

@@ -67,3 +67,31 @@ export const getAddressListAPI = () => {
         method: 'GET'
     });
 };
+
+// 获取我的收藏列表
+export const getMyCollect = (page=1,limit=5) => {
+    return request({
+        url: '/api/users/favorites',
+        method: 'GET',
+        params:{
+            page,
+            limit
+        }
+    })
+};
+
+//移出收藏
+export const removeCollect = (id) => {
+    return request({
+        url: `/api/users/favorites/${id}`,
+        method: 'DELETE'
+    })
+};
+
+// 添加商品收藏
+export const addCollect = (productId) => {
+    return request({
+        url: `/api/users/favorites/${productId}`,
+        method: 'POST',
+    })
+}

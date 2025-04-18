@@ -17,9 +17,10 @@ import Checkout from "@/views/Checkout/index.vue";
 import Member from "@/views/Member/index.vue";
 import UserOrder from "@/views/Member/Components/UserOrder.vue";
 import UserInfo from "@/views/Member/Components/UserInfo.vue";
-import Payment from "@/views/Payment/index.vue";
-import BankInfo from "@/views/BankInfo/index.vue";
-import Address from "@/views/Member/Components/address.vue";
+import Payment from "@/views/Payment/index.vue"
+import BankInfo from "@/views/BankInfo/index.vue"
+import Address from "@/views/Member/Components/address.vue"
+import Collection from "@/views/Member/Components/collection.vue"
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   // path和component对应关系的位置
@@ -29,8 +30,59 @@ const router = createRouter({
       component: Layout,
       children: [
         {
+
           path: "",
           component: Home,
+        },
+                {
+                    path:'detail/:id',
+                    component: Detail,
+                },
+                {
+                    path:'search',
+                    component: Search,
+                },
+                {
+                    path:'cart',
+                    component: Cart,
+                },
+                {
+                    path:'checkout',
+                    component: Checkout,
+                },
+                {
+                    path:'payment',
+                    component: Payment,
+                },
+                {
+                    path:'bank-info',
+                    component: BankInfo,
+                },
+                //会员中心
+                {
+                    name: 'member',
+                    path: 'member',
+                    component: Member,
+                    children:[
+                        {
+                            path:'',
+                            component:UserInfo,
+                        },
+                        {
+                            path:'order',
+                            component:UserOrder,
+                        },
+                        {
+                            path:'address',
+                            component:Address,
+                        },
+                        {
+                            path:'Collection',
+                            component:Collection,
+                        },
+                    ]
+                }
+            ]
         },
         {
           path: "detail/:id",

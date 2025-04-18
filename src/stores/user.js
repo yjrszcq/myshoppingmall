@@ -11,7 +11,7 @@ export const useUserstore = defineStore('user', () => {
 
     const getUserInfo = async ({ username, password }) => {
         const res = await loginapi({ username, password })
-        console.log('mock返回数据', res)
+        // Debug log removed to avoid cluttering production output
         userInfo.value = res
        
     }

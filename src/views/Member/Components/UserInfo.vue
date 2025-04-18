@@ -34,14 +34,6 @@ const likeList = ref([]);
 
         </a>
       </RouterLink>
-      <RouterLink to="/member/Collection">
-        <a href="javascript:;">
-          <span class="iconfont icon-hy"></span>
-
-          <p>Collection</p>
-
-        </a>
-      </RouterLink>
     </div>
   </div>
 <!--  后续可拓展-->

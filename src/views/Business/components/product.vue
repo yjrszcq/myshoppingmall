@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
-import { getproductsList, deleteProducts, reviseProducts, addProducts, uploadImageAPI } from '@/apis/business.js';
+import { getproductsList, deleteProducts, reviseProducts, addProducts, uploadImageAPI, createPromotion } from '@/apis/business.js';
 
 const products = ref([]);
 const dialogVisible = ref(false);
@@ -108,6 +108,66 @@ const handleSubmit = async () => {
     ElMessage.error('Operation failed');
   }
 };
+
+const promotionDialogVisible = ref(false);
+const selectedProductId = ref('');
+
+const showPromotionDialog = (productId) => {
+  selectedProductId.value = productId;
+  promotionForm.value = {
+    productIds: [productId], // Initialize with the selected product
+    discountRate: 10,
+    startDate: '',
+    endDate: ''
+  };
+  promotionDialogVisible.value = true;
+};
+
+const promotionForm = ref({
+  productIds: [],
+  discountRate: 10, // 默认10%折扣
+  startDate: '',
+  endDate: ''
+})
+
+const loading = ref(false)
+
+const handleCreatePromotion = async () => {
+  try {
+    if (!promotionForm.value.discountRate ||
+        !promotionForm.value.startDate ||
+        !promotionForm.value.endDate) {
+      ElMessage.warning('Please fill all fields');
+      return;
+    }
+
+    if (promotionForm.value.discountRate < 0.01 || promotionForm.value.discountRate > 99.99) {
+      ElMessage.warning('Discount rate must be between 0.01% and 99.99%');
+      return;
+    }
+
+    if (new Date(promotionForm.value.endDate) <= new Date(promotionForm.value.startDate)) {
+      ElMessage.warning('End date must be after start date');
+      return;
+    }
+
+    loading.value = true;
+    const response = await createPromotion({
+      productIds: [selectedProductId.value],
+      discountRate: promotionForm.value.discountRate,
+      startDate: new Date(promotionForm.value.startDate).toISOString(),
+      endDate: new Date(promotionForm.value.endDate).toISOString()
+    });
+
+    ElMessage.success('Promotion created successfully!');
+    promotionDialogVisible.value = false;
+  } catch (error) {
+    console.error('Failed to create promotion:', error);
+    ElMessage.error(error.response?.data?.message || 'Failed to create promotion');
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 
@@ -130,6 +190,7 @@ const handleSubmit = async () => {
             <div class="action-buttons">
               <el-button size="small" @click="handleEdit(scope.row)">Edit</el-button>
               <el-button size="small" type="danger" @click="handleDelete(scope.row)">Delete</el-button>
+              <el-button size="small" type="warning" @click="showPromotionDialog(scope.row.productId)">Discount</el-button>
               <el-upload
                   class="upload-demo"
                   action=""
@@ -138,10 +199,11 @@ const handleSubmit = async () => {
                   accept="image/*"
               >
                 <el-button size="small">Upload Image</el-button>
-              </el-upload>            </div>
+              </el-upload>
+            </div>
             <el-image
-                v-if="productForm.image"
-                :src="productForm.image"
+                v-if="scope.row.image"
+                :src="scope.row.image"
                 class="product-image"
             ></el-image>
           </template>
@@ -175,6 +237,53 @@ const handleSubmit = async () => {
         <div class="dialog-footer">
           <el-button @click="dialogVisible = false">Cancel</el-button>
           <el-button type="primary" @click="handleSubmit">Confirm</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- Discount Promotion Dialog -->
+    <el-dialog
+        title="Create Discount Promotion"
+        v-model="promotionDialogVisible"
+        width="600px"
+    >
+      <el-form :model="promotionForm" label-width="120px">
+        <el-form-item label="Discount Rate (%)">
+          <el-input-number
+              v-model="promotionForm.discountRate"
+              :min="0.01"
+              :max="99.99"
+              :precision="2"
+              controls-position="right"
+          />
+        </el-form-item>
+        <el-form-item label="Start Date">
+          <el-date-picker
+              v-model="promotionForm.startDate"
+              type="datetime"
+              placeholder="Select start date"
+              value-format="YYYY-MM-DD HH:mm:ss"
+          />
+        </el-form-item>
+        <el-form-item label="End Date">
+          <el-date-picker
+              v-model="promotionForm.endDate"
+              type="datetime"
+              placeholder="Select end date"
+              value-format="YYYY-MM-DD HH:mm:ss"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="promotionDialogVisible = false">Cancel</el-button>
+          <el-button
+              type="primary"
+              @click="handleCreatePromotion"
+              :loading="loading"
+          >
+            Create Promotion
+          </el-button>
         </div>
       </template>
     </el-dialog>

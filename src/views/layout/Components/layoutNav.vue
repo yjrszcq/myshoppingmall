@@ -5,12 +5,6 @@ import {useUserstore} from "@/stores/user.js";
 const Userstore = useUserstore();
 const router = useRouter();
 
-Userstore.userInfo = {
-  sessionId: 'mock-session-id-123456',
-  userAccount: 'mock_user',
-  userId: 'mock-user-id-abc'
-}
-
 const goToBusiness = () => {
   Userstore.clearUserInfo()
   router.push({ path: '/loginbusiness' });
@@ -38,7 +32,7 @@ const goToPromotion = () =>{
       <ul>
 <!--        多模板渲染，区分登录和未登录-->
         <template v-if="Userstore.userInfo.sessionId">
-          <li><a href="javascript:;" @click="goToUser"><i class="iconfont icon-user"></i>{{ Userstore.userInfo.userAccount }}</a></li>
+          <li><a  @click="goToUser"><i class="iconfont icon-user"></i>{{ Userstore.userInfo.userAccount }}</a></li>
           <li>
 
             <el-popconfirm @confirm="confirm" title="Are you sure?" confirm-button-text="yes" cancel-button-text="no">
@@ -47,16 +41,16 @@ const goToPromotion = () =>{
               </template>
             </el-popconfirm>
           </li>
-          <li><a href="javascript:;" @click="goToUser">Member Center</a></li>
-          <li><a href="javascript:;" @click="$router.push('/cart')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
+          <li><a  @click="goToUser">Member Center</a></li>
+          <li><a  @click="$router.push('/cart')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
           <li><a href="https://space.bilibili.com/1265680561">About us</a></li>
         </template>
         <template v-else>
-          <li><a href="javascript:;" @click="$router.push('/login')">log in</a></li>
-          <li><a href="javascript:;" @click="$router.push('/login')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
-          <li><a href="javascript:;">Help Center</a></li>
+          <li><a  @click="$router.push('/login')">log in</a></li>
+          <li><a  @click="$router.push('/login')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
+          <li><a >Help Center</a></li>
           <li><a href="https://space.bilibili.com/1265680561">About us</a></li>
-          <li><a href="javascript:;" @click="goToBusiness">Merchant Edition</a></li>
+          <li><a  @click="goToBusiness">Merchant Edition</a></li>
 
         </template>
       </ul>

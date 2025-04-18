@@ -76,29 +76,6 @@ const handleShipOrder = async (orderId) => {
   }
 }
 
-// 订单完成
-// 这里的逻辑留待讨论
-// const handleCompleteOrder = async (orderId) => {
-//   try {
-//     await ElMessageBox.confirm(
-//         '确认订单已完成？',
-//         '确认',
-//         {
-//           confirmButtonText: '确认',
-//           cancelButtonText: '取消',
-//           type: 'success',
-//         }
-//     )
-//     await store.manageOrderAPI(orderId, 'complete')
-//     ElMessage.success('订单状态已更新')
-//     getOrders()
-//   } catch (error) {
-//     if (error !== 'cancel') {
-//       ElMessage.error('操作失败')
-//     }
-//   }
-// }
-
 // 取消订单
 const handleCancelOrder = async (orderId) => {
   try {

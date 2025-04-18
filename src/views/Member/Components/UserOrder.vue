@@ -141,7 +141,17 @@ onMounted(() => getOrderList());
                   <div v-for="item in order.items.items" :key="item.productId" class="item-row">
                     <div class="item-info">
                       <span class="item-name">{{ item.productName }}</span>
-                      <span class="item-quantity">Qty: {{ item.quantity }}</span>
+                      <span class="item-quantity">
+                        Qty: {{ item.quantity }}
+                        <el-button type="info"
+                                   size="small"
+                                   v-if="order.status === 'finished'"
+                                   @click="HandleComment"
+                                   style="align-content: end"
+                                            >
+                      Leave Review</el-button>
+                      </span>
+
                     </div>
                     <span class="item-price">${{ (item.price / item.quantity).toFixed(2) }}</span>
                   </div>
@@ -164,8 +174,6 @@ onMounted(() => getOrderList());
                   >
                     Cancel Order</el-button>
 <!--                  <el-button type="success" size="small" v-if="order.status === 'shipping'">Track Package</el-button>-->
-<!--                  等待后端给接口-->
-<!--                  <el-button type="info" size="small" v-if="order.status === 'finished'">Leave Review</el-button>-->
 <!--                  等待后端给接口-->
                   <el-button
                       size="small"

@@ -1,175 +1,183 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { ElMessageBox, ElMessage } from 'element-plus';
-import { getproductsList, deleteProducts, reviseProducts, addProducts, uploadImageAPI, createPromotion } from '@/apis/business.js';
+import { ref, onMounted } from 'vue'
+import { ElMessageBox, ElMessage } from 'element-plus'
+import {
+  getproductsList,
+  deleteProducts,
+  reviseProducts,
+  addProducts,
+  uploadImageAPI,
+  createPromotion
+} from '@/apis/business.js'
+import ProductTable from '../components/components/ProductTable.vue'
+import ProductFormDialog from '../components/components/ProductFormDialog.vue'
+import PromotionDialog from '../components/components/PromotionDialog.vue'
 
-const products = ref([]);
-const dialogVisible = ref(false);
-const dialogType = ref('add'); // 'add' 或 'edit'
-const productId = ref(0);
+// 商品数据相关
+const products = ref([])
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+
+// 商品表单相关
+const dialogVisible = ref(false)
+const dialogType = ref('add')
+const productId = ref(0)
 const productForm = ref({
   name: '',
   description: '',
   price: '',
   stock: '',
-  image: '' // 存储图片路径
-});
+  image: ''
+})
 
-const currentPage = ref(1);
-const pageSize = ref(10);
-const total = ref(0);
+// 促销表单相关
+const promotionDialogVisible = ref(false)
+const selectedProductId = ref('')
+const promotionForm = ref({
+  productIds: [],
+  discountRate: 10,
+  startDate: '',
+  endDate: ''
+})
+const loading = ref(false)
 
 // 获取商品数据
 const getproducts = async () => {
-  const res = await getproductsList({ page: currentPage.value, pageSize: pageSize.value });
-  products.value = res.products;
-  total.value = res.total;
-};
+  const res = await getproductsList({ page: currentPage.value, pageSize: pageSize.value })
+  products.value = res.products
+  total.value = res.total
+}
 
-onMounted(getproducts);
+onMounted(getproducts)
 
-// 编辑商品
+// 商品操作
 const handleEdit = (row) => {
-  dialogType.value = 'edit';
-  productForm.value = { ...row };
-  productId.value = row.productId;
-  dialogVisible.value = true;
-};
+  dialogType.value = 'edit'
+  productForm.value = { ...row }
+  productId.value = row.productId
+  dialogVisible.value = true
+}
 
-// 删除商品
 const handleDelete = (row) => {
   ElMessageBox.confirm('Are you sure you want to delete the item?', 'prompt', {
     confirmButtonText: 'yes',
     cancelButtonText: 'no',
     type: 'warning',
   }).then(async () => {
-    await deleteProducts(row.productId);
-    ElMessage.success('Deleted successfully');
-    await getproducts();
-  });
-};
+    await deleteProducts(row.productId)
+    ElMessage.success('Deleted successfully')
+    await getproducts()
+  })
+}
 
-// 新增商品
 const handleAdd = () => {
-  dialogType.value = 'add';
+  dialogType.value = 'add'
   productForm.value = {
     name: '',
     description: '',
     price: '',
     stock: '',
-    image: '' // 置空图片
-  };
-  dialogVisible.value = true;
-};
-
-// **处理图片上传**
-const handleImageUpload = async (file, productId) => {
-  if (!file) {
-    console.error("Error: No file provided!");
-    ElMessage.error("No file selected");
-    return;
+    image: ''
   }
-  console.log("Uploading file:", file);
-  console.log("Product ID:", productId);
+  dialogVisible.value = true
+}
 
-  const formData = new FormData();
-  formData.append('image', file); // `file.raw` 可能是多余的，直接用 `file`
+// 图片上传
+const handleImageUpload = async ({ file, productId }) => {
+  if (!file) {
+    console.error("Error: No file provided!")
+    ElMessage.error("No file selected")
+    return
+  }
+
+  const formData = new FormData()
+  formData.append('image', file)
 
   try {
-    const res = await uploadImageAPI(productId, formData);
-    console.log("Upload response:", res);
-
+    const res = await uploadImageAPI(productId, formData)
     if (res.imagePath) {
-      productForm.value.image = res.imagePath; // 假设后端返回 `imagePath`
-      ElMessage.success('Image uploaded successfully');
+      // 更新对应商品的图片
+      const product = products.value.find(p => p.productId === productId)
+      if (product) {
+        product.image = res.imagePath
+      }
+      ElMessage.success('Image uploaded successfully')
     } else {
-      throw new Error("No imagePath in response");
+      throw new Error("No imagePath in response")
     }
   } catch (error) {
-    console.error("Upload failed:", error);
-    ElMessage.error('Image upload failed');
+    console.error("Upload failed:", error)
+    ElMessage.error('Image upload failed')
   }
-};
+}
 
-
-// 提交表单
+// 提交商品表单
 const handleSubmit = async () => {
   try {
     if (dialogType.value === 'add') {
-      await addProducts(productForm.value);
-      ElMessage.success('Added successfully');
+      await addProducts(productForm.value)
+      ElMessage.success('Added successfully')
     } else {
-      await reviseProducts(productForm.value, productId.value);
-      ElMessage.success('Updated successfully');
+      await reviseProducts(productForm.value, productId.value)
+      ElMessage.success('Updated successfully')
     }
-    dialogVisible.value = false;
-    await getproducts();
+    dialogVisible.value = false
+    await getproducts()
   } catch (error) {
-    ElMessage.error('Operation failed');
+    ElMessage.error('Operation failed')
   }
-};
+}
 
-const promotionDialogVisible = ref(false);
-const selectedProductId = ref('');
-
-const showPromotionDialog = (productId) => {
-  selectedProductId.value = productId;
+// 促销操作
+const showPromotionDialog = (id) => {
+  selectedProductId.value = id
   promotionForm.value = {
-    productIds: [productId], // Initialize with the selected product
+    productIds: [id],
     discountRate: 10,
     startDate: '',
     endDate: ''
-  };
-  promotionDialogVisible.value = true;
-};
-
-const promotionForm = ref({
-  productIds: [],
-  discountRate: 10, // 默认10%折扣
-  startDate: '',
-  endDate: ''
-})
-
-const loading = ref(false)
+  }
+  promotionDialogVisible.value = true
+}
 
 const handleCreatePromotion = async () => {
   try {
     if (!promotionForm.value.discountRate ||
         !promotionForm.value.startDate ||
         !promotionForm.value.endDate) {
-      ElMessage.warning('Please fill all fields');
-      return;
+      ElMessage.warning('Please fill all fields')
+      return
     }
 
     if (promotionForm.value.discountRate < 0.01 || promotionForm.value.discountRate > 99.99) {
-      ElMessage.warning('Discount rate must be between 0.01% and 99.99%');
-      return;
+      ElMessage.warning('Discount rate must be between 0.01% and 99.99%')
+      return
     }
 
     if (new Date(promotionForm.value.endDate) <= new Date(promotionForm.value.startDate)) {
-      ElMessage.warning('End date must be after start date');
-      return;
+      ElMessage.warning('End date must be after start date')
+      return
     }
 
-    loading.value = true;
-    const response = await createPromotion({
+    loading.value = true
+    await createPromotion({
       productIds: [selectedProductId.value],
       discountRate: promotionForm.value.discountRate,
       startDate: new Date(promotionForm.value.startDate).toISOString(),
       endDate: new Date(promotionForm.value.endDate).toISOString()
-    });
+    })
 
-    ElMessage.success('Promotion created successfully!');
-    promotionDialogVisible.value = false;
+    ElMessage.success('Promotion created successfully!')
+    promotionDialogVisible.value = false
   } catch (error) {
-    console.error('Failed to create promotion:', error);
-    ElMessage.error(error.response?.data?.message || 'Failed to create promotion');
+    console.error('Failed to create promotion:', error)
+    ElMessage.error(error.response?.data?.message || 'Failed to create promotion')
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 </script>
-
 
 <template>
   <div class="management-container">
@@ -179,114 +187,30 @@ const handleCreatePromotion = async () => {
         <el-button @click="handleAdd">Add product</el-button>
       </div>
 
-      <el-table :data="products" style="width: 100%" border class="pink-table">
-        <el-table-column prop="productId" label="ID" width="300"></el-table-column>
-        <el-table-column prop="name" label="Name" width="200"></el-table-column>
-        <el-table-column prop="description" label="Description"></el-table-column>
-        <el-table-column prop="price" label="Price" width="120" align="right"></el-table-column>
-        <el-table-column prop="stock" label="Stock" width="120" align="center"></el-table-column>
-        <el-table-column label="Operations" width="420" align="center">
-          <template #default="scope">
-            <div class="action-buttons">
-              <el-button size="small" @click="handleEdit(scope.row)">Edit</el-button>
-              <el-button size="small" type="danger" @click="handleDelete(scope.row)">Delete</el-button>
-              <el-button size="small" type="warning" @click="showPromotionDialog(scope.row.productId)">Discount</el-button>
-              <el-upload
-                  class="upload-demo"
-                  action=""
-                  :show-file-list="false"
-                  :http-request="(options) => handleImageUpload(options.file, scope.row.productId)"
-                  accept="image/*"
-              >
-                <el-button size="small">Upload Image</el-button>
-              </el-upload>
-            </div>
-            <el-image
-                v-if="scope.row.image"
-                :src="scope.row.image"
-                class="product-image"
-            ></el-image>
-          </template>
-        </el-table-column>
-      </el-table>
+      <ProductTable
+          :products="products"
+          @edit="handleEdit"
+          @delete="handleDelete"
+          @promotion="showPromotionDialog"
+          @upload="handleImageUpload"
+      />
     </div>
 
-    <!-- Add/Edit Product Dialog -->
-    <el-dialog
-        :title="dialogType === 'add' ? 'Add Product' : 'Edit Product'"
-        v-model="dialogVisible"
-        width="500px"
-    >
-      <el-form :model="productForm" label-width="100px">
-        <el-form-item label="Name">
-          <el-input v-model="productForm.name"></el-input>
-        </el-form-item>
-        <el-form-item label="Description">
-          <el-input v-model="productForm.description" type="textarea" :rows="3"></el-input>
-        </el-form-item>
-        <div class="form-row">
-          <el-form-item label="Price" class="form-col">
-            <el-input-number v-model="productForm.price" :min="0" :precision="2"></el-input-number>
-          </el-form-item>
-          <el-form-item label="Stock" class="form-col">
-            <el-input-number v-model="productForm.stock" :min="0"></el-input-number>
-          </el-form-item>
-        </div>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="dialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="handleSubmit">Confirm</el-button>
-        </div>
-      </template>
-    </el-dialog>
+    <ProductFormDialog
+        :visible="dialogVisible"
+        :type="dialogType"
+        :form="productForm"
+        @update:visible="val => dialogVisible = val"
+        @submit="handleSubmit"
+    />
 
-    <!-- Discount Promotion Dialog -->
-    <el-dialog
-        title="Create Discount Promotion"
-        v-model="promotionDialogVisible"
-        width="600px"
-    >
-      <el-form :model="promotionForm" label-width="120px">
-        <el-form-item label="Discount Rate (%)">
-          <el-input-number
-              v-model="promotionForm.discountRate"
-              :min="0.01"
-              :max="99.99"
-              :precision="2"
-              controls-position="right"
-          />
-        </el-form-item>
-        <el-form-item label="Start Date">
-          <el-date-picker
-              v-model="promotionForm.startDate"
-              type="datetime"
-              placeholder="Select start date"
-              value-format="YYYY-MM-DD HH:mm:ss"
-          />
-        </el-form-item>
-        <el-form-item label="End Date">
-          <el-date-picker
-              v-model="promotionForm.endDate"
-              type="datetime"
-              placeholder="Select end date"
-              value-format="YYYY-MM-DD HH:mm:ss"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="promotionDialogVisible = false">Cancel</el-button>
-          <el-button
-              type="primary"
-              @click="handleCreatePromotion"
-              :loading="loading"
-          >
-            Create Promotion
-          </el-button>
-        </div>
-      </template>
-    </el-dialog>
+    <PromotionDialog
+        :visible="promotionDialogVisible"
+        :form="promotionForm"
+        :loading="loading"
+        @update:visible="val => promotionDialogVisible = val"
+        @create="handleCreatePromotion"
+    />
   </div>
 </template>
 
@@ -315,79 +239,5 @@ const handleCreatePromotion = async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-}
-
-.pink-table {
-  width: 100%;
-
-  :deep(.el-table__header) {
-    background-color: #fce4ec;
-
-    th {
-      background-color: #fce4ec;
-      color: #e23d7d;
-      font-weight: 600;
-    }
-  }
-
-  :deep(.el-table__row) {
-    &:hover {
-      background-color: #fff0f4 !important;
-    }
-  }
-
-  :deep(.el-button) {
-    background-color: #f784a7;
-    border-color: #f784a7;
-    color: white;
-    margin: 4px;
-
-    &:hover {
-      background-color: #e23d7d;
-      border-color: #e23d7d;
-    }
-
-    &.el-button--danger {
-      background-color: #ff4081;
-      border-color: #ff4081;
-
-      &:hover {
-        background-color: #f50057;
-        border-color: #f50057;
-      }
-    }
-  }
-}
-
-.action-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.product-image {
-  width: 100px;
-  height: 100px;
-  margin-top: 8px;
-  border-radius: 4px;
-  object-fit: cover;
-}
-
-.form-row {
-  display: flex;
-  gap: 5px;
-
-  .form-col {
-    width: 50%;
-    flex: 0;
-    margin-bottom: 0;
-  }
-}
-
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
 }
 </style>

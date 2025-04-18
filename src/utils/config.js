@@ -2,7 +2,8 @@ import { load } from 'js-yaml';
 
 // 同步加载所有 YAML 配置文件
 const yamlFiles = import.meta.glob('/Config/application.yaml', {
-    as: 'raw',
+    query: '?raw',
+    import: 'default',
     eager: true
 });
 

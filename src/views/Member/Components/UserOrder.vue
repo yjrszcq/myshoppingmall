@@ -4,7 +4,7 @@ import { useOrderStore } from "@/stores/orderStore";
 import {  ShoppingCart } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import {useCartStore} from "@/stores/cartStore.js";
-import Comment from "@/views/Business/components/comment.vue";
+import Comment from "@/views/Member/Components/comment.vue";
 
 const router = useRouter();
 const orderStore = useOrderStore();

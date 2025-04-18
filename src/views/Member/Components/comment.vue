@@ -54,7 +54,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import { submitEvaluate } from '@/apis/detail' // 导入提交评论的API
+import { submitEvaluate } from '@/apis/detail'
+import {Edit} from "@element-plus/icons-vue"; // 导入提交评论的API
 
 const props = defineProps({
   // 对话框标题

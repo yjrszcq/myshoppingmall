@@ -17,15 +17,6 @@ const likeList = ref([]);
       <h4>{{ userStore.userInfo?.account }}</h4>
     </div>
     <div class="item">
-<!--      后续版本可以扩展的地方-->
-<!--      <a href="javascript:;">-->
-<!--        <span class="iconfont icon-hy"></span>-->
-<!--        <p>会员中心</p>-->
-<!--      </a>-->
-<!--      <a href="javascript:;">-->
-<!--        <span class="iconfont icon-aq"></span>-->
-<!--        <p>安全设置</p>-->
-<!--      </a>-->
       <RouterLink to="/member/address">
         <a href="javascript:;">
           <span class="iconfont icon-dw"></span>
@@ -44,19 +35,6 @@ const likeList = ref([]);
       </RouterLink>
     </div>
   </div>
-<!--  后续可拓展-->
-<!--  <div class="like-container">-->
-<!--    <div class="home-panel">-->
-<!--      <div class="header">-->
-
-<!--        <h4 data-v-bcb266e0="">You may also like it </h4>-->
-
-<!--      </div>-->
-<!--      <div class="goods-list">-->
-<!--        <GoodsItem v-for="good in likeList" :key="good.id" :goods="good" />-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
 </template>
 
 <style scoped lang="scss">

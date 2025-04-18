@@ -3,7 +3,7 @@
     <el-card class="collection-card">
       <template #header>
         <div class="card-header">
-          <span class="title">我的收藏</span>
+          <span class="title">My Favorites</span>
         </div>
       </template>
 
@@ -12,7 +12,7 @@
           style="width: 100%"
           v-loading="collectionStore.loading"
       >
-        <el-table-column prop="name" label="商品名称">
+        <el-table-column prop="name" label="Product Name">
           <template #default="scope">
             <router-link
                 :to="`/detail/${scope.row.productId}`"
@@ -22,12 +22,12 @@
             </router-link>
           </template>
         </el-table-column>
-        <el-table-column prop="currentPrice" label="价格">
+        <el-table-column prop="currentPrice" label="Price">
           <template #default="scope">
             <span class="price">¥{{ scope.row.currentPrice }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="productId" label="商品ID">
+        <el-table-column prop="productId" label="Product ID">
           <template #default="scope">
             <router-link
                 :to="`/detail/${scope.row.productId}`"
@@ -37,15 +37,16 @@
             </router-link>
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="Actions">
           <template #default="scope">
             <el-button
                 type="danger"
                 size="small"
                 @click.stop="removeCollection(scope.row)"
                 :loading="collectionStore.loading"
+                class="remove-btn"
             >
-              移出收藏
+              Remove
             </el-button>
           </template>
         </el-table-column>
@@ -60,6 +61,7 @@
             :total="total"
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
+            class="pink-pagination"
         />
       </div>
     </el-card>
@@ -73,56 +75,69 @@ import { useCollectionStore } from '@/stores/collectionStore'
 
 const collectionStore = useCollectionStore()
 
-// 分页相关
+// Pagination
 const currentPage = ref(1)
 const pageSize = ref(5)
 const total = ref(0)
 
-// 获取收藏列表数据
+// Fetch collection list
 const fetchCollectionList = async () => {
   try {
     const data = await collectionStore.fetchCollections(currentPage.value, pageSize.value)
-    total.value = data.length // 根据实际API返回的总数调整
+    total.value = data.length
   } catch (error) {
-    console.error('获取收藏列表失败:', error)
+    console.error('Failed to fetch favorites:', error)
+    ElMessage.error('Failed to load favorites')
   }
 }
 
-// 分页大小改变
+// Handle page size change
 const handleSizeChange = (val) => {
   pageSize.value = val
   fetchCollectionList()
 }
 
-// 当前页改变
+// Handle page change
 const handleCurrentChange = (val) => {
   currentPage.value = val
   fetchCollectionList()
 }
 
-// 移出收藏
+// Remove from collection
 const removeCollection = async (item) => {
   try {
     await collectionStore.removeFromCollection(item.productId)
-    // 不需要手动更新列表，store中已经处理
+    ElMessage.success('Removed from favorites')
   } catch (error) {
-    console.error('移出收藏失败:', error)
+    console.error('Failed to remove:', error)
+    ElMessage.error('Failed to remove item')
   }
 }
 
-// 页面加载时发请求
+// Fetch data on mount
 onMounted(() => {
   fetchCollectionList()
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .collection-container {
   padding: 20px;
+  background-color: #fff5f7; // Light pink background
 }
 
 .collection-card {
   margin-bottom: 20px;
+  border: 1px solid #ffc0cb; // Pink border
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(255, 182, 193, 0.2); // Soft pink shadow
+
+  :deep(.el-card__header) {
+    background-color: #ffebee; // Light pink header
+    border-bottom: 1px solid #ffc0cb;
+    border-radius: 12px 12px 0 0;
+    padding: 15px 20px;
+  }
 }
 
 .card-header {
@@ -132,12 +147,13 @@ onMounted(() => {
 }
 
 .title {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 20px;
+  font-weight: 600;
+  color: #d23669; // Deep pink text
 }
 
 .price {
-  color: #ff6b6b;
+  color: #e84393; // Pink price color
   font-weight: bold;
 }
 
@@ -148,31 +164,85 @@ onMounted(() => {
 }
 
 .product-link {
-  color: #606266;
+  color: #555;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: all 0.3s;
+  font-weight: 500;
 
   &:hover {
-    color: #409eff;
+    color: #e84393; // Pink on hover
     text-decoration: underline;
   }
 }
 
-/* 使整个行可点击 */
-:deep(.el-table__row) {
-  cursor: pointer;
+.remove-btn {
+  background-color: #ff6b81; // Coral pink
+  border-color: #ff6b81;
+  color: white;
 
   &:hover {
-    background-color: #f5f7fa;
+    background-color: #ff4757; // Darker pink
+    border-color: #ff4757;
+  }
+
+  &:active {
+    background-color: #e84393;
+    border-color: #e84393;
   }
 }
 
-/* 防止操作列的按钮点击触发行点击 */
+/* Pink theme for table */
+:deep(.el-table) {
+  --el-table-border-color: #ffc0cb;
+  --el-table-header-bg-color: #ffebee;
+}
+
+:deep(.el-table__row) {
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #ffebee !important; // Light pink on hover
+  }
+}
+
 :deep(.el-table__row .el-table__cell:last-child) {
   cursor: default;
 
   &:hover {
-    background-color: inherit;
+    background-color: inherit !important;
+  }
+}
+
+/* Pink pagination styles */
+.pink-pagination {
+  :deep(.btn-prev),
+  :deep(.btn-next),
+  :deep(.number) {
+    &:hover {
+      color: #e84393;
+    }
+  }
+
+  :deep(.number.active) {
+    background-color: #e84393;
+    border-color: #e84393;
+    color: white;
+  }
+
+  :deep(.el-pagination__jump) {
+    color: #555;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .collection-container {
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 18px;
   }
 }
 </style>

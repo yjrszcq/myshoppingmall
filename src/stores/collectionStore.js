@@ -42,6 +42,7 @@ export const useCollectionStore = defineStore('collection', () => {
         try {
             await removeCollect(productId)
             ElMessage.success('已取消收藏')
+            console.log(productId,"cancel")
             // 从本地列表中移除
             collections.value = collections.value.filter(
                 item => item.productId !== productId
@@ -54,15 +55,17 @@ export const useCollectionStore = defineStore('collection', () => {
 
     // 检查是否已收藏
     const isCollected = (productId) => {
+        console.log(collections,"collections")
         return collections.value.some(item => item.productId === productId)
     }
 
     // 切换收藏状态
     const toggleCollection = async (productId) => {
         if (isCollected(productId)) {
+            console.log(productId,"remove")
             await removeFromCollection(productId)
         } else {
-            console.log(productId,"productId")
+            console.log(productId,"add")
             await addToCollection(productId)
         }
     }

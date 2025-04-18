@@ -179,14 +179,14 @@ onMounted(() => {
     .collect-btn {
       font-size: 20px;
       padding: 8px;
-      background-color: #FFC0CB; // 经典粉红色
-      border-color: #FF9999; // 珊瑚粉边框
-      color: #FF6B8B; // 深一点的粉色图标
+      background-color: #FFE4E1; // 玫瑰石英粉
+      border-color: #FFC0CB;
+      color: #DB7093; // 旧玫瑰色图标
 
       &:hover {
         transform: scale(1.1);
         transition: transform 0.2s;
-        background-color: #FF6B8B; // 悬停时变为玫瑰粉
+        background-color: #DB7093;
         color: white;
       }
     }

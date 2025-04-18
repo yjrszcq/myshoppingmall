@@ -4,139 +4,116 @@
       <template #header>
         <div class="card-header">
           <span class="title">我的收藏</span>
-          <!-- <el-button type="primary" @click="showAddDialog">添加收藏</el-button> -->
         </div>
       </template>
-      
-      <el-table :data="collectionList" style="width: 100%">
-        <el-table-column prop="name" label="商品名称" />
+
+      <el-table
+          :data="collectionStore.collections"
+          style="width: 100%"
+          v-loading="collectionStore.loading"
+      >
+        <el-table-column prop="name" label="商品名称">
+          <template #default="scope">
+            <router-link
+                :to="`/detail/${scope.row.productId}`"
+                class="product-link"
+            >
+              {{ scope.row.name }}
+            </router-link>
+          </template>
+        </el-table-column>
         <el-table-column prop="currentPrice" label="价格">
           <template #default="scope">
             <span class="price">¥{{ scope.row.currentPrice }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="productId" label="商品id" />
+        <el-table-column prop="productId" label="商品ID">
+          <template #default="scope">
+            <router-link
+                :to="`/detail/${scope.row.productId}`"
+                class="product-link"
+            >
+              {{ scope.row.productId }}
+            </router-link>
+          </template>
+        </el-table-column>
         <el-table-column label="操作">
           <template #default="scope">
-            <el-button type="danger" size="small" @click="removeCollection(scope.row)">
+            <el-button
+                type="danger"
+                size="small"
+                @click.stop="removeCollection(scope.row)"
+                :loading="collectionStore.loading"
+            >
               移出收藏
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-    </el-card>
 
-    <!-- 添加收藏对话框 -->
-    <el-dialog v-model="dialogVisible" title="添加收藏" width="30%">
-      <el-form :model="newCollection" label-width="80px">
-        <el-form-item label="商品名称">
-          <el-input v-model="newCollection.title" />
-        </el-form-item>
-        <el-form-item label="价格">
-          <el-input-number v-model="newCollection.price" :min="0" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="addCollection">确认</el-button>
-        </span>
-      </template>
-    </el-dialog>
+      <div class="pagination">
+        <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[5, 10, 20, 50]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+        />
+      </div>
+    </el-card>
   </div>
 </template>
 
 <script setup>
-import { ref,onMounted  } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getMyCollect,removeCollect } from '@/apis/vip.js'
-// 收藏列表数据
-const collectionList = ref([
-  {
-    id: 1,
-    title: '示例商品1',
-    price: 199,
-    date: '2025-04-18'
-  },
-  {
-    id: 2,
-    title: '示例商品2',
-    price: 299,
-    date: '2025-04-18'
-  }
-])
-onMounted(() => {
-  fetchCollectionList()
-})
-let pages = 1
-let pageSize = 10
+import { useCollectionStore } from '@/stores/collectionStore'
+
+const collectionStore = useCollectionStore()
+
+// 分页相关
+const currentPage = ref(1)
+const pageSize = ref(5)
+const total = ref(0)
+
 // 获取收藏列表数据
 const fetchCollectionList = async () => {
   try {
-    const response = await getMyCollect(pages, pageSize)
-    console.log(response.favorites," 获取收藏列表数据");
-    
-    collectionList.value = response.favorites || []
+    const data = await collectionStore.fetchCollections(currentPage.value, pageSize.value)
+    total.value = data.length // 根据实际API返回的总数调整
   } catch (error) {
-    ElMessage.error('获取收藏列表失败')
+    console.error('获取收藏列表失败:', error)
   }
 }
 
-// 控制添加收藏对话框显示
-const dialogVisible = ref(false)
-
-// 新收藏商品数据
-const newCollection = ref({
-  title: '',
-  price: 0
-})
-
-// 显示添加对话框
-const showAddDialog = () => {
-  dialogVisible.value = true
-  newCollection.value = {
-    title: '',
-    price: 0
-  }
+// 分页大小改变
+const handleSizeChange = (val) => {
+  pageSize.value = val
+  fetchCollectionList()
 }
 
-// 添加收藏
-const addCollection = () => {
-  if (!newCollection.value.title) {
-    ElMessage.warning('请输入商品名称')
-    return
-  }
-  
-  const collection = {
-    id: collectionList.value.length + 1,
-    title: newCollection.value.title,
-    price: newCollection.value.price,
-    date: new Date().toISOString().split('T')[0]
-  }
-  
-  collectionList.value.push(collection)
-  dialogVisible.value = false
-  ElMessage.success('添加收藏成功')
+// 当前页改变
+const handleCurrentChange = (val) => {
+  currentPage.value = val
+  fetchCollectionList()
 }
 
 // 移出收藏
-const removeCollection = (item) => {
-    //id转为字符串
-    item.productId = String(item.productId)
-  //调取移出收藏接口
-    removeCollect(item.productId).then((res) => {
-        if (res.code === 200) {
-        ElMessage.success('移出收藏成功')
-        collectionList.value = collectionList.value.filter(i => i.id !== item.id)
-        } else {
-        ElMessage.error('移出收藏失败')
-        }
-    }).catch((error) => {
-        console.error(error)
-        ElMessage.error('移出收藏失败')
-    })
+const removeCollection = async (item) => {
+  try {
+    await collectionStore.removeFromCollection(item.productId)
+    // 不需要手动更新列表，store中已经处理
+  } catch (error) {
+    console.error('移出收藏失败:', error)
+  }
 }
 
+// 页面加载时发请求
+onMounted(() => {
+  fetchCollectionList()
+})
 </script>
 
 <style scoped>
@@ -164,7 +141,38 @@ const removeCollection = (item) => {
   font-weight: bold;
 }
 
-.dialog-footer {
+.pagination {
   margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.product-link {
+  color: #606266;
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #409eff;
+    text-decoration: underline;
+  }
+}
+
+/* 使整个行可点击 */
+:deep(.el-table__row) {
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f5f7fa;
+  }
+}
+
+/* 防止操作列的按钮点击触发行点击 */
+:deep(.el-table__row .el-table__cell:last-child) {
+  cursor: default;
+
+  &:hover {
+    background-color: inherit;
+  }
 }
 </style>

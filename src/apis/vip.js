@@ -87,3 +87,11 @@ export const removeCollect = (id) => {
         method: 'DELETE'
     })
 };
+
+// 添加商品收藏
+export const addCollect = (productId) => {
+    return request({
+        url: `/api/users/favorites/${productId}`,
+        method: 'POST',
+    })
+}

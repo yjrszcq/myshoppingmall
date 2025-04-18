@@ -5,6 +5,7 @@ import { getProductById } from "@/apis/detail.js"; // 用你的接口方法
 import ImageView from "@/components/imageView/index.vue";
 import { useCartStore } from "@/stores/cartStore";
 //import { picture } from '@element-plus/icons-vue/dist/types'
+import Evaluate from "@/views/Detail/evaluate.vue";
 import { useCollectionStore } from "@/stores/collectionStore"
 import { Star, StarFilled } from '@element-plus/icons-vue'
 
@@ -134,6 +135,10 @@ onMounted(() => {
           </div>
         </div>
       </div>
+
+
+      <!-- 评价 -->
+      <Evaluate />
     </div>
   </div>
 </template>
@@ -399,4 +404,6 @@ onMounted(() => {
 .bread-container {
   padding: 25px 0;
 }
+
+
 </style>

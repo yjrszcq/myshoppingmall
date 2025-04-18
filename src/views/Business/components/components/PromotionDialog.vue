@@ -20,7 +20,7 @@
             v-model="form.startDate"
             type="datetime"
             placeholder="Select start date"
-            value-format="yyyy-MM-DD HH:mm"
+            value-format="YYYY-MM-DD HH:mm"
         />
       </el-form-item>
       <el-form-item label="End Date">
@@ -28,7 +28,7 @@
             v-model="form.endDate"
             type="datetime"
             placeholder="Select end date"
-            value-format="yyyy-MM-DD HH:mm"
+            value-format="YYYY-MM-DD HH:mm"
         />
       </el-form-item>
     </el-form>

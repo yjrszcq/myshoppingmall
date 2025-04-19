@@ -5,6 +5,7 @@ import {useUserstore} from "@/stores/user.js";
 import {config} from "@/utils/config.js"
 
 const httpInstance = axios.create({
+
     baseURL: config.http.baseURL, // 使用配置中的 baseURL
     timeout: config.http.timeout  // 使用配置中的 timeout
 });

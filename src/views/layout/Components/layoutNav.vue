@@ -1,6 +1,7 @@
 <script setup>
 import { useRouter} from 'vue-router';
 import {useUserstore} from "@/stores/user.js";
+import { logoutapi } from "@/apis/login.js";
 
 const Userstore = useUserstore();
 const router = useRouter();
@@ -15,8 +16,9 @@ const goToUser = () => {
 }
 
 // 退出登录
-const confirm = () =>{
-  Userstore.clearUserInfo()
+const confirm = async () =>{
+  await logoutapi()
+  Userstore.clearUserInfo();
   router.push({ path: '/login'});
 }
 

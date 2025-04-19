@@ -17,12 +17,17 @@ import Checkout from "@/views/Checkout/index.vue";
 import Member from "@/views/Member/index.vue";
 import UserOrder from "@/views/Member/Components/UserOrder.vue";
 import UserInfo from "@/views/Member/Components/UserInfo.vue";
-import Payment from "@/views/Payment/index.vue";
-import BankInfo from "@/views/BankInfo/index.vue";
-import Address from "@/views/Member/Components/address.vue";
+
+import Payment from "@/views/Payment/index.vue"
+import BankInfo from "@/views/BankInfo/index.vue"
+import Address from "@/views/Member/Components/address.vue"
+
+import Promotion from "@/views/Promotion/promotionList.vue"
+
+import Collection from "@/views/Member/Components/collection.vue"
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  // path和component对应关系的位置
   routes: [
     {
       path: "/",
@@ -56,7 +61,10 @@ const router = createRouter({
           path: "bank-info",
           component: BankInfo,
         },
-        //会员中心
+        {
+          path: "promotion", 
+          component: Promotion,
+        },
         {
           name: "member",
           path: "member",
@@ -73,6 +81,10 @@ const router = createRouter({
             {
               path: "address",
               component: Address,
+            },
+            {
+              path: "collection", 
+              component: Collection,
             },
           ],
         },
@@ -95,15 +107,15 @@ const router = createRouter({
           component: businesshome,
         },
         {
-          path: "/product",
+          path: "product",
           component: Product,
         },
         {
-          path: "/order",
+          path: "order",
           component: Order,
         },
         {
-          path: "/dashboard",
+          path: "dashboard",
           name: "Dashboard",
           component: () => import("@/views/Dashboard/index.vue"),
         },

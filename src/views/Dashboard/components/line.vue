@@ -31,7 +31,9 @@ const initCharts = () => {
     series: [
       {
         data: props.data.yData,
+
         type: "line",
+
         smooth: true,
       },
     ],

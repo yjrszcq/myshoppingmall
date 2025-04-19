@@ -1,6 +1,8 @@
 <script setup>
 import Line from "./components/line.vue";
+
 import pic from "./components/pie.vue";
+
 import Column from "./components/column.vue";
 import { ref, onMounted, computed } from "vue";
 import * as echarts from "echarts";
@@ -14,7 +16,9 @@ const size = ref("large");
 
 const handleSearch = () => {
   // console.log(getCurrentMonth(value1.value));
+
  //你们这控制台都不能打印估计你到时候要去调一下
+
   
   getDataList(getCurrentMonth(value1.value));
 };
@@ -67,8 +71,9 @@ const getDataList = async (CurrentMonth  = getCurrentMonth()) => {
   try {
     const res = await getData(CurrentMonth);
   
-  
     dataList.value = res;
+
+  
     // console.log(dataList.value);
     console.log("==========>", res);
   } catch {
@@ -85,7 +90,9 @@ const ChartData = computed(() => {
       xData: [],
       yData: [],
     },
+
     pic: [],
+
     column: {
       xData: [],
       yData: [],
@@ -96,7 +103,9 @@ const ChartData = computed(() => {
     arr.line.xData.push(item.name);
     arr.line.yData.push(item.totalRevenue);
 
+
     arr.pic.push({
+
       value: item.salesCount,
       name: item.name,
     });
@@ -129,13 +138,16 @@ const ChartData = computed(() => {
         <Line :data="ChartData.line" />
       </el-card>
       <el-card class="chart-card">
+
         <pic :data="ChartData.pic" />
+
       </el-card>
       <el-card class="chart-card">
         <Column :data="ChartData.column" />
      
       </el-card>
     </div>
+
 
     <el-card class="table-section">
       <el-table :data="dataList?.details" style="width: 100%">
@@ -175,7 +187,10 @@ const ChartData = computed(() => {
 }
 
 .chart-card {
+
   min-height: 450px;
+
+
 }
 
 .table-section {

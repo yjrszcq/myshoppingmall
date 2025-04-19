@@ -18,10 +18,12 @@ interface Comment {
 // 模拟更多的评论数据
 const allComments = ref<Comment[]>([]);
 
+
 const form = ref({
   comment: "",
   rating: 0,
 });
+
 
 
 // 分页相关
@@ -50,7 +52,9 @@ const getEvaluates = async () => {
     page: currentPage.value,
     limit: pageSize.value,
   });
+
   console.log(res);
+
   total.value = res.total;
   allComments.value = res.reviews;
 };
@@ -59,7 +63,9 @@ getEvaluates();
 
 <template>
   <div class="comment-section">
+
     <h2 class="comment-title">COMMENTS</h2>
+
 
     <!-- 评论列表 -->
     <div class="comments-list">
@@ -78,7 +84,9 @@ getEvaluates();
         <div class="comment-content">
           {{ comment.comment }}
         </div>
+
         <el-rate :model-value="comment.rating" disabled />
+
       </el-card>
     </div>
 
@@ -93,6 +101,7 @@ getEvaluates();
         background
       />
     </div>
+
 
   </div>
 </template>

@@ -1,63 +1,69 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { getProductById } from "@/apis/detail.js"; // 用你的接口方法
+import {ref, onMounted} from "vue";
+import {useRoute} from "vue-router";
+import {getProductById} from "@/apis/detail.js";
 import ImageView from "@/components/imageView/index.vue";
-import { useCartStore } from "@/stores/cartStore";
-//import { picture } from '@element-plus/icons-vue/dist/types'
-import Evaluate from "@/views/Detail/evaluate.vue";
-import { useCollectionStore } from "@/stores/collectionStore"
-import { Star, StarFilled } from '@element-plus/icons-vue'
+import {useCartStore} from "@/stores/cartStore";
+import {usePromotionInfoStore} from '@/stores/promotionInfoStore';
+import {getPromotionByProductId} from '@/apis/promotionInfo.js';
 
+const promotionInfoStore = usePromotionInfoStore();
 const cartStore = useCartStore();
 
-
-// 商品详情对象
 const goods = ref({});
+const promotionInfo = ref({});
+const quantity = ref(1);
+const route = useRoute();
 
 const updateQuantity = (itemId, quantity) => {
   cartStore.updateCartItemQuantity(itemId, quantity);
 };
 
-// 获取路由参数 id
-const route = useRoute();
-
-//count
-const quantity = ref(1);
 const countChange = (quantity) => {
   console.log(quantity);
 };
 
-//添加购物车
 const addCart = () => {
   cartStore.addCart({
     itemId: goods.value.itemId,
     productId: goods.value.productId,
     name: goods.value.name,
-    // picture: goods.value.mainPictures[0],
     price: goods.value.price,
     quantity: quantity.value,
     selected: true,
   });
 };
 
-
-const collectionStore = useCollectionStore()
-// 获取商品详情
 const getGoods = async () => {
   try {
-    const res = await getProductById(route.params.id)
-    goods.value = res
-    // 初始化时可以预加载收藏列表（可选）
-    await collectionStore.fetchCollections()
+    const res = await getProductById(route.params.id);
+    goods.value = res;
   } catch (error) {
-    console.error("获取商品详情失败", error)
+    console.error("Fetch store details failed", error);
   }
-}
+};
 
-// 页面加载时发请求
+const getPromotionInfo = async () => {
+  try {
+    const res = await getPromotionByProductId(route.params.id);
+    promotionInfo.value = res;
+    console.log(promotionInfo.value, "promotionInfo");
+  } catch (error) {
+    // 请求失败时静默处理，不触发全局弹窗
+    console.error("Failed to fetch promotion info:", error);
+    promotionInfo.value = null; // 也可以设成 {} 或其他默认值
+  }
+};
+
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
+};
+
 onMounted(() => {
   getGoods();
+  getPromotionInfo();
 });
 </script>
 
@@ -67,343 +73,292 @@ onMounted(() => {
       <div class="bread-container">
         <el-breadcrumb separator=">">
           <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
-
-
           <el-breadcrumb-item>{{ goods.name }}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
-      <!-- 商品信息 -->
+
+      <!-- Product Information -->
       <div class="info-container">
-        <div>
-          <div class="goods-info">
-            <div class="media">
-              <!-- 图片预览区 -->
-              <ImageView />
+        <div class="goods-info">
+          <div class="media">
+            <ImageView />
+          </div>
+
+          <div class="spec">
+            <h1 class="g-name">{{ goods.name }}</h1>
+            <p class="g-desc">{{ goods.desc }}</p>
+
+            <div class="price-section">
+              <div class="g-price">
+                <div v-if="promotionInfo" class="discounted-price">
+                  <span class="price">${{ promotionInfo.currentPrice }}</span>
+                  <span class="original-price">${{ promotionInfo.basePrice }}</span>
+                </div>
+                <div v-else>
+                  <span class="price">${{ goods.price }}</span>
+                </div>
+                <span class="stock">Stock: {{ goods.stock }} items</span>
+              </div>
             </div>
-            <div class="spec">
-              <!-- 商品信息区 -->
-              <div class="g-name-container">
-                <p class="g-name">{{ goods.name }}</p>
-                <el-button
-                    :icon="collectionStore.isCollected(goods.productId) ? StarFilled : Star"
-                    circle
-                    @click="collectionStore.toggleCollection(goods.productId)"
-                    :loading="collectionStore.loading"
-                    :type="collectionStore.isCollected(goods.productId) ? 'warning' : ''"
-                    class="collect-btn"
+
+            <div class="g-service">
+              <dl>
+                <dt>Promotion</dt>
+                <dd>
+                  <span v-if="promotionInfo" class="promotion-tag">
+                    {{ promotionInfo.discountRate }}% Discount
+                    <span class="valid-date">(Valid for {{ promotionInfo.validUntil }} more days)</span>
+                  </span>
+                  <span v-else class="no-promotion-tag">No current promotions</span>
+                </dd>
+              </dl>
+
+              <dl>
+                <dt>Services</dt>
+                <dd>
+                  <span class="service-tag">Free Returns</span>
+                  <span class="service-tag">Fast Refund</span>
+                  <span class="service-tag">Free Shipping</span>
+                </dd>
+              </dl>
+            </div>
+
+            <div class="action-section">
+              <div class="quantity-selector">
+                <span class="label">Quantity</span>
+                <el-input-number
+                    v-model="quantity"
+                    :min="1"
+                    :max="goods.stock"
+                    size="large"
+                    controls-position="right"
                 />
               </div>
-              <p class="g-desc">{{ goods.desc }}</p>
-              <p class="g-price">
-                <span>{{ goods.price }}</span>
-                <span> {{ goods.stock }}</span>
-              </p>
-              <div class="g-service">
-                <dl>
-                  <dt>sales</dt>
-                  <dd>
-                    good things were broadcast, the App coupon purchase 120 yuan
-                    dropped
-                  </dd>
-                </dl>
-                <dl>
-                  <dt>serve</dt>
-                  <dd>
-                    <span>Hassle-free returns</span>
-                    <span>Fast refunds</span>
-                    <span>Free shipping</span>
-                    <a href="javascript:;">Learn more</a>
-                  </dd>
-                </dl>
-              </div>
-              <!-- sku组件 -->
 
-              <!-- 数据组件 -->
-              <el-input-number
-                v-model="quantity"
-                :min="1"
-               
-                class="number"
-              />
-              <!-- 按钮组件 -->
-              <div>
-                <el-button size="large" class="btn" @click="addCart">
-                  Add to cart
-                </el-button>
-              </div>
+              <el-button
+                  type="danger"
+                  size="large"
+                  class="add-cart-btn"
+                  @click="addCart"
+              >
+                Add to Cart
+              </el-button>
             </div>
           </div>
         </div>
       </div>
-
-
-      <!-- 评价 -->
-      <Evaluate />
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
 .xtx-goods-page {
-  .goods-info {
-    min-height: 600px;
+  padding-bottom: 40px;
+
+  .bread-container {
+    padding: 25px 0;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .info-container {
+    max-width: 1200px;
+    margin: 0 auto;
     background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  .goods-info {
     display: flex;
+    padding: 30px;
 
     .media {
-      width: 580px;
-      height: 600px;
-      padding: 30px 50px;
+      width: 480px;
+      padding-right: 40px;
     }
 
     .spec {
       flex: 1;
-      padding: 30px 30px 30px 0;
-    }
-  }
-
-  .goods-footer {
-    display: flex;
-    margin-top: 20px;
-
-    .goods-article {
-      width: 940px;
-      margin-right: 20px;
-    }
-
-    .goods-aside {
-      width: 280px;
-      min-height: 1000px;
-    }
-  }
-  .g-name-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    .collect-btn {
-      font-size: 20px;
-      padding: 8px;
-      background-color: #FFE4E1; // 玫瑰石英粉
-      border-color: #FFC0CB;
-      color: #DB7093; // 旧玫瑰色图标
-
-      &:hover {
-        transform: scale(1.1);
-        transition: transform 0.2s;
-        background-color: #DB7093;
-        color: white;
-      }
-    }
-  }
-  .goods-tabs {
-    min-height: 600px;
-    background: #fff;
-  }
-
-  .goods-warn {
-    min-height: 600px;
-    background: #fff;
-    margin-top: 20px;
-  }
-
-  .number-box {
-    display: flex;
-    align-items: center;
-
-    .label {
-      width: 60px;
-      color: #999;
-      padding-left: 10px;
+      padding-left: 40px;
+      border-left: 1px solid #f5f5f5;
     }
   }
 
   .g-name {
-    font-size: 22px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    line-height: 1.4;
   }
 
   .g-desc {
     color: #999;
-    margin-top: 10px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.6;
   }
 
-  .g-price {
-    margin-top: 10px;
+  .price-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
 
-    span {
-      &:first-child {
-        &::before {
-          content: "¥";
-          font-size: 14px;
-        }
-        color: $priceColor;
-        margin-right: 10px;
-        font-size: 22px;
+    .g-price {
+      .discounted-price {
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
 
-      &:last-child {
-        &::before {
-          content: "库存仅剩：";
-        }
+      .price {
+        font-size: 28px;
+        color: deeppink;
+        font-weight: 600;
+        margin-right: 15px;
+      }
+
+      .original-price {
+        font-size: 18px;
         color: #999;
-        font-size: 16px;
+        text-decoration: line-through;
       }
+
+      .stock {
+        color: #666;
+        font-size: 14px;
+        display: block;
+        margin-top: 5px;
+      }
+    }
+
+    .discount-badge {
+      background: #fef0f0;
+      color: deeppink;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-left: 15px;
+      font-weight: 500;
     }
   }
 
   .g-service {
-    background: #f5f5f5;
-    width: 500px;
-    padding: 20px 10px 0 10px;
-    margin-top: 10px;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 30px;
 
     dl {
-      padding-bottom: 20px;
       display: flex;
-      align-items: center;
+      margin-bottom: 15px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
 
       dt {
-        width: 50px;
-        color: #999;
+        width: 80px;
+        color: #666;
+        font-weight: 500;
       }
 
       dd {
-        color: #666;
-
-        &:last-child {
-          span {
-            margin-right: 10px;
-
-            &::before {
-              content: "•";
-              color: $xtxColor;
-              margin-right: 2px;
-            }
-          }
-
-          a {
-            color: $xtxColor;
-          }
-        }
-      }
-    }
-  }
-
-  .goods-sales {
-    display: flex;
-    width: 400px;
-    align-items: center;
-    text-align: center;
-    height: 140px;
-
-    li {
-      flex: 1;
-      position: relative;
-
-      ~ li::after {
-        position: absolute;
-        top: 10px;
-        left: 0;
-        height: 60px;
-        border-left: 1px solid #e4e4e4;
-        content: "";
-      }
-
-      p {
-        &:first-child {
-          color: #999;
-        }
-
-        &:nth-child(2) {
-          color: $priceColor;
-          margin-top: 10px;
-        }
-
-        &:last-child {
-          color: #666;
-          margin-top: 10px;
-
-          i {
-            color: $xtxColor;
-            font-size: 14px;
-            margin-right: 2px;
-          }
-
-          &:hover {
-            color: $xtxColor;
-            cursor: pointer;
-          }
-        }
-      }
-    }
-  }
-}
-
-.goods-tabs {
-  min-height: 600px;
-  background: #fff;
-
-  nav {
-    height: 70px;
-    line-height: 70px;
-    display: flex;
-    border-bottom: 1px solid #f5f5f5;
-
-    a {
-      padding: 0 40px;
-      font-size: 18px;
-      position: relative;
-
-      > span {
-        color: $priceColor;
-        font-size: 16px;
-        margin-left: 10px;
-      }
-    }
-  }
-}
-
-.goods-detail {
-  padding: 40px;
-
-  .attrs {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 30px;
-
-    li {
-      display: flex;
-      margin-bottom: 10px;
-      width: 50%;
-
-      .dt {
-        width: 100px;
-        color: #999;
-      }
-
-      .dd {
         flex: 1;
         color: #666;
       }
     }
+
+    .promotion-tag {
+      color: deeppink;
+      font-weight: 500;
+
+      .valid-date {
+        color: #999;
+        font-size: 12px;
+        margin-left: 5px;
+      }
+    }
+
+    .no-promotion-tag {
+      color: #999;
+    }
+
+    .service-tag {
+      display: inline-block;
+      margin-right: 15px;
+      position: relative;
+      padding-left: 18px;
+
+      &::before {
+        content: "•";
+        color: #67c23a;
+        font-size: 18px;
+        position: absolute;
+        left: 0;
+        top: -1px;
+      }
+    }
   }
 
-  > img {
-    width: 100%;
+  .action-section {
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      margin-bottom: 25px;
+
+      .label {
+        width: 80px;
+        color: #666;
+        font-size: 14px;
+      }
+
+      :deep(.el-input-number) {
+        width: 120px;
+
+        .el-input__inner {
+          text-align: center;
+        }
+      }
+    }
+
+    .add-cart-btn {
+      width: 200px;
+      height: 50px;
+      font-size: 16px;
+      background: hotpink;
+      border: none;
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .goods-info {
+      flex-direction: column;
+      padding: 15px;
+
+      .media {
+        width: 100%;
+        padding-right: 0;
+        margin-bottom: 20px;
+      }
+
+      .spec {
+        padding-left: 0;
+        border-left: none;
+      }
+    }
+
+    .action-section {
+      .add-cart-btn {
+        width: 100%;
+      }
+    }
   }
 }
-
-.btn {
-  margin-top: 20px;
-}
-
-.number {
-  margin-top: 15px;
-}
-
-.bread-container {
-  padding: 25px 0;
-}
-
-
 </style>

@@ -94,3 +94,27 @@ export const uploadImageAPI = (productId, formData) => {
         data: formData,
     });
 };
+/**
+ * 创建促销活动
+ * @param {Object} params 促销活动参数
+ * @param {Array<string>} params.productIds 商品ID数组
+ * @param {number} params.discountRate 折扣率 (0.01-99.99)
+ * @param {string} params.startDate 开始时间 (ISO 8601格式)
+ * @param {string} params.endDate 结束时间 (ISO 8601格式)
+ * @returns {Promise<{promotionId: string}>}
+ */
+export const createPromotion = ({ productIds, discountRate, startDate, endDate }) => {
+    return request({
+        url: '/api/seller/promotions',
+        method: 'POST',
+        headers: {
+            'Session-Id': localStorage.getItem('sessionId') // 假设sessionId存储在localStorage中
+        },
+        data: {
+            productId: productIds, // 注意接口要求是productId字段而不是productIds
+            discountRate,
+            startDate,
+            endDate
+        }
+    })
+}

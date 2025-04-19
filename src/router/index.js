@@ -20,7 +20,11 @@ import UserInfo from "@/views/Member/Components/UserInfo.vue";
 import Payment from "@/views/Payment/index.vue"
 import BankInfo from "@/views/BankInfo/index.vue"
 import Address from "@/views/Member/Components/address.vue"
+
+import Promotion from "@/views/Promotion/promotionList.vue"
+
 import Collection from "@/views/Member/Components/collection.vue"
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -56,7 +60,10 @@ const router = createRouter({
           path: "bank-info",
           component: BankInfo,
         },
-        // 会员中心
+        {
+          path: "promotion", 
+          component: Promotion,
+        },
         {
           name: "member",
           path: "member",
@@ -75,7 +82,7 @@ const router = createRouter({
               component: Address,
             },
             {
-              path: "collection", // 小写统一风格
+              path: "collection", 
               component: Collection,
             },
           ],
@@ -99,7 +106,7 @@ const router = createRouter({
           component: businesshome,
         },
         {
-          path: "product", // 改为相对路径
+          path: "product",
           component: Product,
         },
         {

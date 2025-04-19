@@ -90,6 +90,7 @@ const dologin = () => {
 
       await userStore.getUserInfo({username, password})
       console.log(loginForm,"form")
+      // Removed logging of session ID to avoid exposing sensitive information
       // 1. 提示用户
       ElMessage({type: 'success', message: 'success'})
       // 2. 跳转首页

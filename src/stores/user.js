@@ -11,8 +11,9 @@ export const useUserstore = defineStore('user', () => {
 
     const getUserInfo = async ({ username, password }) => {
         const res = await loginapi({ username, password })
-
+        // Debug log removed to avoid cluttering production output
         userInfo.value = res
+       
     }
     // 3. 以对象的格式把state和action return
 

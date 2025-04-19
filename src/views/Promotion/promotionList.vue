@@ -37,7 +37,7 @@ onMounted(() => {
       
       <el-table-column prop="discountRate" label="Discount Rate" align="center">
         <template #default="{ row }">
-          <span class="discount-tag">{{ row.discountRate * 100 }}%</span>
+          <span class="discount-tag">{{ row.discountRate }}%</span>
         </template>
       </el-table-column>
 

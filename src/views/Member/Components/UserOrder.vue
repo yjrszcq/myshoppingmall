@@ -78,7 +78,6 @@ const handlePayNow = (order) => {
 };
 
 const handleCommentSuccess = () => {
-  ElMessage.success('评论已提交')
 }
 
 onMounted(() => getOrderList());

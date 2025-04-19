@@ -50,7 +50,7 @@ const getEvaluates = async () => {
     page: currentPage.value,
     limit: pageSize.value,
   });
-  console.log(res.reviews[0]);
+  console.log(res);
   total.value = res.total;
   allComments.value = res.reviews;
 };
@@ -78,7 +78,7 @@ getEvaluates();
         <div class="comment-content">
           {{ comment.comment }}
         </div>
-        <el-rate disabled />
+        <el-rate :model-value="comment.rating" disabled />
       </el-card>
     </div>
 

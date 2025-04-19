@@ -107,15 +107,15 @@ const router = createRouter({
           component: businesshome,
         },
         {
-          path: "product",
+          path: "/product",
           component: Product,
         },
         {
-          path: "order",
+          path: "/order",
           component: Order,
         },
         {
-          path: "dashboard",
+          path: "/dashboard",
           name: "Dashboard",
           component: () => import("@/views/Dashboard/index.vue"),
         },

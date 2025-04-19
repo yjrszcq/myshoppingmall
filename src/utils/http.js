@@ -23,11 +23,8 @@ httpInstance.interceptors.request.use(config => {
 
 //axios响应式拦截器
 httpInstance.interceptors.response.use(res => res.data,e =>{
-    //统一警告
-    ElMessage({
-        type:'warning',
-        message:e.message,
-    })
+    //在控制台打印警告
+    console.log(e.message,"error")
     return Promise.reject(e)
 })
 

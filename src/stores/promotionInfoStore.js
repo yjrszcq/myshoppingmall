@@ -8,12 +8,8 @@ export const usePromotionInfoStore = defineStore('promotionInfo', {
   }),
   actions: {
     async fetchPromotionInfo(productId) {
-      try {
         const res = await getPromotionByProductId(productId);
         this.promotionInfo = res.data;
-      } catch (error) {
-        console.error('Failed to fetch promotion info:', error);
-      }
     },
     setPromotionInfo(info) {
       this.promotionInfo = info;

@@ -47,11 +47,14 @@ const getPromotionInfo = async () => {
   try {
     const res = await getPromotionByProductId(route.params.id);
     promotionInfo.value = res;
-    console.log(promotionInfo.value,"promotionInfo");
+    console.log(promotionInfo.value, "promotionInfo");
   } catch (error) {
-    console.error('Failed to fetch promotion info:', error);
+    // 请求失败时静默处理，不触发全局弹窗
+    console.error("Failed to fetch promotion info:", error);
+    promotionInfo.value = null; // 也可以设成 {} 或其他默认值
   }
 };
+
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -87,9 +90,9 @@ onMounted(() => {
 
             <div class="price-section">
               <div class="g-price">
-                <div v-if="promotionInfo.discountRate" class="discounted-price">
+                <div v-if="promotionInfo" class="discounted-price">
                   <span class="price">${{ promotionInfo.currentPrice }}</span>
-                  <span class="original-price">${{ promotionInfo.originalPrice }}</span>
+                  <span class="original-price">${{ promotionInfo.basePrice }}</span>
                 </div>
                 <div v-else>
                   <span class="price">${{ goods.price }}</span>
@@ -102,7 +105,7 @@ onMounted(() => {
               <dl>
                 <dt>Promotion</dt>
                 <dd>
-                  <span v-if="promotionInfo.discountRate" class="promotion-tag">
+                  <span v-if="promotionInfo" class="promotion-tag">
                     {{ promotionInfo.discountRate }}% Discount
                     <span class="valid-date">(Valid for {{ promotionInfo.validUntil }} more days)</span>
                   </span>

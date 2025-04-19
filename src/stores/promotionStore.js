@@ -10,13 +10,9 @@ export const usePromotionStore = defineStore('promotion', {
   }),
   actions: {
     async fetchPromotions() {
-      try {
         const res = await getActivePromotions()
         this.promotions = res.promotions
         this.total = res.total
-      } catch (error) {
-        console.error('Failed to fetch promotions:', error)
-      }
     },
     filterPromotions() {
       if (!this.searchKeyword.trim()) return this.promotions

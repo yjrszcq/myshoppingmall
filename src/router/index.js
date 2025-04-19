@@ -23,66 +23,14 @@ import Address from "@/views/Member/Components/address.vue"
 import Collection from "@/views/Member/Components/collection.vue"
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  // path和component对应关系的位置
   routes: [
     {
       path: "/",
       component: Layout,
       children: [
         {
-
           path: "",
           component: Home,
-        },
-                {
-                    path:'detail/:id',
-                    component: Detail,
-                },
-                {
-                    path:'search',
-                    component: Search,
-                },
-                {
-                    path:'cart',
-                    component: Cart,
-                },
-                {
-                    path:'checkout',
-                    component: Checkout,
-                },
-                {
-                    path:'payment',
-                    component: Payment,
-                },
-                {
-                    path:'bank-info',
-                    component: BankInfo,
-                },
-                //会员中心
-                {
-                    name: 'member',
-                    path: 'member',
-                    component: Member,
-                    children:[
-                        {
-                            path:'',
-                            component:UserInfo,
-                        },
-                        {
-                            path:'order',
-                            component:UserOrder,
-                        },
-                        {
-                            path:'address',
-                            component:Address,
-                        },
-                        {
-                            path:'Collection',
-                            component:Collection,
-                        },
-                    ]
-                }
-            ]
         },
         {
           path: "detail/:id",
@@ -108,7 +56,7 @@ const router = createRouter({
           path: "bank-info",
           component: BankInfo,
         },
-        //会员中心
+        // 会员中心
         {
           name: "member",
           path: "member",
@@ -125,6 +73,10 @@ const router = createRouter({
             {
               path: "address",
               component: Address,
+            },
+            {
+              path: "collection", // 小写统一风格
+              component: Collection,
             },
           ],
         },
@@ -147,20 +99,21 @@ const router = createRouter({
           component: businesshome,
         },
         {
-          path: "/product",
+          path: "product", // 改为相对路径
           component: Product,
         },
         {
-          path: "/order",
+          path: "order",
           component: Order,
         },
         {
-          path: "/dashboard",
+          path: "dashboard",
           name: "Dashboard",
           component: () => import("@/views/Dashboard/index.vue"),
         },
       ],
     },
-);
+  ],
+});
 
 export default router;

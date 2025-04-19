@@ -3,9 +3,14 @@ import {ref, onMounted} from "vue";
 import {useRoute} from "vue-router";
 import {getProductById} from "@/apis/detail.js";
 import ImageView from "@/components/imageView/index.vue";
+
+//import { picture } from '@element-plus/icons-vue/dist/types'
+import Evaluate from "@/views/Detail/evaluate.vue";
+
 import {useCartStore} from "@/stores/cartStore";
 import {usePromotionInfoStore} from '@/stores/promotionInfoStore';
 import {getPromotionByProductId} from '@/apis/promotionInfo.js';
+
 
 const promotionInfoStore = usePromotionInfoStore();
 const cartStore = useCartStore();
@@ -147,6 +152,10 @@ onMounted(() => {
           </div>
         </div>
       </div>
+
+
+      <!-- 评价 -->
+      <Evaluate />
     </div>
   </div>
 </template>
@@ -361,4 +370,19 @@ onMounted(() => {
     }
   }
 }
+
+.btn {
+  margin-top: 20px;
+}
+
+.number {
+  margin-top: 15px;
+}
+
+.bread-container {
+  padding: 25px 0;
+}
+
+
 </style>
+

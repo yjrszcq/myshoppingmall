@@ -17,6 +17,7 @@ import Checkout from "@/views/Checkout/index.vue";
 import Member from "@/views/Member/index.vue";
 import UserOrder from "@/views/Member/Components/UserOrder.vue";
 import UserInfo from "@/views/Member/Components/UserInfo.vue";
+
 import Payment from "@/views/Payment/index.vue"
 import BankInfo from "@/views/BankInfo/index.vue"
 import Address from "@/views/Member/Components/address.vue"

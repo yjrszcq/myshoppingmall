@@ -18,45 +18,13 @@ interface Comment {
 // 模拟更多的评论数据
 const allComments = ref<Comment[]>([]);
 
-const newComment = ref("");
+
 const form = ref({
   comment: "",
   rating: 0,
 });
 
-const submitComment = async () => {
-  if (!form.value.comment.trim()) {
-    ElMessage.warning("请输入评论内容");
-    return;
-  }
-   // 检查评分是否大于0
-   if (form.value.rating <= 0) {
-    ElMessage.warning("请选择评价星级");
-    return;
-  }
-  try {
-    const res = await submitEvaluate({
-      productId: route.params.id,
-      ...form.value,
-    });
-    console.log(res);
-    ElMessage.success("评论成功");
-  } catch (error) {
-    ElMessage.error("无评论权限（或订单不存在）");
-  }
 
-  // const comment: Comment = {
-  //   id: comments.value.length + 1,
-  //   username: "当前用户",
-  //   content: newComment.value,
-  //   date: new Date().toISOString().split("T")[0],
-  //   avatar: "https://placekitten.com/43/43",
-  // };
-
-  // comments.value.push(comment);
-  // newComment.value = "";
-  // ElMessage.success("评论发布成功");
-};
 
 // 分页相关
 const currentPage = ref(1);
@@ -84,7 +52,9 @@ const getEvaluates = async () => {
     page: currentPage.value,
     limit: pageSize.value,
   });
-  console.log(res.reviews[0]);
+
+  console.log(res);
+
   total.value = res.total;
   allComments.value = res.reviews;
 };
@@ -93,7 +63,9 @@ getEvaluates();
 
 <template>
   <div class="comment-section">
-    <h2 class="comment-title">用户评价</h2>
+
+    <h2 class="comment-title">COMMENTS</h2>
+
 
     <!-- 评论列表 -->
     <div class="comments-list">
@@ -112,7 +84,9 @@ getEvaluates();
         <div class="comment-content">
           {{ comment.comment }}
         </div>
-        <el-rate disabled />
+
+        <el-rate :model-value="comment.rating" disabled />
+
       </el-card>
     </div>
 
@@ -128,20 +102,7 @@ getEvaluates();
       />
     </div>
 
-    <!-- 评论输入框 -->
-    <div class="comment-input">
-      <el-input
-        v-model="form.comment"
-        type="textarea"
-        :rows="4"
-        placeholder="请输入您的评价..."
-        resize="none"
-      />
-      <el-rate v-model="form.rating" />
-      <div class="submit-button">
-        <el-button type="primary" @click="submitComment">评价</el-button>
-      </div>
-    </div>
+
   </div>
 </template>
 

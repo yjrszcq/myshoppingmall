@@ -24,10 +24,11 @@
           >
             <el-button size="small">Upload Image</el-button>
           </el-upload>
+
         </div>
         <el-image
             v-if="scope.row.image"
-            :src="scope.row.image"
+            :src="`/uploads/${scope.row.image}`"
             class="product-image"
         ></el-image>
       </template>

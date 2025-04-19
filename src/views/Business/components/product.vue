@@ -97,11 +97,13 @@ const handleImageUpload = async ({ file, productId }) => {
 
   try {
     const res = await uploadImageAPI(productId, formData)
+    console.log(res,"image");
     if (res.imagePath) {
       // 更新对应商品的图片
       const product = products.value.find(p => p.productId === productId)
       if (product) {
         product.image = res.imagePath
+        console.log(product,"product")
       }
       ElMessage.success('Image uploaded successfully')
     } else {

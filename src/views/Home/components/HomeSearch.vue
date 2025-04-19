@@ -26,6 +26,7 @@ const fetchProducts = async () => {
       limit: limit.value,
       sort: sort.value
     });
+    console.log(res,"searchProducts");
     products.value = res.results;
     total.value = res.total;
   } catch (error) {

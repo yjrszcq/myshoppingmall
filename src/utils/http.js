@@ -5,6 +5,7 @@ import {useUserstore} from "@/stores/user.js";
 import {config} from "@/utils/config.js"
 
 const httpInstance = axios.create({
+
     baseURL: config.http.baseURL, // 使用配置中的 baseURL
     timeout: config.http.timeout  // 使用配置中的 timeout
 });
@@ -23,11 +24,8 @@ httpInstance.interceptors.request.use(config => {
 
 //axios响应式拦截器
 httpInstance.interceptors.response.use(res => res.data,e =>{
-    //统一警告
-    ElMessage({
-        type:'warning',
-        message:e.message,
-    })
+    //在控制台打印警告
+    console.log(e.message,"error")
     return Promise.reject(e)
 })
 

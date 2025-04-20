@@ -6,7 +6,6 @@ import { logoutapi } from "@/apis/login.js";
 const Userstore = useUserstore();
 const router = useRouter();
 
-
 const goToBusiness = () => {
   Userstore.clearUserInfo()
   router.push({ path: '/loginbusiness' });
@@ -22,6 +21,11 @@ const confirm = async () =>{
   Userstore.clearUserInfo();
   router.push({ path: '/login'});
 }
+
+// 跳转促销页面
+const goToPromotion = () =>{
+  router.push({ path: '/promotion'});
+}
 </script>
 
 <template>
@@ -30,7 +34,7 @@ const confirm = async () =>{
       <ul>
 <!--        多模板渲染，区分登录和未登录-->
         <template v-if="Userstore.userInfo.sessionId">
-          <li><a href="javascript:;" @click="goToUser"><i class="iconfont icon-user"></i>{{ Userstore.userInfo.userAccount }}</a></li>
+          <li><a  @click="goToUser"><i class="iconfont icon-user"></i>{{ Userstore.userInfo.userAccount }}</a></li>
           <li>
 
             <el-popconfirm @confirm="confirm" title="Are you sure?" confirm-button-text="yes" cancel-button-text="no">
@@ -39,16 +43,16 @@ const confirm = async () =>{
               </template>
             </el-popconfirm>
           </li>
-          <li><a href="javascript:;" @click="goToUser">Member Center</a></li>
-          <li><a href="javascript:;" @click="$router.push('/cart')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
+          <li><a  @click="goToUser">Member Center</a></li>
+          <li><a  @click="$router.push('/cart')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
           <li><a href="https://space.bilibili.com/1265680561">About us</a></li>
         </template>
         <template v-else>
-          <li><a href="javascript:;" @click="$router.push('/login')">log in</a></li>
-          <li><a href="javascript:;" @click="$router.push('/login')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
-<!--          <li><a href="javascript:;">Help Center</a></li>-->
+          <li><a  @click="$router.push('/login')">log in</a></li>
+          <li><a  @click="$router.push('/login')"><i class="iconfont icon-cart" ></i>Shopping cart</a></li>
+          <li><a >Help Center</a></li>
           <li><a href="https://space.bilibili.com/1265680561">About us</a></li>
-          <li><a href="javascript:;" @click="goToBusiness">Merchant Edition</a></li>
+          <li><a  @click="goToBusiness">Merchant Edition</a></li>
 
         </template>
       </ul>

@@ -10,7 +10,8 @@ import Evaluate from "@/views/Detail/evaluate.vue";
 import {useCartStore} from "@/stores/cartStore";
 import {usePromotionInfoStore} from '@/stores/promotionInfoStore';
 import {getPromotionByProductId} from '@/apis/promotionInfo.js';
-
+import {Star, StarFilled} from "@element-plus/icons-vue";
+import {useCollectionStore} from "@/stores/collectionStore.js";
 
 const promotionInfoStore = usePromotionInfoStore();
 const cartStore = useCartStore();
@@ -19,6 +20,7 @@ const goods = ref({});
 const promotionInfo = ref({});
 const quantity = ref(1);
 const route = useRoute();
+const collectionStore = useCollectionStore();
 
 const updateQuantity = (itemId, quantity) => {
   cartStore.updateCartItemQuantity(itemId, quantity);
@@ -91,8 +93,16 @@ onMounted(() => {
 
           <div class="spec">
             <h1 class="g-name">{{ goods.name }}</h1>
+            <el-button
+                    :icon="collectionStore.isCollected(goods.productId) ? StarFilled : Star"
+                    circle
+                    @click="collectionStore.toggleCollection(goods.productId)"
+                    :loading="collectionStore.loading"
+                    :type="collectionStore.isCollected(goods.productId) ? 'warning' : ''"
+                    class="collect-btn"
+            />
             <p class="g-desc">{{ goods.desc }}</p>
-
+            
             <div class="price-section">
               <div class="g-price">
                 <div v-if="promotionInfo" class="discounted-price">

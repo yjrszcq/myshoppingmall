@@ -98,28 +98,6 @@ const handleCancelOrder = async (orderId) => {
   }
 }
 
-// 接受订单
-// const handleAcceptOrder = async (orderId) => {
-//   try {
-//     await ElMessageBox.confirm(
-//         '确认接受订单？',
-//         '确认',
-//         {
-//           confirmButtonText: '确认',
-//           cancelButtonText: '取消',
-//           type: 'success',
-//         }
-//     )
-//     await store.manageOrderAPI(orderId, 'accept')
-//     ElMessage.success('订单已接受')
-//     getOrders()
-//   } catch (error) {
-//     if (error !== 'cancel') {
-//       ElMessage.error('接受订单失败')
-//     }
-//   }
-// }
-
 // 组件加载时获取订单
 onMounted(() => {
   getOrders()

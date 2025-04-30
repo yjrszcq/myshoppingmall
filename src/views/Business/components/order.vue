@@ -162,6 +162,28 @@ onMounted(() => {
                 </div>
               </div>
 
+              <div class="shipping-info" v-if="order.city || order.address || order.postalCode">
+                <h4 class="info-title">Shipping Information</h4>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">City:</span>
+                    <span class="info-value">{{ order.city }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Address:</span>
+                    <span class="info-value">{{ order.address }}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">Postal Code:</span>
+                    <span class="info-value">{{ order.postalCode }}</span>
+                  </div>
+                  <div class="info-item" v-if="order.trackingNumber && (order.status === 'shipping' || order.status === 'finished')">
+                    <span class="info-label">Tracking Number:</span>
+                    <span class="info-value">{{ order.trackingNumber }}</span>
+                  </div>
+                </div>
+              </div>
+
               <div class="action-buttons">
 
                 <el-button
@@ -315,6 +337,45 @@ onMounted(() => {
 .product-list {
   margin-bottom: 16px;
 }
+
+.shipping-info {
+  margin: 16px 0;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+
+  .info-title {
+    color: #e23d7d;
+    margin-bottom: 12px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .info-item {
+    display: flex;
+    align-items: center;
+  }
+
+  .info-label {
+    font-weight: 500;
+    color: #666;
+    margin-right: 8px;
+    min-width: 100px;
+  }
+
+  .info-value {
+    color: #333;
+    word-break: break-word;
+  }
+}
+
 
 .product-item {
   display: flex;

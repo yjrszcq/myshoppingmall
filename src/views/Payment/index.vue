@@ -144,8 +144,19 @@ const processPayment = async (cartStore) => {
     }
 
     // 1. 提交支付请求
-    await submitPayment(orderId)
+    const html =  await submitPayment(orderId)
     ElMessage.success('load...')
+
+    // 创建一个新的标签页，html为支付页面的HTML内容
+    const newTab = window.open('', '_blank')
+    if (newTab) {
+      newTab.document.writeln(html)
+      newTab.document.close()
+    } else {
+      ElMessage.error('Unable to open payment page, please check your browser settings')
+      return
+    }
+
 
     // 2. 轮询查询支付状态
     const checkStatus = async () => {

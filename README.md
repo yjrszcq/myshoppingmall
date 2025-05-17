@@ -37,6 +37,10 @@ node v20.15.0  ***请不要低于19，否则可能会引发未知错误***
 * 评论（✔️）
 * 收藏（✔️）
 
+## VERSION 3
+* MVP修复（✔️）
+* 支付宝支付页面支持（✔️shenyaoguan）
+
 
 ## Recommended IDE Setup
 
